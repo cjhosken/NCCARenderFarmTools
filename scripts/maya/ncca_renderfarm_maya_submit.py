@@ -222,11 +222,16 @@ If this is not correct the renders will fail""")
         except subprocess.CalledProcessError as e:
             QtWidgets.QMessageBox.critical(self, "Render Submission Failed", f"Failed to submit render job.\nError: {e}")
 
+def main():
+    try:
+        if os.environ.get("QB_SUPERVISOR") is None :
+            os.environ["QB_SUPERVISOR"]="tete.bournemouth.ac.uk"
+            os.environ["QB_DOMAIN"]="ncca"
 
-if os.environ.get("QB_SUPERVISOR") is None :
-    os.environ["QB_SUPERVISOR"]="tete.bournemouth.ac.uk"
-    os.environ["QB_DOMAIN"]="ncca"
+        main_window = get_main_window()
+        dialog = RenderFarmSubmitDialog(main_window)
+        dialog.show()
+    except Exception as e:
+       cmds.confirmDialog(title="NCCA Renderfarm Tool Error", message=f"Uh oh! An error occurred. Please contact the NCCA team if this issue persists.\n\n {e}", button=["Ok"])
 
-main_window = get_main_window()
-dialog = RenderFarmSubmitDialog(main_window)
-dialog.show()
+main()

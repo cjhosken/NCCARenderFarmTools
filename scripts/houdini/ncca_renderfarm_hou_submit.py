@@ -1,6 +1,4 @@
 import os
-import platform
-import sys
 import subprocess
 import tempfile
 
@@ -8,6 +6,7 @@ import hou
 from PySide2 import QtCore, QtWidgets
 
 class RenderFarmSubmitDialog(QtWidgets.QDialog):
+    """"""
     def __init__(self, parent=None):
         super().__init__(parent)
         # Move to Build mode
@@ -91,7 +90,7 @@ class RenderFarmSubmitDialog(QtWidgets.QDialog):
         # row 4
         # cancel button
 
-        self.Cancel = QtWidgets.QPushButton("Cancel", self)
+        self.Cancel = QtWidgets.QPushButton("Close", self)
         self.Cancel.setToolTip("Close the submit dialog")
         self.Cancel.clicked.connect(self.close)
         self.gridLayout.addWidget(self.Cancel, 4, 0, 1, 1)
@@ -197,11 +196,19 @@ print(id_list)
                 self.end_frame.setValue(int(frame_values[1]))
                 self.by_frame.setValue(int(frame_values[2]))
         
-if os.environ.get("QB_SUPERVISOR") is None :
-    os.environ["QB_SUPERVISOR"]="tete.bournemouth.ac.uk"
-    os.environ["QB_DOMAIN"]="ncca"
-    
-dialog = RenderFarmSubmitDialog()
-dialog.setWindowFlags(QtCore.Qt.Tool | QtCore.Qt.WindowStaysOnTopHint)
-dialog.setParent(hou.qt.mainWindow(), QtCore.Qt.Window)
-dialog.show()
+
+
+def main():
+    try:
+        if os.environ.get("QB_SUPERVISOR") is None :
+            os.environ["QB_SUPERVISOR"]="tete.bournemouth.ac.uk"
+            os.environ["QB_DOMAIN"]="ncca"
+            
+        dialog = RenderFarmSubmitDialog()
+        dialog.setWindowFlags(QtCore.Qt.Tool | QtCore.Qt.WindowStaysOnTopHint)
+        dialog.setParent(hou.qt.mainWindow(), QtCore.Qt.Window)
+        dialog.show()
+    except Exception as e:
+        hou.ui.displayMessage(title="NCCA Renderfarm Tool Error", severity=hou.severityType.Error, details=f"{e}", text="Uh oh! An error occurred. Please contact the NCCA team if this issue persists.")
+
+main()

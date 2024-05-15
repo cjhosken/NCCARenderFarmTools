@@ -67,7 +67,7 @@ global proc shelf_NCCAMaya () {
         -style "iconOnly" 
         -marginWidth 0
         -marginHeight 1
-        -command "exec(open('/home/cjhosken/Documents/programming/NCCARenderFarmTools/scripts/ncca_renderfarm_cubeui.py').read())" 
+        -command "exec(open('/home/cjhosken/Documents/programming/NCCARenderFarmTools/scripts/maya/ncca_renderfarm_maya_cubeui.py').read())" 
         -sourceType "python" 
         -commandRepeatable 1
         -flat 1
