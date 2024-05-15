@@ -24,8 +24,6 @@ class RenderFarmSubmitDialog(QtWidgets.QDialog):
         self.gridLayout = QtWidgets.QGridLayout(self)
         self.home_dir = os.environ.get("HOME")
         self.user = os.environ.get("USER")
-        
-        time_line = OMA.MAnimControl()
 
         self.min_frame = int(cmds.playbackOptions(query=True, animationStartTime=True))
         self.max_frame = int(cmds.playbackOptions(query=True, animationEndTime=True))
