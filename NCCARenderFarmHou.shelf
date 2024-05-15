@@ -6,10 +6,13 @@
   </toolshelf>
 
   <tool name="ncca_submit_renderfarm_job" label="Submit Job" icon="TOP_commandserver">
-    <script scriptType="python" path="/home/s5605094/Programming/NCCARenderFarmTools/scripts/houdini/ncca_renderfarm_hou_submit.py"/>
+    <script scriptType="python"><![CDATA[exec(open('/home/s5605094/Programming/NCCARenderFarmTools/scripts/houdini/ncca_renderfarm_hou_submit.py').read())]]>
+    </script>
   </tool>
 
   <tool name="ncca_qubeui" label="Qube UI" icon="MISC_control_panel">
-    <script scriptType="python" path="/home/s5605094/Programming/NCCARenderFarmTools/scripts/ncca_renderfarm_cubeui.py"/>
+    <script scriptType="python">
+    <![CDATA[exec(open('/home/s5605094/Programming/NCCARenderFarmTools/scripts/ncca_renderfarm_cubeui.py').read())]]>
+    </script>
   </tool>
 </shelfDocument>

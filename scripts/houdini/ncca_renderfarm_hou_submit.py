@@ -203,6 +203,7 @@ print(id_list)
 if os.environ.get("QB_SUPERVISOR") is None :
     os.environ["QB_SUPERVISOR"]="tete.bournemouth.ac.uk"
     os.environ["QB_DOMAIN"]="ncca"
+    
 dialog = RenderFarmSubmitDialog()
 dialog.setWindowFlags(QtCore.Qt.Tool | QtCore.Qt.WindowStaysOnTopHint)
 dialog.setParent(hou.qt.mainWindow(), QtCore.Qt.Window)
