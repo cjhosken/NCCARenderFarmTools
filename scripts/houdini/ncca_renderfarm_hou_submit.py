@@ -7,8 +7,6 @@ import tempfile
 import hou
 from PySide2 import QtCore, QtWidgets
 
-
-
 class RenderFarmSubmitDialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -90,7 +88,6 @@ class RenderFarmSubmitDialog(QtWidgets.QDialog):
         If this is not correct the renders will fail""")
         self.gridLayout.addWidget(self.farm_location, 3, 1, 1, 5)
    
-
         # row 4
         # cancel button
 
