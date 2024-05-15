@@ -1,9 +1,13 @@
 import subprocess
+import sys
 import maya.cmds as cmds
+
+sys.path.append('/home/cjhosken/Documents/programming/NCCARenderFarmTools')
+from NCCARenderFarmTools import TEST
 
 def main():
     try:
-        result = subprocess.call("unset PYTHONHOME;  /public/bin/2023/goQube &")
+        result = subprocess.call("unset PYTHONHOME;  /public/bin/2023/goQube &", shell=True)
         if result != 0:
             raise subprocess.CalledProcessError(result, "unset PYTHONHOME;  /public/bin/2023/goQube &")
     except Exception as e:
