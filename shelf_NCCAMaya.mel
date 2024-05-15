@@ -1,4 +1,4 @@
-global proc shelf_NCCARenderFarmMaya () {
+global proc shelf_NCCAMaya () {
     global string $gBuffStr;
     global string $gBuffStr0;
     global string $gBuffStr1;
