@@ -1,4 +1,4 @@
-global proc shelf_NCCAMaya () {
+global proc shelf_NCCA () {
     global string $gBuffStr;
     global string $gBuffStr0;
     global string $gBuffStr1;
@@ -14,12 +14,12 @@ global proc shelf_NCCAMaya () {
         -manage 1
         -visible 1
         -preventOverride 0
-        -annotation "Launch Render Farm Tool" 
+        -annotation "Submit Renderfarm Job" 
         -enableBackground 0
         -backgroundColor 0 0 0 
         -highlightColor 0.321569 0.521569 0.65098 
         -align "center" 
-        -label "RenderFarmSubmit" 
+        -label "Submit Renderfarm Job" 
         -labelOffset 0
         -rotation 0
         -flipX 0
@@ -48,12 +48,12 @@ global proc shelf_NCCAMaya () {
         -manage 1
         -visible 1
         -preventOverride 0
-        -annotation "Launch Qube" 
+        -annotation "Launch Qube UI" 
         -enableBackground 0
         -backgroundColor 0 0 0 
         -highlightColor 0.321569 0.521569 0.65098 
         -align "center" 
-        -label "Qube" 
+        -label "Qube UI" 
         -labelOffset 0
         -rotation 0
         -flipX 0
