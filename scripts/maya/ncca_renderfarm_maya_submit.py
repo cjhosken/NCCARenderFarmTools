@@ -223,7 +223,7 @@ class RenderFarmSubmitDialog(QtWidgets.QDialog):
         file_location_command = farm_path + file_location_command
 
         submit_command = [
-            "Render",
+            "/opt/autodesk/maya2023/bin/Render",
             "-r", renderer_command,
             "-s", start_frame_command,
             "-e", end_frame_command,
@@ -269,7 +269,7 @@ job['name'] = f"{self.project_name.text()}"
 job['prototype'] = 'cmdrange'
 package = {{}}
 package['shell']="/bin/bash"
-pre_render="export PATH=/opt/autodesk/maya2023/bin:$PATH; export PATH=/opt/autodesk/arnold/maya2023/:$PATH;export MAYA_PLUG_IN_PATH=/opt/ChaosGroup/V-Ray/Maya2023-x64/maya_vray/plug-ins/:/opt/autodesk/arnold/maya2023/plug-ins/:$MAYA_PLUG_IN_PATH;"
+pre_render="export PATH=/opt/autodesk/arnold/maya2023/bin/:$PATH;"
 render_command=f"{qb_command}"
 package['cmdline']=f"{{pre_render}} {{render_command}}"
         

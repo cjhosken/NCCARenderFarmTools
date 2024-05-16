@@ -1,6 +1,7 @@
 import bpy
 import os
 import subprocess
+import tempfile
 
 bl_info = {
     "name": "NCCA Tools for Blender",
@@ -12,7 +13,6 @@ bl_info = {
     "category": "System",
 }
 
-from .ncca_renderfarm_blend_payload import NCCA_RenderFarm_submit_job
 
 class VIEW3D_PT_NCCA_ToolsPanel(bpy.types.Panel):
     bl_space_type = "VIEW_3D"
@@ -70,20 +70,15 @@ class NCCA_SubmitRenderJobOperator(bpy.types.Operator):
     Num CPUs: {self.num_cpus}
     Farm Locaion: {farm_location_command}
                   """)
-            NCCA_RenderFarm_submit_job(
-                self.project_name,
-                self.frame_start,
-                self.frame_end,
-                self.frame_step,
-                self.num_cpus,
-                farm_location_command,
-                user_name
-            )
+        
+            self.submit_job()
         except Exception as e:
             show_message_box(title="NCCA Tool Error", message=f"Uh oh! An error occurred. Please contact the NCCA team if this issue persists.\n\n {e}", icon="ERROR")
             return {"CANCELLED"}
         
         return {"FINISHED"}
+    
+    
     
     def invoke(self, context, event):
         file_path = bpy.data.filepath
@@ -109,6 +104,65 @@ class NCCA_SubmitRenderJobOperator(bpy.types.Operator):
         layout.prop(self, "frame_end", text="Frame End")
         layout.prop(self, "frame_step", text="By Frame")
         layout.prop(self, "farm_location", text="Farm Location")
+
+    def submit_job(self):
+        file_path = bpy.data.filepath
+        user_name = get_user_name(file_path)
+
+        range=f"{self.frame_start}-{self.frame_end}x{self.frame_step}"
+
+        farm_location_command = f"/render/{user_name}/{self.farm_location}"
+
+        payload=f"""
+import os
+import sys
+sys.path.insert(0,"/public/devel/2022/pfx/qube/api/python")
+
+import qb
+if os.environ.get("QB_SUPERVISOR") is None :
+    os.environ["QB_SUPERVISOR"]="tete.bournemouth.ac.uk"
+    os.environ["QB_DOMAIN"]="ncca"
+
+job = {{}}
+job['name'] = f"{self.project_name}"
+job['prototype'] = 'cmdrange'
+package = {{}}
+package['shell']="/bin/bash"
+pre_render=""
+render_command=f"blender -b {farm_location_command} -f QB_FRAME_NUMBER -E CYCLES"
+package['cmdline']=f"{{pre_render}} {{render_command}}"
+        
+job['package'] = package
+job['cpus'] = {self.num_cpus}
+   
+env={{"HOME" :f"/render/{user_name}",  
+            "SESI_LMHOST" : "lepe.bournemouth.ac.uk",
+            "PIXAR_LICENSE_FILE" : "9010@talavera.bournemouth.ac.uk",            
+            }}
+job['env']=env
+
+agendaRange = f'{range}'  
+agenda = qb.genframes(agendaRange)
+
+job['agenda'] = agenda
+        
+listOfJobsToSubmit = []
+listOfJobsToSubmit.append(job)
+listOfSubmittedJobs = qb.submit(listOfJobsToSubmit)
+id_list=[]
+for job in listOfSubmittedJobs:
+    print(job['id'])
+    id_list.append(job['id'])
+
+print(id_list)
+"""
+        with tempfile.TemporaryDirectory() as tmpdirname:
+            with open(tmpdirname+"/payload.py","w") as fp :
+                fp.write(payload)
+
+            output=subprocess.run(["/usr/bin/python3",f"{tmpdirname}/payload.py"],capture_output=True,env={})
+            ids=output.stdout.decode("utf-8") 
+            show_message_box(message=f"{self.project_name} has been successfully added to the NCCA Renderfarm! \nID: {ids}",title="NCCA Tools", icon="INFO")
     
 class NCCA_OpenQubeUIOperator(bpy.types.Operator):
     bl_idname = "ncca.open_qubeui"
@@ -147,6 +201,7 @@ def get_user_name(file_path):
     return None
 
 
+
 classes = [VIEW3D_PT_NCCA_ToolsPanel, NCCA_SubmitRenderJobOperator, NCCA_OpenQubeUIOperator]
 
 def register():
@@ -159,3 +214,4 @@ def unregister():
 
 if __name__ == "__main__":
     register()
+
