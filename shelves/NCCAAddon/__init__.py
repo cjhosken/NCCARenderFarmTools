@@ -48,12 +48,12 @@ class NCCA_SubmitRenderJobOperator(bpy.types.Operator):
         user_name = get_user_name(file_path)
 
         # Check for a project name
-        if (self.project_name is None or len(self.project_name) == 0):
+        if (not self.project_name):
             show_message_box(title="NCCA Tool Error", message=f"Please specify a project name!", icon="ERROR")
             return {"CANCELLED"}
 
         # Check for a valid farm location path. TODO: GET IT CONNECTED TO SFTP://TETE
-        if (self.farm_location is None or len(self.farm_location) == 0):
+        if (not self.farm_location):
             show_message_box(title="NCCA Tool Error", message=f"Please specify a valid farm path!", icon="ERROR")
             return {"CANCELLED"}
 
