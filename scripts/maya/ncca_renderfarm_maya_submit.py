@@ -76,7 +76,6 @@ class RenderFarmSubmitDialog(QtWidgets.QDialog):
         row += 1
         label = QtWidgets.QLabel("Project Name")
         self.gridLayout.addWidget(label, row, 0, 1, 1)
-        name = cmds.workspace(q=True, sn=True)
         self.project_name = QtWidgets.QLineEdit(f"{self.user}_{self.file_name}", self)
         self.project_name.setToolTip("The name of the project as it will appear on the Qube UI.")
         self.gridLayout.addWidget(self.project_name, row, 1, 1, 5)
@@ -245,13 +244,69 @@ class RenderFarmSubmitDialog(QtWidgets.QDialog):
         submit_command.append(file_location_command)
 
         print(f"NCCA Tools: Submitting render job with command: {submit_command}")
-        self.run_submission(submit_command)
+        self.submit_job(submit_command)
         super().accept()
 
-    def run_submission(self, command):
+
+    def submit_job(self, submit_command):
+
+        range=f"{self.start_frame.value()}-{self.end_frame.value()}x{self.by_frame.value()}"
+
+        qb_command = " ".join(submit_command)
+
+        payload=f"""
+import os
+import sys
+sys.path.insert(0,"/public/devel/2022/pfx/qube/api/python")
+
+import qb
+if os.environ.get("QB_SUPERVISOR") is None :
+    os.environ["QB_SUPERVISOR"]="tete.bournemouth.ac.uk"
+    os.environ["QB_DOMAIN"]="ncca"
+
+job = {{}}
+job['name'] = f"{self.project_name.text()}"
+job['prototype'] = 'cmdrange'
+package = {{}}
+package['shell']="/bin/bash"
+pre_render="export PATH=/opt/autodesk/maya2023/bin:$PATH; export PATH=/opt/autodesk/arnold/maya2023/:$PATH;export MAYA_PLUG_IN_PATH=/opt/ChaosGroup/V-Ray/Maya2023-x64/maya_vray/plug-ins/:/opt/autodesk/arnold/maya2023/plug-ins/:$MAYA_PLUG_IN_PATH;"
+render_command=f"{qb_command}"
+package['cmdline']=f"{{pre_render}} {{render_command}}"
+        
+job['package'] = package
+job['cpus'] = {self.cpus.currentText()}
+   
+env={{"HOME" :f"/render/{self.user}",  
+            "SESI_LMHOST" : "lepe.bournemouth.ac.uk",
+            "PIXAR_LICENSE_FILE" : "9010@talavera.bournemouth.ac.uk",            
+            }}
+job['env']=env
+
+agendaRange = f'{range}'  
+agenda = qb.genframes(agendaRange)
+
+job['agenda'] = agenda
+        
+listOfJobsToSubmit = []
+listOfJobsToSubmit.append(job)
+listOfSubmittedJobs = qb.submit(listOfJobsToSubmit)
+id_list=[]
+for job in listOfSubmittedJobs:
+    print(job['id'])
+    id_list.append(job['id'])
+
+print(id_list)
+"""
         try:
-            subprocess.run(command, check=True)
-        except subprocess.CalledProcessError as e:
+            with tempfile.TemporaryDirectory() as tmpdirname:
+                with open(tmpdirname+"/payload.py","w") as fp :
+                    fp.write(payload)
+
+                output=subprocess.run(["/usr/bin/python3",f"{tmpdirname}/payload.py"],capture_output=True,env={})
+                ids=output.stdout.decode("utf-8") 
+                cmds.confirmDialog(message=f"{self.project_name.text()} has been successfully added to the NCCA Renderfarm! \nID: {ids}",button=["Ok"],title="NCCA Tools")
+            self.done(0)
+        except Exception as e:
             cmds.confirmDialog(title="NCCA Tool Error", message=f"Render Submission Failed! Please check your submission settings and try again. Please contact the NCCA team if this issue persists.\n\n {e}", button=["Ok"])
 
 

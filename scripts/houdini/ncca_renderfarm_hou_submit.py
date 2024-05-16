@@ -5,6 +5,7 @@ import tempfile
 import hou
 from PySide2 import QtCore, QtWidgets
 
+
 class RenderFarmSubmitDialog(QtWidgets.QDialog):
     """"""
     def __init__(self, parent=None):
@@ -79,8 +80,10 @@ class RenderFarmSubmitDialog(QtWidgets.QDialog):
         self.location_button.setToolTip("Select the file to render, not this must be on the farm mount")
         self.gridLayout.addWidget(self.location_button,3,0,1,1)
         self.location_button.clicked.connect(self.set_farm_location)
+        
         base_path=hou.hipFile.path().split("/")[-2]
-        location=f"/render/{self.user}/{base_path}/{hou.hipFile.basename()}"
+
+        location=f"{base_path}/{hou.hipFile.basename()}"
         self.farm_location = QtWidgets.QLineEdit(location, self)
         self.farm_location.setToolTip("""This is the full path to the hip file on the farm, you can enter this manually or press the button to select.
         If the farm is mounted on /render you can navigate to here and select the file. If not you must specify the full path and name manually. 
@@ -104,7 +107,13 @@ class RenderFarmSubmitDialog(QtWidgets.QDialog):
         self.gridLayout.addWidget(self.submit, 4, 5, 1, 1)
 
 
-    def submit_job(self) :
+    def submit_job(self):
+        self.farm_path = f"/render/{self.user}/"
+
+        farm_location_command = self.farm_path + self.farm_location.text()
+
+
+
         range=f"{self.start_frame.value()}-{self.end_frame.value()}x{self.by_frame.value()}"
         payload=f"""
 import os
@@ -123,7 +132,7 @@ job['prototype'] = 'cmdrange'
 package = {{}}
 package['shell']="/bin/bash"
 pre_render="cd /opt/software/hfs19.5.605/; source houdini_setup_bash; "
-render_command=f"hython $HB/hrender.py -e -F QB_FRAME_NUMBER -R -d {self.output_driver.text()} {self.farm_location.text()}"
+render_command=f"hython $HB/hrender.py -e -F QB_FRAME_NUMBER -R -d {self.output_driver.text()} {farm_location_command}"
 package['cmdline']=f"{{pre_render}} {{render_command}}"
         
 job['package'] = package

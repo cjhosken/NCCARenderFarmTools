@@ -12,6 +12,8 @@ bl_info = {
     "category": "System",
 }
 
+from .ncca_renderfarm_blend_payload import NCCA_RenderFarm_submit_job
+
 class VIEW3D_PT_NCCA_ToolsPanel(bpy.types.Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
@@ -48,14 +50,16 @@ class NCCA_SubmitRenderJobOperator(bpy.types.Operator):
         user_name = get_user_name(file_path)
 
         # Check for a project name
-        if (not self.project_name):
+        if (self.project_name is None or len(self.project_name) == 0):
             show_message_box(title="NCCA Tool Error", message=f"Please specify a project name!", icon="ERROR")
             return {"CANCELLED"}
 
         # Check for a valid farm location path. TODO: GET IT CONNECTED TO SFTP://TETE
-        if (not self.farm_location):
+        if (self.farm_location is None or len(self.farm_location) == 0):
             show_message_box(title="NCCA Tool Error", message=f"Please specify a valid farm path!", icon="ERROR")
             return {"CANCELLED"}
+        
+        farm_location_command = f"/render/{user_name}/{self.farm_location}"
 
         try:
             print(f"""PAYLOAD CONTAINING DATA:
@@ -64,8 +68,17 @@ class NCCA_SubmitRenderJobOperator(bpy.types.Operator):
     Frame End: {self.frame_end}
     Frame Step: {self.frame_step}
     Num CPUs: {self.num_cpus}
-    Farm Locaion: sftp://tete{self.farm_location}
+    Farm Locaion: {farm_location_command}
                   """)
+            NCCA_RenderFarm_submit_job(
+                self.project_name,
+                self.frame_start,
+                self.frame_end,
+                self.frame_step,
+                self.num_cpus,
+                farm_location_command,
+                user_name
+            )
         except Exception as e:
             show_message_box(title="NCCA Tool Error", message=f"Uh oh! An error occurred. Please contact the NCCA team if this issue persists.\n\n {e}", icon="ERROR")
             return {"CANCELLED"}
@@ -75,7 +88,6 @@ class NCCA_SubmitRenderJobOperator(bpy.types.Operator):
     def invoke(self, context, event):
         file_path = bpy.data.filepath
         scene = bpy.context.window.scene
-        user_name = get_user_name(file_path)
 
         self.project_name = os.path.splitext(os.path.basename(file_path))[0]
 
@@ -83,8 +95,8 @@ class NCCA_SubmitRenderJobOperator(bpy.types.Operator):
         self.frame_end = scene.frame_end
         self.frame_step = scene.frame_step
 
-        if (user_name is not None):
-            self.farm_location = os.path.join("home", user_name)
+        if (self.farm_location is None):
+            self.farm_location = os.path.basename(file_path)
 
         wm = context.window_manager
         return wm.invoke_props_dialog(self)
