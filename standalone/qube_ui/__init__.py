@@ -10,4 +10,5 @@ def main():
     except Exception as e:
         print(f"Uh oh! An error occurred. Please contact the NCCA team if this issue persists.\n\n {e}")
 
-main()
+if __name__ == "__main__":
+    main()
