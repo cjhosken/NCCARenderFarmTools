@@ -1,5 +1,4 @@
 import subprocess
-import hou
 
 def main():
     try:
@@ -9,6 +8,6 @@ def main():
         if len(error) > 0:
             raise subprocess.CalledProcessError(1, error)
     except Exception as e:
-        hou.ui.displayMessage(title="NCCA Tool Error", severity=hou.severityType.Error, details=f"{e}", text="Uh oh! An error occurred. Please contact the NCCA team if this issue persists.")
+        print(f"Uh oh! An error occurred. Please contact the NCCA team if this issue persists.\n\n {e}")
 
 main()
