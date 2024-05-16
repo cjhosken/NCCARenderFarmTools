@@ -151,14 +151,14 @@ for job in listOfSubmittedJobs:
 print(id_list)
 """
         with tempfile.TemporaryDirectory() as tmpdirname:
+
             with open(tmpdirname+"/payload.py","w") as fp :
                 fp.write(payload)
+
             output=subprocess.run(["/usr/bin/python3",f"{tmpdirname}/payload.py"],capture_output=True,env={})
-            j=output.stdout.decode("utf-8") 
-            hou.ui.displayMessage(f"Job submitted to Qube, ID's {j}",buttons=("Ok",),title="Job Submitted")
-            #print(j)
-            #os.system(f"unset PYTHONHOME; /usr/bin/python3 {tmpdirname}/payload.py")
-            #os.system(f"cp {tmpdirname}/payload.py /home/jmacey/tmp")
+            ids=output.stdout.decode("utf-8") 
+            hou.ui.displayMessage(f"{self.project_name.text()} has been successfully added to the NCCA Renderfarm! \nID: {ids}",buttons=("Ok",),title="NCCA Tools")
+
         self.done(0)
     
     def closeEvent(self,event) :    
@@ -200,7 +200,7 @@ print(id_list)
 
 def main():
     try:
-        if os.environ.get("QB_SUPERVISOR") is None :
+        if os.environ.get("QB_SUPERVISOR") is None:
             os.environ["QB_SUPERVISOR"]="tete.bournemouth.ac.uk"
             os.environ["QB_DOMAIN"]="ncca"
             
