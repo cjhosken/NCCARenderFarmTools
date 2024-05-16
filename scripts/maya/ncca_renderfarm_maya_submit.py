@@ -13,11 +13,12 @@ from shiboken2 import wrapInstance
 
 RENDERER_COMMANDS = {
     "Set by file": "file",
-    "Maya Software": "ms",
-    "Maya Hardware 2.0": "mh2",
+    "Maya Software": "sw",
+    "Maya Hardware 2.0": "hw2",
     "Arnold": "arnold",
     "Renderman": "renderman",
-    "VRay": "vray"
+    "VRay": "vray",
+    "Viewport": "default"
 }
 
 FILE_EXTENSION_COMMANDS = {
@@ -62,14 +63,14 @@ class RenderFarmSubmitDialog(QtWidgets.QDialog):
         self.gridLayout.addWidget(label, row, 0, 1, 1)
         self.active_renderer = QtWidgets.QComboBox()
         self.active_renderer.addItems(RENDERER_COMMANDS)
-        self.active_renderer.setToolTip("Choose the active renderer")
+        self.active_renderer.setToolTip("The active renderer on the farm.")
         self.gridLayout.addWidget(self.active_renderer, row, 1, 1, 2)
         label = QtWidgets.QLabel("Number of CPUs")
         self.gridLayout.addWidget(label, row, 3, 1, 1)
         self.cpus = QtWidgets.QComboBox()
         self.cpus.addItems(["1", "2", "3", "4", "5", "6", "7", "8"])
         self.cpus.setCurrentIndex(1)
-        self.cpus.setToolTip("Number of nodes to use. Please be respectful of others and only use high numbers if the farm is empty")
+        self.cpus.setToolTip("Number of CPU nodes to use. Please be respectful of others and only use high numbers if the farm is empty.")
         self.gridLayout.addWidget(self.cpus, row, 4, 1, 1)
 
         row += 1
@@ -77,7 +78,7 @@ class RenderFarmSubmitDialog(QtWidgets.QDialog):
         self.gridLayout.addWidget(label, row, 0, 1, 1)
         name = cmds.workspace(q=True, sn=True)
         self.project_name = QtWidgets.QLineEdit(f"{self.user}_{self.file_name}", self)
-        self.project_name.setToolTip("The name of the project as it will appear on the Qube GUI")
+        self.project_name.setToolTip("The name of the project as it will appear on the Qube UI.")
         self.gridLayout.addWidget(self.project_name, row, 1, 1, 5)
 
         row += 1
@@ -85,7 +86,7 @@ class RenderFarmSubmitDialog(QtWidgets.QDialog):
         self.gridLayout.addWidget(label, row, 0, 1, 1)
         self.camera = QtWidgets.QComboBox(self)
         self.camera.addItems(cmds.listCameras(p=True))
-        self.camera.setToolTip("Select camera used for rendering")
+        self.camera.setToolTip("The camera used for rendering on the farm.")
         self.gridLayout.addWidget(self.camera, row, 1, 1, 5)
 
         row += 2
@@ -94,20 +95,20 @@ class RenderFarmSubmitDialog(QtWidgets.QDialog):
         self.start_frame = QtWidgets.QSpinBox()
         self.start_frame.setRange(self.min_frame, self.max_frame)
         self.start_frame.setValue(self.min_frame)
-        self.start_frame.setToolTip("Start frame for rendering, This will override the start frame in the Maya file")
+        self.start_frame.setToolTip("Start frame for rendering. This will override the start frame in the Maya file.")
         self.gridLayout.addWidget(self.start_frame, row, 1, 1, 1)
         label = QtWidgets.QLabel("End Frame")
         self.gridLayout.addWidget(label, row, 2, 1, 1)
         self.end_frame = QtWidgets.QSpinBox()
         self.end_frame.setRange(self.min_frame, self.max_frame)
         self.end_frame.setValue(self.max_frame)
-        self.end_frame.setToolTip("End frame for rendering, This will override the end frame in the Maya file")
+        self.end_frame.setToolTip("End frame for rendering. This will override the end frame in the Maya file.")
         self.gridLayout.addWidget(self.end_frame, row, 3, 1, 1)
         label = QtWidgets.QLabel("By Frame")
         self.gridLayout.addWidget(label, row, 4, 1, 1)
         self.by_frame = QtWidgets.QSpinBox()
         self.by_frame.setValue(1)
-        self.by_frame.setToolTip("Frame Step for rendering. This will override the frame step in the Maya file")
+        self.by_frame.setToolTip("Frame Step for rendering. This will override the frame step in the Maya file.")
         self.gridLayout.addWidget(self.by_frame, row, 5, 1, 1)
 
         row += 1
@@ -117,38 +118,36 @@ class RenderFarmSubmitDialog(QtWidgets.QDialog):
         self.scene_button.clicked.connect(self.set_scene_location)
 
         project_path = cmds.workspace(q=True, sn=True).split("/")[-1]
-        location = f"/home/{self.user}/{project_path}/{cmds.file(q=True, sn=True, shn=True)}"
+        location = f"{project_path}/{cmds.file(q=True, sn=True, shn=True)}"
         self.scene_location = QtWidgets.QLineEdit(location, self)
-        self.scene_location.setToolTip("""This is the full path to the Maya file on the farm, you can enter this manually or press the button to select.
-If the farm is mounted on /render you can navigate to here and select the file. If not you must specify the full path and name manually.
-If this is not correct the renders will fail""")
+        self.scene_location.setToolTip("""The full path to the Maya file on the farm. You do not need to include /home/username/ or /render/username/. If this is not correct the renders will fail""")
         self.gridLayout.addWidget(self.scene_location, row, 1, 1, 5)
 
         row += 1
         self.project_button = QtWidgets.QPushButton("Project Location")
-        self.project_button.setToolTip("Select the Maya project for the scene")
+        self.project_button.setToolTip("Select the Maya project for the scene. The project must be on the farm.")
         self.gridLayout.addWidget(self.project_button, row, 0, 1, 1)
         self.project_button.clicked.connect(self.set_project_location)
         base_path = cmds.workspace(q=True, sn=True).split("/")[-1]
-        location = f"/home/{self.user}/{base_path}/"
+        location = f"{base_path}/"
         self.project_location = QtWidgets.QLineEdit(location, self)
-        self.project_location.setToolTip("""This is the full path to the Maya project on the farm, you can enter this manually or press the button to select.
-If the farm is mounted on /render you can navigate to here and select the file. If not you must specify the full path and name manually.
-If this is not correct the renders will fail""")
+        self.project_location.setToolTip("""The full path to the Maya project on the farm. You do not need to include /home/username/ or /render/username/. If this is not correct the renders will fail""")
         self.gridLayout.addWidget(self.project_location, row, 1, 1, 5)
 
         row += 1
         self.override_output_dir = QtWidgets.QCheckBox("Output Directory")
         self.override_output_dir.setChecked(False)
+        self.override_output_dir.setToolTip("Overrides the output folder path in the Maya file.")
         self.gridLayout.addWidget(self.override_output_dir, row, 0, 1, 1)
-        self.output_dir = QtWidgets.QLineEdit(f"/home/{self.user}/output/")
+        self.output_dir = QtWidgets.QLineEdit(f"output/")
         self.output_dir.setReadOnly(True)
         self.override_output_dir.stateChanged.connect(lambda state: self.output_dir.setReadOnly(not state))
-        self.output_dir.setToolTip("This folder must be on the farm")
+        self.output_dir.setToolTip("The folder path in which rendered frames will be saved to on the farm.")
         self.gridLayout.addWidget(self.output_dir, row, 1, 1, 1)
 
         row += 1
         self.override_filename = QtWidgets.QCheckBox("Output File Name")
+        self.override_filename.setToolTip("Overrides the output file name in the Maya file.")
         self.override_filename.setChecked(False)
         self.gridLayout.addWidget(self.override_filename, row, 0, 1, 1)
 
@@ -157,35 +156,36 @@ If this is not correct the renders will fail""")
         self.output_filename = QtWidgets.QLineEdit(CUSTOM_FILENAME)
         self.output_filename.setReadOnly(True)
         self.override_filename.stateChanged.connect(lambda state: self.output_filename.setReadOnly(not state))
-        self.output_filename.setToolTip("Override Filename in Render Globals")
+        self.output_filename.setToolTip("The file name in which rendered frames will be saved as.")
         self.gridLayout.addWidget(self.output_filename, row, 1, 1, 1)
 
         row += 1
         self.override_extension = QtWidgets.QCheckBox("Output Format")
         self.override_extension.setChecked(False)
+        self.override_extension.setToolTip("Overrides the output file format in the Maya file.")
         self.gridLayout.addWidget(self.override_extension, row, 0, 1, 1)
         self.output_extension = QtWidgets.QComboBox()
         self.output_extension.addItems(FILE_EXTENSION_COMMANDS)
         self.output_extension.setDisabled(True)
         self.override_extension.stateChanged.connect(lambda state: self.output_extension.setDisabled(not state))
-        self.output_extension.setToolTip("Override image extension in Render Globals")
+        self.output_extension.setToolTip("The file format in which rendered frames will be saved as")
         self.gridLayout.addWidget(self.output_extension, row, 1, 1, 1)
 
         row += 1
         label = QtWidgets.QLabel("Extra Commands")
         self.gridLayout.addWidget(label, row, 0, 1, 1)
         self.extra_commands = QtWidgets.QLineEdit()
-        self.extra_commands.setToolTip("This commands will be added verbatim to the Render call")
+        self.extra_commands.setToolTip("Extra commands to be added verbatim to the render call")
         self.gridLayout.addWidget(self.extra_commands, row, 1, 1, 1)
 
         row += 1
         self.submit_button = QtWidgets.QPushButton("Submit Render Job")
-        self.submit_button.setToolTip("Submit job to renderfarm")
+        self.submit_button.setToolTip("Submit the job to the NCCA Renderfarm")
         self.gridLayout.addWidget(self.submit_button, row, 0, 1, 1)
         self.submit_button.clicked.connect(self.accept)
 
         self.cancel_button = QtWidgets.QPushButton("Cancel")
-        self.cancel_button.setToolTip("Cancel job submission")
+        self.cancel_button.setToolTip("Cancel the job submission")
         self.gridLayout.addWidget(self.cancel_button, row, 1, 1, 1)
         self.cancel_button.clicked.connect(self.reject)
 
@@ -216,6 +216,12 @@ If this is not correct the renders will fail""")
         output_filename_command = self.output_filename.text() if self.override_filename.isChecked() else ""
         output_extension_command = FILE_EXTENSION_COMMANDS[self.output_extension.currentText()] if self.override_extension.isChecked() else ""
         extra_commands = self.extra_commands.text()
+
+        farm_path = f"/render/{self.user}/"
+
+        project_location_command = farm_path + project_location_command
+        output_dir_command = farm_path + output_dir_command
+        file_location_command = farm_path + file_location_command
 
         submit_command = [
             "Render",
