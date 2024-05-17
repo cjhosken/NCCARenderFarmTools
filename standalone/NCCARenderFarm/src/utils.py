@@ -20,13 +20,7 @@ def get_user_name():
     else:
         return None  # Return None for other operating systems
     
-def get_renderfarm():
-    dotenv_path = os.path.join(os.path.dirname(__file__), '../.env')
-    load_dotenv(dotenv_path)
-
-    username = os.environ.get("USERNAME")
-    password = os.environ.get("PASSWORD")
-
-    renderfarm = NCCA_RenderFarm("tete.bournemouth.ac.uk", username, password)
+def get_renderfarm(username, password):
+    renderfarm = NCCA_RenderFarm.create("tete.bournemouth.ac.uk", username, password)
 
     return renderfarm
