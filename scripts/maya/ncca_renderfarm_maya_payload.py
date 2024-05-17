@@ -59,7 +59,6 @@ def main():
     listOfSubmittedJobs = qb.submit(listOfJobsToSubmit)
     id_list = []
     for job in listOfSubmittedJobs:
-        print(job['id'])
         id_list.append(job['id'])
 
     print(id_list)

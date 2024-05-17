@@ -1,6 +1,7 @@
 import os
 import subprocess
 import tempfile
+import shutil
 
 import hou
 from PySide2 import QtCore, QtWidgets
@@ -112,62 +113,27 @@ class RenderFarmSubmitDialog(QtWidgets.QDialog):
 
         farm_location_command = self.farm_path + self.farm_location.text()
 
+        frame_range=f"{self.start_frame.value()}-{self.end_frame.value()}x{self.by_frame.value()}"
 
-
-        range=f"{self.start_frame.value()}-{self.end_frame.value()}x{self.by_frame.value()}"
-        payload=f"""
-import os
-import sys
-sys.path.insert(0,"/public/devel/2022/pfx/qube/api/python/")
-
-import qb
-if os.environ.get("QB_SUPERVISOR") is None :
-    os.environ["QB_SUPERVISOR"]="tete.bournemouth.ac.uk"
-    os.environ["QB_DOMAIN"]="ncca"
-
-
-job = {{}}
-job['name'] = f"{self.project_name.text()}"
-job['prototype'] = 'cmdrange'
-package = {{}}
-package['shell']="/bin/bash"
-pre_render="cd /opt/software/hfs19.5.605/; source houdini_setup_bash; "
-render_command=f"hython $HB/hrender.py -e -F QB_FRAME_NUMBER -R -d {self.output_driver.text()} {farm_location_command}"
-package['cmdline']=f"{{pre_render}} {{render_command}}"
-        
-job['package'] = package
-job['cpus'] = {self.cpus.currentText()}
-   
-env={{"HOME" :f"/render/{self.user}",  
-            "SESI_LMHOST" : "lepe.bournemouth.ac.uk",
-            "PIXAR_LICENSE_FILE" : "9010@talavera.bournemouth.ac.uk",            
-            }}
-job['env']=env
-
-agendaRange = f'{range}'  
-agenda = qb.genframes(agendaRange)
-
-job['agenda'] = agenda
-        
-listOfJobsToSubmit = []
-listOfJobsToSubmit.append(job)
-listOfSubmittedJobs = qb.submit(listOfJobsToSubmit)
-id_list=[]
-for job in listOfSubmittedJobs:
-    print(job['id'])
-    id_list.append(job['id'])
-
-print(id_list)
-"""
         with tempfile.TemporaryDirectory() as tmpdirname:
+            src_folder = "/home/s5605094/Programming/NCCARenderFarmTools/scripts/houdini"
+            main_script = "ncca_renderfarm_hou_payload.py"
+            main_dst_script = os.path.join(tmpdirname, main_script)
 
-            with open(tmpdirname+"/payload.py","w") as fp :
-                fp.write(payload)
+            shutil.copy(os.path.join(src_folder, main_script), main_dst_script)
 
-            output=subprocess.run(["/usr/bin/python3",f"{tmpdirname}/payload.py"],capture_output=True,env={})
-            ids=output.stdout.decode("utf-8") 
-            hou.ui.displayMessage(f"{self.project_name.text()} has been successfully added to the NCCA Renderfarm! \nID: {ids}",buttons=("Ok",),title="NCCA Tools")
+            try:
+                output=subprocess.run(["/usr/bin/python3", main_dst_script, self.project_name.text(), self.output_driver.text(), farm_location_command, self.cpus.currentText(), self.user, frame_range],capture_output=True,env={})
+                error = output.stderr.decode("utf-8")
 
+                if (error):
+                    raise Exception(error)
+
+                ids=output.stdout.decode("utf-8") 
+                hou.ui.displayMessage(f"{self.project_name.text()} has been successfully added to the NCCA Renderfarm! \nID: {ids}",buttons=("Ok",),title="NCCA Tools")
+            except Exception as e:
+                hou.ui.displayMessage(title="NCCA Tool Error", severity=hou.severityType.Error, details=f"{e}", text="Uh oh! An error occurred. Please contact the NCCA team if this issue persists.")
+                 
         self.done(0)
     
     def closeEvent(self,event) :    
@@ -204,8 +170,6 @@ print(id_list)
                 self.start_frame.setValue(int(frame_values[0]))
                 self.end_frame.setValue(int(frame_values[1]))
                 self.by_frame.setValue(int(frame_values[2]))
-        
-
 
 def main():
     try:
