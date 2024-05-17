@@ -4,6 +4,7 @@ import subprocess
 import sys
 import tempfile
 import webbrowser
+import shutil
 
 import maya.cmds as cmds
 import maya.OpenMayaAnim as OMA
@@ -14,11 +15,12 @@ from shiboken2 import wrapInstance
 RENDERER_COMMANDS = {
     "Set by file": "file",
     "Maya Software": "sw",
+    "Maya Hardware": "hw",
     "Maya Hardware 2.0": "hw2",
     "Arnold": "arnold",
     "Renderman": "renderman",
     "VRay": "vray",
-    "Viewport": "default"
+    "Vector Renderer": "vr"
 }
 
 FILE_EXTENSION_COMMANDS = {
@@ -223,7 +225,7 @@ class RenderFarmSubmitDialog(QtWidgets.QDialog):
         file_location_command = farm_path + file_location_command
 
         submit_command = [
-            "/opt/autodesk/maya2023/bin/Render",
+            "Render",
             "-r", renderer_command,
             "-s", start_frame_command,
             "-e", end_frame_command,
@@ -250,62 +252,30 @@ class RenderFarmSubmitDialog(QtWidgets.QDialog):
 
     def submit_job(self, submit_command):
 
-        range=f"{self.start_frame.value()}-{self.end_frame.value()}x{self.by_frame.value()}"
+        frame_range=f"{self.start_frame.value()}-{self.end_frame.value()}x{self.by_frame.value()}"
 
         qb_command = " ".join(submit_command)
 
-        payload=f"""
-import os
-import sys
-sys.path.insert(0,"/public/devel/2022/pfx/qube/api/python")
-
-import qb
-if os.environ.get("QB_SUPERVISOR") is None :
-    os.environ["QB_SUPERVISOR"]="tete.bournemouth.ac.uk"
-    os.environ["QB_DOMAIN"]="ncca"
-
-job = {{}}
-job['name'] = f"{self.project_name.text()}"
-job['prototype'] = 'cmdrange'
-package = {{}}
-package['shell']="/bin/bash"
-pre_render="export PATH=/opt/autodesk/arnold/maya2023/bin/:$PATH;"
-render_command=f"{qb_command}"
-package['cmdline']=f"{{pre_render}} {{render_command}}"
-        
-job['package'] = package
-job['cpus'] = {self.cpus.currentText()}
-   
-env={{"HOME" :f"/render/{self.user}",  
-            "SESI_LMHOST" : "lepe.bournemouth.ac.uk",
-            "PIXAR_LICENSE_FILE" : "9010@talavera.bournemouth.ac.uk",            
-            }}
-job['env']=env
-
-agendaRange = f'{range}'  
-agenda = qb.genframes(agendaRange)
-
-job['agenda'] = agenda
-        
-listOfJobsToSubmit = []
-listOfJobsToSubmit.append(job)
-listOfSubmittedJobs = qb.submit(listOfJobsToSubmit)
-id_list=[]
-for job in listOfSubmittedJobs:
-    print(job['id'])
-    id_list.append(job['id'])
-
-print(id_list)
-"""
         try:
             with tempfile.TemporaryDirectory() as tmpdirname:
-                with open(tmpdirname+"/payload.py","w") as fp :
-                    fp.write(payload)
+                src_folder = "/home/s5605094/Programming/NCCARenderFarmTools/scripts/maya"
+                main_script = "ncca_renderfarm_maya_payload.py"
+                main_dst_script = os.path.join(tmpdirname, main_script)
 
-                output=subprocess.run(["/usr/bin/python3",f"{tmpdirname}/payload.py"],capture_output=True,env={})
+                shutil.copy(os.path.join(src_folder, main_script), main_dst_script)
+
+                src_script = "ncca_renderfarm_maya_enable_plugins.py"
+                dst_script = os.path.join(tmpdirname, src_script)
+                shutil.copy(os.path.join(src_folder, src_script), dst_script)
+
+                output=subprocess.run(["/usr/bin/python3", main_dst_script, self.project_name.text(), qb_command, self.cpus.currentText(), self.user, frame_range],capture_output=True,env={})
+                error = output.stderr.decode("utf-8")
+
+                if (error):
+                    raise Exception(error)
+
                 ids=output.stdout.decode("utf-8") 
                 cmds.confirmDialog(message=f"{self.project_name.text()} has been successfully added to the NCCA Renderfarm! \nID: {ids}",button=["Ok"],title="NCCA Tools")
-            self.done(0)
         except Exception as e:
             cmds.confirmDialog(title="NCCA Tool Error", message=f"Render Submission Failed! Please check your submission settings and try again. Please contact the NCCA team if this issue persists.\n\n {e}", button=["Ok"])
 
