@@ -1,4 +1,5 @@
 import paramiko
+import stat
 import os
 
 
@@ -29,12 +30,28 @@ class NCCA_RenderFarm(paramiko.SSHClient):
         self.close()
         print(f"Disconnected from host")
 
-    def listdir(self, remote_path):
+    def list_dir(self, remote_path):
+        is_hidden = lambda item: not item.startswith(".")
+
         """lists all the files and directories in the specified path and returns them"""
         try:
-            return self.root.listdir(remote_path)
+            return list(filter(is_hidden, self.root.listdir(remote_path)))
+
         except Exception as err:
             raise Exception(f"Failed to list directory {remote_path}: {err}")
+        
+    def is_dir(self, remote_path: str) -> bool:
+        """
+        Check if the given remote path is a directory.
+        """
+        try:
+            # Get attributes of the remote path
+            attributes = self.root.stat(remote_path)
+            # Check if it's a directory
+            return stat.S_ISDIR(attributes.st_mode)
+        except FileNotFoundError:
+            # File does not exist
+            return False
 
 
     def upload(self, source_local_path, remote_path):
