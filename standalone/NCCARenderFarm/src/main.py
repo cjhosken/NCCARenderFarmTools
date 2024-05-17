@@ -83,7 +83,7 @@ class NCCARenderFarmApplication():
         username_label.pack(side=LEFT, padx=(100, 5))
 
         def validate_input(new_text):
-            return len(new_text) <= 8
+            return len(new_text) <= 10
 
         username_validation = self.root.register(validate_input)
 
