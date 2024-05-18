@@ -82,6 +82,7 @@ class NCCA_RenderFarm(paramiko.SSHClient):
         """Deletes the file or directory from the remote SFTP server"""
         try:
             if self.is_dir(remote_path):
+                print("Deleting dir!")
                 # Delete directory
                 self.sftp.rmdir(remote_path)
                 print(f"Directory deleted: {remote_path}")
@@ -91,5 +92,5 @@ class NCCA_RenderFarm(paramiko.SSHClient):
                 print(f"File deleted: {remote_path}")
         except FileNotFoundError:
             print(f"File or directory not found: {remote_path}")
-        except Exception as err:
+        except OSError as err:
             raise Exception(f"Failed to delete {remote_path}: {err}")
