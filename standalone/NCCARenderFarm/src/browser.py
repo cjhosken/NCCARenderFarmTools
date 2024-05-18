@@ -9,7 +9,9 @@ import tempfile
 import subprocess
 import threading
 import numpy as np
-from jobs import *
+from jobs.blender_job import NCCA_RenderFarm_BlenderJob
+from jobs.maya_job import NCCA_RenderFarm_MayaJob
+from jobs.houdini_job import NCCA_RenderFarm_HoudiniJob
 
 os.environ["OPENCV_IO_ENABLE_OPENEXR"] = "1" 
 import cv2
@@ -254,15 +256,14 @@ class NCCA_RenderFarm_Browser():
 
         if (file_extension):
             if ("blend" in file_extension):
-                dialog = BlenderSubmitDialog(self.root, render_path, self.username)
-                self.root.wait_window(dialog.dialog)
+                job_dialog = NCCA_RenderFarm_BlenderJob(self.root, render_path, self.username)
+                self.root.wait_window(job_dialog.dialog)
             if ("hip" in file_extension):
-                dialog = HoudiniSubmitDialog(self.root, render_path, self.username)
-                self.root.wait_window(dialog.dialog)
+                job_dialog = NCCA_RenderFarm_HoudiniJob(self.root, render_path, self.username)
+                self.root.wait_window(job_dialog.dialog)
             if (file_extension in [".ma", ".mb"]):
-
-                dialog = MayaSubmitDialog(self.root, render_path, self.username)
-                self.root.wait_window(dialog.dialog)
+                job_dialog = NCCA_RenderFarm_MayaJob(self.root, render_path, self.username)
+                self.root.wait_window(job_dialog.dialog)
 
 
     def upload_file_to_item(self):
@@ -341,8 +342,6 @@ class NCCA_RenderFarm_Browser():
             else:
                 with Image.open(local_path) as img:
                     img.show()
-
-            
 
         except Exception as err:
             print(f"Failed to open {remote_path}: {err}")
