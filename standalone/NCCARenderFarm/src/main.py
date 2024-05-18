@@ -21,7 +21,6 @@ class NCCARenderFarmApplication():
         if self.os == "other":
             raise Exception("Current operating system not supported.")
         
-        self.configure_styles()
         env_path = os.path.join(self.application_folder, ".env")
         use_env = True
         
@@ -53,18 +52,6 @@ class NCCARenderFarmApplication():
         else:
             print("Application icon not found.")
 
-    def configure_styles(self):
-        self.style = ttk.Style()
-
-        # Configure the root theme
-        self.style.theme_use('clam')
-
-        # Configure the colors
-        self.style.configure('.', background='#FFFFFF', foreground='#000000')  # Set background to white and foreground (text) to black
-        self.style.configure('TButton', background='#000000', foreground='#FFFFFF', bordercolor='none', borderwidth=1, padding=(10, 10), font=('Helvetica', 15), width=20)  # Set button properties
-        self.style.map('TButton', background=[('active', '#FFFFFF')], bordercolor=[("active", "black")], foreground=[('active', "#000000")])  # Change button background color on active state
-
-        self.style.configure('TLabel', font=('Helvetica', 15))
         
 
     def create_sign_in_window(self):

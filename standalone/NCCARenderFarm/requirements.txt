@@ -2,4 +2,3 @@ tk
 paramiko
 python-dotenv
 Pillow
-opencv-python

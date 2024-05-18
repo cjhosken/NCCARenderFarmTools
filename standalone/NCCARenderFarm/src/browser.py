@@ -5,8 +5,18 @@ from tkinter import ttk, Menu, filedialog
 from PIL import Image, ImageTk
 import os
 from utils import get_user_name
-import cv2
 import tempfile
+import subprocess
+import threading
+from jobs import *
+
+# Add the directory to sys.path
+#houdini_path = '/opt/hfs19.5.605/python/lib/python3.9'
+#if houdini_path not in sys.path:
+#    sys.path.append(houdini_path)
+
+# Now import the hou module
+#import hou
 
 
 class NCCA_RenderFarm_Browser():
@@ -151,6 +161,8 @@ class NCCA_RenderFarm_Browser():
             self.context_menu = Menu(self.root, tearoff=0)
             if (render_path != f"/render/{self.username}"):
                 self.context_menu.add_command(label="Delete", command=self.delete_item)
+            else:
+                self.context_menu.add_command(label="Qube", command=self.open_cube)
 
             self.context_menu.add_command(label="Download", command=self.download_item)
 
@@ -158,10 +170,12 @@ class NCCA_RenderFarm_Browser():
                 self.context_menu.add_command(label="Upload File", command=self.upload_file_to_item)
                 self.context_menu.add_command(label="Upload Folder", command=self.upload_folder_to_item)
             else:
-                self.context_menu.add_command(label="Open", command=self.open_item)
+                if (file_extension in self.IMAGE_EXTENSIONS):
+                    self.context_menu.add_command(label="Open", command=self.open_item)
 
                 if ("blend" in file_extension or "hip" in file_extension or file_extension in [".ma", ".mb"]):
                     self.context_menu.add_command(label="Render", command=self.render_item)
+                
 
             self.root.bind("<Button-1>", self.hide_context_menu)
 
@@ -237,7 +251,25 @@ class NCCA_RenderFarm_Browser():
         """
         item = self.treeview.selection()[0]
         path = self.fsobjects[item]
-        print(f"Rendering {path}")
+        file_name = os.path.basename(path)
+        file_extension = os.path.splitext(file_name)[1]
+
+        render_path = f"/render/{self.username}".join(path.split(".", 1))
+
+        print(f"Rendering {render_path}")
+
+        if (file_extension):
+            if ("blend" in file_extension):
+                NCCA_RenderFarm_JobSubmitter.submit_blender(render_path, self.username)
+            if ("hip" in file_extension):
+
+                rop_path = "/stage/usdrender_rop1"
+                NCCA_RenderFarm_JobSubmitter.submit_houdini(render_path, self.username, rop_path)
+            if (file_extension in [".ma", ".mb"]):
+
+                dialog = MayaSubmitDialog(self.root, render_path, self.username)
+                self.root.wait_window(dialog.dialog)
+
 
     def upload_file_to_item(self):
         item = self.treeview.selection()[0]
@@ -312,8 +344,24 @@ class NCCA_RenderFarm_Browser():
             # Open the downloaded file using PIL
             with Image.open(local_path) as img:
                 img.show(title=file_name)
+
         except Exception as err:
             print(f"Failed to open {remote_path}: {err}")
         finally:
             # Cleanup: Delete the temporary directory
             temp_dir.cleanup()
+
+    def open_cube(self):
+        def run_qube():
+            try:
+                process = subprocess.Popen("unset PYTHONHOME;  /public/bin/2023/goQube &", shell=True, stderr=subprocess.PIPE)
+                process.wait()
+                error = process.stderr.read().decode('utf-8')
+                if len(error) > 0:
+                    raise subprocess.CalledProcessError(1, error)
+            except Exception as e:
+                print(e)
+
+        # Start the Qube process in a separate thread
+        qube_thread = threading.Thread(target=run_qube)
+        qube_thread.start()
