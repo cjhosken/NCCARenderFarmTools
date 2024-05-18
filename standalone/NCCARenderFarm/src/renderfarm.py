@@ -77,3 +77,19 @@ class NCCA_RenderFarm(paramiko.SSHClient):
             print("Download completed")
         except Exception as err:
             raise Exception(f"Download failed: {err}")
+        
+    def delete(self, remote_path):
+        """Deletes the file or directory from the remote SFTP server"""
+        try:
+            if self.is_dir(remote_path):
+                # Delete directory
+                self.sftp.rmdir(remote_path)
+                print(f"Directory deleted: {remote_path}")
+            else:
+                # Delete file
+                self.sftp.remove(remote_path)
+                print(f"File deleted: {remote_path}")
+        except FileNotFoundError:
+            print(f"File or directory not found: {remote_path}")
+        except Exception as err:
+            raise Exception(f"Failed to delete {remote_path}: {err}")

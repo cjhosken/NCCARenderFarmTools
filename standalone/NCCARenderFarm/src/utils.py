@@ -1,5 +1,4 @@
 import os
-from dotenv import load_dotenv
 from renderfarm import NCCA_RenderFarm
 
 def get_os_type():
@@ -20,13 +19,7 @@ def get_user_name():
     else:
         return None  # Return None for other operating systems
     
-def get_renderfarm(username, password, env_path, use_env=False):
-    if (os.path.exists(env_path) and use_env):
-        load_dotenv(env_path)
-        username = os.getenv('USERNAME')
-        password = os.getenv('PASSWORD')
-
-
+def get_renderfarm(username, password):
     renderfarm = NCCA_RenderFarm.create("tete.bournemouth.ac.uk", username, password)
 
     return renderfarm

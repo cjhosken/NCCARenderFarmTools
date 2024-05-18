@@ -1,9 +1,10 @@
 import sys
 import tkinter as tk
 from pathlib import Path
-from tkinter import ttk
+from tkinter import ttk, Menu, filedialog
 from PIL import Image, ImageTk
 import os
+from utils import get_user_name
 
 
 class NCCA_RenderFarm_Browser():
@@ -127,13 +128,119 @@ class NCCA_RenderFarm_Browser():
         self.load_subitems(iid)
 
     def show_filepath(self, event: tk.Event) -> None:
+        if hasattr(self, 'context_menu'):
+            self.context_menu.destroy()
+            del self.context_menu
         """
         Show the file path of the selected node when right-clicked.
         """
 
         item = self.treeview.identify_row(event.y)
         if item in self.fsobjects:
-            path = f"/render/{self.user}".join(self.fsobjects[item].split(".", 1))
+            real_path = self.fsobjects[item]
+            render_path = f"/render/{self.username}".join(self.fsobjects[item].split(".", 1))
+            file_extension = os.path.splitext(os.path.basename(real_path))[1]
             # Activate the selected item
             self.treeview.selection_set(item)
             self.treeview.focus(item)
+            print(real_path)
+
+            self.context_menu = Menu(self.root, tearoff=0)
+            if (render_path != f"/render/{self.username}"):
+                self.context_menu.add_command(label="Delete", command=self.delete_item)
+
+            self.context_menu.add_command(label="Download", command=self.download_item)
+
+            if os.path.isdir(real_path):
+                self.context_menu.add_command(label="Upload to", command=self.upload_to_item)
+            else:
+                self.context_menu.add_command(label="Open", command=self.open_item)
+
+                if ("blend" in file_extension or "hip" in file_extension or file_extension in [".ma", ".mb"]):
+                    self.context_menu.add_command(label="Render", command=self.render_item)
+
+            self.root.bind("<Button-1>", self.hide_context_menu)
+
+            self.context_menu.post(event.x_root, event.y_root)
+
+    def hide_context_menu(self, _event: tk.Event) -> None:
+        """
+        Hide the context menu.
+        """
+        self.context_menu.unpost()
+        self.root.bind("<Button-3>", self.show_filepath)
+
+    def delete_item(self):
+        """
+        Placeholder function for deleting an item.
+        """
+        item = self.treeview.selection()[0]
+        path = self.fsobjects[item]
+        print(f"Deleting {path}")
+        self.renderfarm.delete(path)
+
+    
+    def download_item(self):
+        """
+        Placeholder function for downloading an item.
+        """
+        item = self.treeview.selection()[0]
+        remote_path = self.fsobjects[item]
+
+        print("Downloading...")
+
+        try:
+            if (self.renderfarm.is_dir(remote_path)):
+                local_directory = filedialog.askdirectory(title="Select Destination Folder")
+                self.download_directory(remote_path, local_directory)
+            else:
+                file_name = os.path.basename(remote_path)
+                local_path = filedialog.asksaveasfilename(title="Save file", initialfile=file_name)
+                if local_path:
+                    # Open the file in write mode to get the path
+                    with open(local_path, "w") as file:
+                        # Close the file immediately after opening
+                        pass
+                    self.renderfarm.download(remote_path, local_path)
+            print("Download Complete")
+        except Exception as err:
+                print(f"Download failed: {err}")
+
+    def download_directory(self, remote_directory, local_directory):
+        """
+        Recursively download a directory and its contents from the SFTP server.
+        """
+        # Create the local directory if it doesn't exist
+        os.makedirs(local_directory, exist_ok=True)
+
+        # List the contents of the remote directory
+        remote_files = self.renderfarm.list_dir(remote_directory)
+
+        for remote_file in remote_files:
+            remote_path = os.path.join(remote_directory, remote_file)
+            local_path = os.path.join(local_directory, remote_file)
+
+            if self.renderfarm.is_dir(remote_path):
+                # If the item is a directory, recursively download it
+                self.download_directory(remote_path, local_path)
+            else:
+                # If the item is a file, download it
+                self.renderfarm.download(remote_path, local_path)
+
+    def render_item(self):
+        """
+        Placeholder function for rendering an item.
+        """
+        item = self.treeview.selection()[0]
+        path = self.fsobjects[item]
+        print(f"Rendering {path}")
+
+    def upload_to_item(self):
+        item = self.treeview.selection()[0]
+        path = self.fsobjects[item]
+        print(f"Uploading to {path}")
+
+    def open_item(self):
+        item = self.treeview.selection()[0]
+        path = self.fsobjects[item]
+        print(f"Opening {path}")
