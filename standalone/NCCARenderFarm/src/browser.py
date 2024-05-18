@@ -256,13 +256,13 @@ class NCCA_RenderFarm_Browser():
 
         if (file_extension):
             if ("blend" in file_extension):
-                job_dialog = NCCA_RenderFarm_BlenderJob(self.root, render_path, self.username)
+                job_dialog = NCCA_RenderFarm_BlenderJob(self.root, render_path, self.username, self.renderfarm)
                 self.root.wait_window(job_dialog.dialog)
             if ("hip" in file_extension):
-                job_dialog = NCCA_RenderFarm_HoudiniJob(self.root, render_path, self.username)
+                job_dialog = NCCA_RenderFarm_HoudiniJob(self.root, render_path, self.username, self.renderfarm)
                 self.root.wait_window(job_dialog.dialog)
             if (file_extension in [".ma", ".mb"]):
-                job_dialog = NCCA_RenderFarm_MayaJob(self.root, render_path, self.username)
+                job_dialog = NCCA_RenderFarm_MayaJob(self.root, render_path, self.username, self.renderfarm)
                 self.root.wait_window(job_dialog.dialog)
 
 

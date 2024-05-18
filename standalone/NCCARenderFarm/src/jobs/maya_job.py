@@ -29,10 +29,9 @@ MAYA_FILE_EXTENSION_COMMANDS = {
 }
 
 class NCCA_RenderFarm_MayaJob(NCCA_RenderFarm_DefaultJob):
-    def __init__(self, parent, render_path, username):
-        super().__init__(parent, render_path, username)
+    def __init__(self, parent, render_path, username, renderfarm):
+        super().__init__(parent, render_path, username, renderfarm)
         self.dialog.title("Maya Render Submission")
-        self.job_name_entry.insert(0, f"_maya")
 
         # Project Location
         Label(self.dialog, text="Project Location:").pack()
@@ -56,17 +55,7 @@ class NCCA_RenderFarm_MayaJob(NCCA_RenderFarm_DefaultJob):
         self.camera_menu = OptionMenu(self.dialog, self.camera_var, *self.camera_options)
         self.camera_menu.pack()
 
-        # Frame Range
-        Label(self.dialog, text="Frame Range:").pack()
-        self.start_frame_entry = Entry(self.dialog)
-        self.start_frame_entry.insert(0, "0")
-        self.start_frame_entry.pack()
-        self.end_frame_entry = Entry(self.dialog)
-        self.end_frame_entry.insert(0, "250")
-        self.end_frame_entry.pack()
-        self.step_frame_entry = Entry(self.dialog)
-        self.step_frame_entry.insert(0, "1")
-        self.step_frame_entry.pack()
+        
 
         # Extra Commands
         Label(self.dialog, text="Extra Commands:").pack()
@@ -146,7 +135,7 @@ class NCCA_RenderFarm_MayaJob(NCCA_RenderFarm_DefaultJob):
         frame_range = f"{start_frame}-{end_frame}x{step_frame}"
         output_file = os.path.basename(output_path)
 
-        frame_padding = max(output_file.count("#"), len(str(end_frame*step_frame) + 1))
+        frame_padding = max(output_file.count("#"), len(str(int(end_frame)*int(step_frame))) + 1)
 
         output_file = re.sub(r'#+', '#', output_file)
         output_dir = os.path.dirname(output_file)
@@ -156,8 +145,15 @@ class NCCA_RenderFarm_MayaJob(NCCA_RenderFarm_DefaultJob):
         output_dir, image_name, output_file_extension, frame_number_format = self.convert_render_path(output_path)
 
         override_extension = MAYA_FILE_EXTENSION_COMMANDS.get(output_file_extension.lower(), "")
-
-        render_options = f"-r {renderer} -proj {project_path} -rd {output_dir}/ -im {image_name} -fnc {frame_number_format} -of {override_extension} -pad {frame_padding}"
+        render_options = ""
+        render_options += f" -r {renderer}" if renderer else ""
+        render_options += f" -proj {project_path}" if project_path else ""
+        render_options += f" -rd {output_dir}" if output_dir else ""
+        render_options += f" -im {image_name}" if image_name else ""
+        render_options += f" -fnc {frame_number_format}" if frame_number_format else ""
+        render_options += f" -of {override_extension}" if override_extension else ""
+        render_options += f" -pad {frame_padding}" if frame_padding else ""
+        render_options += f" -cam {camera}" if camera else ""
         
         job = {}
         job['name'] = job_name

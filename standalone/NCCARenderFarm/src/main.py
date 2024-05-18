@@ -22,7 +22,7 @@ class NCCARenderFarmApplication():
             raise Exception("Current operating system not supported.")
         
         env_path = os.path.join(self.application_folder, ".env")
-        use_env = True
+        use_env = False
         
         if os.path.exists(env_path) and use_env:
             try:
@@ -56,7 +56,7 @@ class NCCARenderFarmApplication():
 
     def create_sign_in_window(self):
         self.sign_in_window = Toplevel(self.root)
-        self.sign_in_window.configure(background="white")
+        self.sign_in_window.configure()
         self.sign_in_window.title("NCCA RenderFarm Sign-In")
 
         # Get window dimensions
@@ -76,7 +76,7 @@ class NCCARenderFarmApplication():
         self.sign_in_window.protocol("WM_DELETE_WINDOW", self.quit)
 
         # Main frame to center the interface vertically
-        main_frame = Frame(self.sign_in_window, background="white")
+        main_frame = Frame(self.sign_in_window)
         main_frame.pack(expand=True, fill="both")
 
         # Error message label
@@ -85,7 +85,7 @@ class NCCARenderFarmApplication():
         self.sign_in_error_label.pack(pady=(10, 5))
 
         # Username Label and Entry
-        username_frame = Frame(main_frame, background="white", width=200)
+        username_frame = Frame(main_frame, width=200)
         username_frame.pack(pady=(5, 5), fill="both", expand=False)
 
         username_label = ttk.Label(username_frame, text="Username:")
@@ -101,7 +101,7 @@ class NCCARenderFarmApplication():
         self.username_entry.config(font=('Helvetica', 15))
 
         # Password Label and Entry
-        password_frame = Frame(main_frame, background="white", width=200)
+        password_frame = Frame(main_frame, width=200)
         password_frame.pack(pady=(5, 5), fill="both", expand=True)
 
         password_label = ttk.Label(password_frame, text="Password:")

@@ -9,11 +9,9 @@ import qb
 import re
 
 class NCCA_RenderFarm_HoudiniJob(NCCA_RenderFarm_DefaultJob):
-    def __init__(self, parent, render_path, username):
-        super().__init__(parent, render_path, username)
+    def __init__(self, parent, render_path, username, renderfarm):
+        super().__init__(parent, render_path, username, renderfarm)
         self.dialog.title("Houdini Render Submission")
-        self.job_name_entry.delete(0, END)
-        self.job_name_entry.insert(0, f"{self.username}_untitled_houdini")
 
         # Project Location
         Label(self.dialog, text="ROP Path:").pack()
@@ -54,7 +52,7 @@ class NCCA_RenderFarm_HoudiniJob(NCCA_RenderFarm_DefaultJob):
         output_file = os.path.basename(output_path)
 
         output_file = re.sub(r'#+', '$F', output_file)
-        output_dir = os.path.dirname(output_file)
+        output_dir = os.path.dirname(output_path)
 
         output_path = os.path.join(output_dir, output_file)
 
@@ -68,9 +66,15 @@ class NCCA_RenderFarm_HoudiniJob(NCCA_RenderFarm_DefaultJob):
         package = {}
         package['shell']="/bin/bash"
 
+        #https://www.sidefx.com/docs/houdini/ref/utils/hrender.html
 
         pre_render="cd /opt/software/hfs19.5.605/; source houdini_setup_bash; "
-        render_command=f"hython $HB/hrender.py -e {extra_commands} -o {output_path} -F QB_FRAME_NUMBER -R -d {rop_path} {self.render_path}"
+        render_command=f"hython $HB/hrender.py -F QB_FRAME_NUMBER"
+        render_command+=f" -e {extra_commands}" if extra_commands else ""
+        #render_command+=f" -o {output_path}" if output_path else ""
+        render_command+=" -R "
+        render_command+=f" -d {rop_path}" if rop_path else ""
+        render_command+=f" {self.render_path}"
 
         print(render_command)
 

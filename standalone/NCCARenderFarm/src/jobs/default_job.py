@@ -17,17 +17,20 @@ load_custom_modules([])
 import qb
 
 class NCCA_RenderFarm_DefaultJob():
-    def __init__(self, parent, render_path, username):
+    def __init__(self, parent, render_path, username, renderfarm):
         self.parent = parent
         self.username = username
         self.render_path = render_path
+        self.renderfarm = renderfarm
         self.dialog = Toplevel(parent)
         self.dialog.title("Default Job Submission")
+
+        file_name = os.path.basename(self.render_path)
 
         # Render Options
         Label(self.dialog, text="Job Name:").pack()
         self.job_name_entry = Entry(self.dialog)
-        self.job_name_entry.insert(0, f"{self.username}_untitled")
+        self.job_name_entry.insert(0, f"{self.username}_{file_name}")
         self.job_name_entry.pack()
 
         # CPU Selection
@@ -41,6 +44,18 @@ class NCCA_RenderFarm_DefaultJob():
         self.output_path_entry = Entry(self.dialog)
         self.output_path_entry.insert(0, f"output/frame_####.exr")
         self.output_path_entry.pack()
+
+        # Frame Range
+        Label(self.dialog, text="Frame Range:").pack()
+        self.start_frame_entry = Entry(self.dialog)
+        self.start_frame_entry.insert(0, "0")
+        self.start_frame_entry.pack()
+        self.end_frame_entry = Entry(self.dialog)
+        self.end_frame_entry.insert(0, "250")
+        self.end_frame_entry.pack()
+        self.step_frame_entry = Entry(self.dialog)
+        self.step_frame_entry.insert(0, "1")
+        self.step_frame_entry.pack()
 
     def submit(self):
         job = self.prepare_job()
