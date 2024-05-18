@@ -67,7 +67,10 @@ class NCCA_RenderFarm_Browser():
 
         file_extension = os.path.splitext(os.path.basename(path))[1]
 
-        if (file_extension):
+        if (self.renderfarm.is_dir(path)):
+            return self.FOLDER_ICON
+
+        elif (file_extension):
             if ("blend" in file_extension): return self.BLENDER_ICON
 
             if ("hip" in file_extension): return self.HOUDINI_ICON
@@ -76,13 +79,9 @@ class NCCA_RenderFarm_Browser():
 
             if (file_extension in self.IMAGE_EXTENSIONS): return self.IMAGE_ICON
 
-            return self.FILE_ICON
+        return self.FILE_ICON
         
 
-        elif (self.renderfarm.is_dir(path)):
-            return self.FOLDER_ICON
-        else:
-            return self.FILE_ICON
     
     def insert_item(self, name: str, path: str = "", parent: str = "") -> str:
         """
