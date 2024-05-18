@@ -5,6 +5,8 @@ from tkinter import ttk, Menu, filedialog
 from PIL import Image, ImageTk
 import os
 from utils import get_user_name
+import cv2
+import tempfile
 
 
 class NCCA_RenderFarm_Browser():
@@ -21,6 +23,7 @@ class NCCA_RenderFarm_Browser():
         self.MAYA_ICON = ImageTk.PhotoImage(Image.open(os.path.join(icon_folder, "maya.png")).resize((icon_size, icon_size), Image.ADAPTIVE))
         self.BLENDER_ICON = ImageTk.PhotoImage(Image.open(os.path.join(icon_folder, "blender.png")).resize((icon_size, icon_size), Image.ADAPTIVE))
 
+        self.IMAGE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.bmp', '.gif']
 
         self.treeview = ttk.Treeview(self.root, show="tree")
         self.treeview.grid(row=0, column=0, sticky="nsew")
@@ -61,7 +64,7 @@ class NCCA_RenderFarm_Browser():
 
             if (file_extension in [".ma", ".mb"]): return self.MAYA_ICON
 
-            if (file_extension in [".png"]): return self.IMAGE_ICON
+            if (file_extension in self.IMAGE_EXTENSIONS): return self.IMAGE_ICON
 
             return self.FILE_ICON
         
@@ -152,7 +155,8 @@ class NCCA_RenderFarm_Browser():
             self.context_menu.add_command(label="Download", command=self.download_item)
 
             if os.path.isdir(real_path):
-                self.context_menu.add_command(label="Upload to", command=self.upload_to_item)
+                self.context_menu.add_command(label="Upload File", command=self.upload_file_to_item)
+                self.context_menu.add_command(label="Upload Folder", command=self.upload_folder_to_item)
             else:
                 self.context_menu.add_command(label="Open", command=self.open_item)
 
@@ -195,7 +199,7 @@ class NCCA_RenderFarm_Browser():
                 self.download_directory(remote_path, local_directory)
             else:
                 file_name = os.path.basename(remote_path)
-                local_path = filedialog.asksaveasfilename(title="Save file", initialfile=file_name)
+                local_path = filedialog.asksaveasfilename(title="Save file", initialfile=file_name, filetypes=[("All Files", "*.*")])
                 if local_path:
                     # Open the file in write mode to get the path
                     with open(local_path, "w") as file:
@@ -235,12 +239,81 @@ class NCCA_RenderFarm_Browser():
         path = self.fsobjects[item]
         print(f"Rendering {path}")
 
-    def upload_to_item(self):
+    def upload_file_to_item(self):
+        item = self.treeview.selection()[0]
+        path = self.fsobjects[item]
+        print(f"Uploading to {path}")
+        
+        # Ask the user to select files or a folder to upload
+        files = filedialog.askopenfilenames(title="Select file(s) to upload", initialdir=os.path.expanduser("~"), filetypes=[("All Files", "*.*")])
+        if files:
+            # Upload each selected file
+            for file in files:
+                try:
+                    # Determine the remote path based on the current item's path
+                    remote_path = os.path.join(path, os.path.basename(file))
+                    # Upload the file
+                    self.renderfarm.upload(file, remote_path)
+                    print(f"Uploaded {file} to {remote_path}")
+                except Exception as err:
+                    print(f"Upload failed for {file}: {err}")
+
+    def upload_folder_to_item(self):
         item = self.treeview.selection()[0]
         path = self.fsobjects[item]
         print(f"Uploading to {path}")
 
+        # Ask the user to select a folder to upload
+        folder = filedialog.askdirectory(title="Select folder to upload", initialdir=os.path.expanduser("~"))
+        if folder:
+            try:
+                # Determine the remote path based on the current item's path
+                remote_folder_path = os.path.join(path, os.path.basename(folder))
+
+                # Iterate over the files in the selected folder
+                for root, dirs, files in os.walk(folder):
+                    for file in files:
+                        local_file_path = os.path.join(root, file)
+                        relative_file_path = os.path.relpath(local_file_path, folder)
+                        remote_file_path = os.path.join(remote_folder_path, relative_file_path)
+
+                        # Upload each file
+                        self.renderfarm.upload(local_file_path, remote_file_path)
+                        print(f"Uploaded {local_file_path} to {remote_file_path}")
+
+                print(f"Uploaded folder {folder} to {remote_folder_path}")
+            except Exception as err:
+                print(f"Upload failed for {folder}: {err}")
+
     def open_item(self):
         item = self.treeview.selection()[0]
-        path = self.fsobjects[item]
-        print(f"Opening {path}")
+        remote_path = self.fsobjects[item]
+
+        # Check if the file is an image based on its extension
+        image_extensions = self.IMAGE_EXTENSIONS
+        _, file_extension = os.path.splitext(remote_path)
+        if file_extension.lower() not in image_extensions:
+            print("The selected file is not an image.")
+            return
+
+        try:
+            # Get the file name from the remote path
+            file_name = os.path.basename(remote_path)
+
+            # Create a temporary directory
+            temp_dir = tempfile.TemporaryDirectory(dir="/tmp")
+
+            # Construct the local path for the downloaded file
+            local_path = os.path.join(temp_dir.name, file_name)
+
+            # Download the file to the temporary directory
+            self.renderfarm.download(remote_path, local_path)
+
+            # Open the downloaded file using PIL
+            with Image.open(local_path) as img:
+                img.show(title=file_name)
+        except Exception as err:
+            print(f"Failed to open {remote_path}: {err}")
+        finally:
+            # Cleanup: Delete the temporary directory
+            temp_dir.cleanup()
