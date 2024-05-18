@@ -138,8 +138,8 @@ class MayaSubmitDialog:
         end_frame = self.end_frame_entry.get()
         step_frame = self.step_frame_entry.get()
         project_location = self.project_location_entry.get()
-        output_dir = self.output_dir_entry.get() if self.output_dir_var.get() else ""
-        output_filename = self.output_filename_entry.get() if self.output_filename_var.get() else ""
+        output_dir = self.output_dir_entry.get()
+        output_filename = self.output_filename_entry.get()
         file_extension = self.file_extension_var.get()
         extra_commands = self.extra_commands_entry.get()
 
@@ -148,6 +148,73 @@ class MayaSubmitDialog:
         
         # Call the Maya submission function with the render options
         NCCA_RenderFarm_JobSubmitter.submit_maya(self.render_path, self.username, job_name, num_cpus, render_options)
+        self.dialog.destroy()
+
+class BlenderSubmitDialog:
+    def __init__(self, parent, render_path, username):
+        self.parent = parent
+        self.username = username
+        self.render_path = render_path
+        self.dialog = Toplevel(parent)
+        self.dialog.title("Blender Render Submission")
+
+        # Render Options
+        Label(self.dialog, text="Job Name:").pack()
+        self.job_name_entry = Entry(self.dialog)
+        self.job_name_entry.insert(0, f"{self.username}_untitled")
+        self.job_name_entry.pack()
+
+        # CPU Selection
+        Label(self.dialog, text="Number of CPUs:").pack()
+        self.cpu_var = IntVar()
+        self.cpu_var.set(1)  # Default number of CPUs
+        self.cpu_spinbox = Spinbox(self.dialog, from_=1, to=64, textvariable=self.cpu_var)
+        self.cpu_spinbox.pack()
+
+        Button(self.dialog, text="Submit", command=self.submit).pack()
+
+    def submit(self):
+        job_name = self.job_name_entry.get()
+        num_cpus = self.cpu_var.get()
+
+        NCCA_RenderFarm_JobSubmitter.submit_blender(self.render_path, self.username, job_name, num_cpus)
+        self.dialog.destroy()
+
+class HoudiniSubmitDialog:
+    def __init__(self, parent, render_path, username):
+        self.parent = parent
+        self.username = username
+        self.render_path = render_path
+        self.dialog = Toplevel(parent)
+        self.dialog.title("Houdini Render Submission")
+
+        # Render Options
+        Label(self.dialog, text="Job Name:").pack()
+        self.job_name_entry = Entry(self.dialog)
+        self.job_name_entry.insert(0, f"{self.username}_untitled")
+        self.job_name_entry.pack()
+
+        # Project Location
+        Label(self.dialog, text="ROP Path:").pack()
+        self.rop_path_entry = Entry(self.dialog)
+        self.rop_path_entry.insert(0, "/stage/usdrender_rop1")
+        self.rop_path_entry.pack()
+
+        # CPU Selection
+        Label(self.dialog, text="Number of CPUs:").pack()
+        self.cpu_var = IntVar()
+        self.cpu_var.set(2)  # Default number of CPUs
+        self.cpu_spinbox = Spinbox(self.dialog, from_=1, to=8, textvariable=self.cpu_var)
+        self.cpu_spinbox.pack()
+
+        Button(self.dialog, text="Submit", command=self.submit).pack()
+
+    def submit(self):
+        job_name = self.job_name_entry.get()
+        rop_path = self.rop_path_entry.get()
+        num_cpus = self.cpu_var.get()
+
+        NCCA_RenderFarm_JobSubmitter.submit_houdini(self.render_path, self.username, job_name, num_cpus, rop_path)
         self.dialog.destroy()
 
 class NCCA_RenderFarm_JobSubmitter:
@@ -188,12 +255,12 @@ class NCCA_RenderFarm_JobSubmitter:
         NCCA_RenderFarm_JobSubmitter.submit_job(job)
 
     @staticmethod
-    def submit_houdini(path, user, rop_path):
+    def submit_houdini(path, user, job_name, num_cpus, rop_path):
         frame_range=f"0-250x1"
 
         job = {}
-        job['name'] = "STANDALONE HOUDINI TEST"
-        job['cpus'] = 2
+        job['name'] = job_name
+        job['cpus'] = num_cpus
 
         job['prototype'] = 'cmdrange'
         package = {}
@@ -205,10 +272,8 @@ class NCCA_RenderFarm_JobSubmitter:
 
         print(render_command)
 
-        
         package['cmdline']=f"{pre_render} {render_command}"
 
-                
         job['package'] = package
         
         env={"HOME" :f"/render/{user}",  
@@ -223,12 +288,12 @@ class NCCA_RenderFarm_JobSubmitter:
         NCCA_RenderFarm_JobSubmitter.submit_job(job)
 
     @staticmethod
-    def submit_blender(path, user):
+    def submit_blender(path, user, job_name, num_cpus):
         frame_range=f"0-250x1"
 
         job = {}
-        job['name'] = "STANDALONE BLENDER TEST"
-        job['cpus'] = 2
+        job['name'] = job_name
+        job['cpus'] = num_cpus
 
         job['prototype'] = 'cmdrange'
         package = {}

@@ -10,14 +10,6 @@ import subprocess
 import threading
 from jobs import *
 
-# Add the directory to sys.path
-#houdini_path = '/opt/hfs19.5.605/python/lib/python3.9'
-#if houdini_path not in sys.path:
-#    sys.path.append(houdini_path)
-
-# Now import the hou module
-#import hou
-
 
 class NCCA_RenderFarm_Browser():
     def __init__(self, root, username, renderfarm, icon_folder, icon_size=16) -> None:
@@ -259,11 +251,11 @@ class NCCA_RenderFarm_Browser():
 
         if (file_extension):
             if ("blend" in file_extension):
-                NCCA_RenderFarm_JobSubmitter.submit_blender(render_path, self.username)
+                dialog = BlenderSubmitDialog(self.root, render_path, self.username)
+                self.root.wait_window(dialog.dialog)
             if ("hip" in file_extension):
-
-                rop_path = "/stage/usdrender_rop1"
-                NCCA_RenderFarm_JobSubmitter.submit_houdini(render_path, self.username, rop_path)
+                dialog = HoudiniSubmitDialog(self.root, render_path, self.username)
+                self.root.wait_window(dialog.dialog)
             if (file_extension in [".ma", ".mb"]):
 
                 dialog = MayaSubmitDialog(self.root, render_path, self.username)
