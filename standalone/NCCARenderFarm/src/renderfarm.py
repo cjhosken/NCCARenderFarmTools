@@ -26,8 +26,8 @@ class NCCA_RenderFarm(paramiko.SSHClient):
             sftp = client.open_sftp()
             print(f"Connected to {hostname} as {username}.")
             return cls(sftp)
-        except paramiko.AuthenticationException:
-            raise InvalidCredentialsException("Invalid username or password.")
+        except paramiko.AuthenticationException as e:
+            raise InvalidCredentialsException(f"Incorrect username or password")
         except (paramiko.SSHException, OSError) as err:
             raise ConnectionFailedException(f"Unable to connect to {hostname}: {err}")
         except Exception as err:

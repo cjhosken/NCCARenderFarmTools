@@ -5,6 +5,7 @@ from tkinter import Tk, ttk, Toplevel, Frame, LEFT, RIGHT, PhotoImage
 
 from utils import get_os_type, get_renderfarm
 from browser import NCCA_RenderFarm_Browser
+from renderfarm import InvalidCredentialsException, ConnectionFailedException
 
 class NCCARenderFarmApplication():
     
@@ -113,14 +114,14 @@ class NCCARenderFarmApplication():
         password = self.password_entry.get()
 
         try:
-            self.renderfarm = get_renderfarm(username, password)
+            self.renderfarm = get_renderfarm(username, password, os.path.join(self.application_folder, ".env"), False)
             if self.renderfarm is not None:
                 self.username = username
                 self.sign_in_window.destroy()
                 self.initialize_main_window()
-            else:
-                self.sign_in_error_label.configure(text="Invalid username or password. Please try again.")
-        except Exception as e:
+        except InvalidCredentialsException:
+            self.sign_in_error_label.configure(text="Invalid username or password. Please try again.")
+        except ConnectionFailedException:
             # Clear the input fields
             self.username_entry.delete(0, 'end')
             self.password_entry.delete(0, 'end')
