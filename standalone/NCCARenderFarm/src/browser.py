@@ -8,8 +8,11 @@ from utils import get_user_name
 import tempfile
 import subprocess
 import threading
+import numpy as np
 from jobs import *
 
+os.environ["OPENCV_IO_ENABLE_OPENEXR"] = "1" 
+import cv2
 
 class NCCA_RenderFarm_Browser():
     def __init__(self, root, username, renderfarm, icon_folder, icon_size=16) -> None:
@@ -25,7 +28,7 @@ class NCCA_RenderFarm_Browser():
         self.MAYA_ICON = ImageTk.PhotoImage(Image.open(os.path.join(icon_folder, "maya.png")).resize((icon_size, icon_size), Image.ADAPTIVE))
         self.BLENDER_ICON = ImageTk.PhotoImage(Image.open(os.path.join(icon_folder, "blender.png")).resize((icon_size, icon_size), Image.ADAPTIVE))
 
-        self.IMAGE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.bmp', '.gif']
+        self.IMAGE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.bmp', '.gif', ".exr"]
 
         self.treeview = ttk.Treeview(self.root, show="tree")
         self.treeview.grid(row=0, column=0, sticky="nsew")
@@ -331,16 +334,41 @@ class NCCA_RenderFarm_Browser():
 
             # Download the file to the temporary directory
             self.renderfarm.download(remote_path, local_path)
+            
+            if (file_extension == ".exr"):
+                img = self.convert_exr_to_png(local_path)
+                img.show()
+            else:
+                with Image.open(local_path) as img:
+                    img.show()
 
-            # Open the downloaded file using PIL
-            with Image.open(local_path) as img:
-                img.show(title=file_name)
+            
 
         except Exception as err:
             print(f"Failed to open {remote_path}: {err}")
         finally:
             # Cleanup: Delete the temporary directory
             temp_dir.cleanup()
+
+    def convert_exr_to_png(self, exr_file):
+        # Read the EXR file using OpenCV
+        exr_image = cv2.imread(exr_file, cv2.IMREAD_ANYDEPTH | cv2.IMREAD_COLOR)
+
+        if exr_image is not None:
+            # Convert the OpenCV image to a numpy array
+            exr_image_rgb = cv2.cvtColor(exr_image, cv2.COLOR_BGR2RGB)
+            exr_array = np.array(exr_image_rgb)
+
+            # Normalize the pixel values between 0 and 1
+            normalized_array = cv2.normalize(exr_array, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8U)
+
+            # Convert the numpy array to a Pillow Image
+            png_image = Image.fromarray(normalized_array)
+
+            return png_image
+        else:
+            print("Failed to read the EXR file.")
+            return None
 
     def open_cube(self):
         def run_qube():
