@@ -22,7 +22,7 @@ class NCCARenderFarmApplication():
             raise Exception("Current operating system not supported.")
         
         env_path = os.path.join(self.application_folder, ".env")
-        use_env = True
+        use_env = False
         
         if os.path.exists(env_path) and use_env:
             try:
