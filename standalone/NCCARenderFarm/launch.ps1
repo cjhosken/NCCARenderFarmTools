@@ -52,5 +52,5 @@ python -m pip install --upgrade pip
 $requirementsPath = Join-Path -Path $SCRIPT_DIR -ChildPath "requirements.txt"
 python -m pip install -r $requirementsPath
 
-$mainScriptPath = Join-Path -Path $SCRIPT_DIR -ChildPath "src\qt_test.py"
+$mainScriptPath = Join-Path -Path $SCRIPT_DIR -ChildPath "src\main.py"
 python $mainScriptPath
