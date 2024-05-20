@@ -1,25 +1,31 @@
-import os
-from renderfarm import NCCA_RenderFarm
+from PySide6.Qt import *
+from PySide6.QtGui import *
+from PySide6.QtCore import *
+from PySide6.QtSvg import *
 
-def get_os_type():
-    """Get the operating system type."""
-    if os.name == 'posix':
-        return 'linux'
-    elif os.name == 'nt':
-        return 'windows'
-    else:
-        return 'other'
-
-def get_user_name():
-    """Get the user name depending on the operating system."""
-    if get_os_type() == 'linux':
-        return os.getlogin()  # On Linux, use os.getlogin()
-    elif get_os_type() == 'windows':
-        return os.environ.get('USERNAME')  # On Windows, use the USERNAME environment variable
-    else:
-        return None  # Return None for other operating systems
+def svg_to_pixmap(svg_filename: str, size: QSize, color: QColor) -> QPixmap:
+    # Create an SVG renderer and set the SVG file
+    renderer = QSvgRenderer(svg_filename)
     
-def get_renderfarm(username, password):
-    renderfarm = NCCA_RenderFarm.create("tete.bournemouth.ac.uk", username, password)
-
-    return renderfarm
+    # Create a QPixmap with the specified size
+    pixmap = QPixmap(size)
+    
+    # Fill the QPixmap with transparent color
+    pixmap.fill(Qt.GlobalColor.transparent)
+    
+    # Create a QPainter for drawing on the QPixmap
+    painter = QPainter(pixmap)
+    
+    # Render the SVG image onto the QPixmap
+    renderer.render(painter)  # Only alpha channel of the destination pixmap is used
+    
+    # Set the composition mode to blend the color with the pixmap
+    painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_SourceIn)
+    
+    # Fill the entire pixmap with the specified color
+    painter.fillRect(pixmap.rect(), color)
+    
+    # End painting
+    painter.end()
+    
+    return pixmap
