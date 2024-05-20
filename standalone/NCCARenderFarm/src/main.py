@@ -8,15 +8,20 @@ from dotenv import load_dotenv
 __version__ = "2024"
 __appname__ = f"NCCA Renderfarm {__version__}"
 
+import os
+
+from styles import SCRIPT_DIR
+
 def main():
     # Load environment variables from .env file
     load_dotenv()
+    os.chdir(SCRIPT_DIR)
     
     # Create the application instance
     app = QApplication(sys.argv)
     
     # Set application metadata
-    app.setWindowIcon(QIcon("./src/assets/icons/farm.png"))
+    app.setWindowIcon(QIcon(os.path.join(SCRIPT_DIR, "assets/icons/farm.png")))
     app.setApplicationName(__appname__)
     app.setApplicationVersion(__version__)
     

@@ -1,7 +1,16 @@
-from PySide6.Qt import *
 from PySide6.QtGui import *
 from PySide6.QtCore import *
 from PySide6.QtSvg import *
+import platform, os
+
+def get_operating_system():
+    os_name = platform.system()
+    if os_name == "Windows":
+        return "windows"
+    elif os_name == "Linux":
+        return "linux"
+    else:
+        return "other"
 
 def svg_to_pixmap(svg_filename: str, size: QSize, color: QColor) -> QPixmap:
     # Create an SVG renderer and set the SVG file
@@ -29,3 +38,8 @@ def svg_to_pixmap(svg_filename: str, size: QSize, color: QColor) -> QPixmap:
     painter.end()
     
     return pixmap
+
+def get_user_home():
+    return os.path.expanduser("~")
+
+

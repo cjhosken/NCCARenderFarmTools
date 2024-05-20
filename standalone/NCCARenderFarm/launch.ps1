@@ -52,5 +52,7 @@ python -m pip install --upgrade pip
 $requirementsPath = Join-Path -Path $SCRIPT_DIR -ChildPath "requirements.txt"
 python -m pip install -r $requirementsPath
 
+cd $SCRIPT_DIR
+
 $mainScriptPath = Join-Path -Path $SCRIPT_DIR -ChildPath "src\main.py"
 python $mainScriptPath

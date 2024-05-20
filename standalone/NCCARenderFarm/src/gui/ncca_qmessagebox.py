@@ -7,7 +7,7 @@ from gui.ncca_qiconbutton import NCCA_QIconButton
 from gui.ncca_qmainwindow import NCCA_QMainWindow
 from gui.ncca_qdialog import NCCA_QDialog
 
-from .styles import *
+from styles import *
 
 class NCCA_QMessageBox(NCCA_QDialog):  # Use QDialog instead of QMessageBox
     def __init__(self, parent=None,icon=None,title=""):
@@ -95,6 +95,8 @@ class NCCA_QMessageBox(NCCA_QDialog):  # Use QDialog instead of QMessageBox
     def warning(parent, title, text, confirm_text="Ok"):
         msg_box = NCCA_QMessageBox(parent, WARNING_ICON, title=title)
         msg_box.label.setText(text)
+
+        print("Title: ", text)
 
         ok_button = NCCA_QFlatButton(confirm_text)
         ok_button.setFixedSize(QSize(125, 35))

@@ -3,7 +3,7 @@ from PySide6.QtCore import *
 from PySide6.QtGui import *
 
 
-from gui.styles import *
+from styles import *
 
 from gui.ncca_qiconbutton import NCCA_QIconButton
 from gui.ncca_qflatbutton import NCCA_QFlatButton
@@ -12,10 +12,6 @@ from gui.ncca_qinput import NCCA_QInput
 from gui.ncca_qmainwindow import NCCA_QMainWindow
 from gui.ncca_qmessagebox import NCCA_QMessageBox
 
-
-from ncca_renderfarm import NCCA_RenderfarmConnectionFailed, NCCA_RenderfarmIncorrectLogin
-
-from gui.styles import *
 
 class NCCA_QSubmitWindow(NCCA_QMainWindow):  # Use QDialog instead of QMessageBox
     def __init__(self, parent=None):

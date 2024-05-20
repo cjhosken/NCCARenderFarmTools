@@ -1,11 +1,8 @@
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
-from gui.styles import *
 
 from ncca_renderfarmwindow import NCCA_RenderFarmWindow
-
-from gui.styles import *
 
 from gui.ncca_qiconbutton import NCCA_QIconButton
 from gui.ncca_qflatbutton import NCCA_QFlatButton
@@ -15,11 +12,14 @@ from gui.ncca_qmainwindow import NCCA_QMainWindow
 from gui.ncca_qmessagebox import NCCA_QMessageBox
 
 
-from ncca_renderfarm import NCCA_RenderfarmConnectionFailed, NCCA_RenderfarmIncorrectLogin
+from gui.ncca_renderfarm_qfilesystemmodel import NCCA_RenderfarmConnectionFailed, NCCA_RenderfarmIncorrectLogin
 
 import os
 
 from cryptography.fernet import Fernet
+
+from styles import *
+
 
 class NCCA_LoginWindow(NCCA_QMainWindow):
     def __init__(self, name):
@@ -96,19 +96,13 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
 
     def handle_login(self):
         try:
-            if self.username.text() == 'admin' and self.password.text() == 'password':
+            app = self.open_main_app()
+
+            if (app is not None):
                 if self.keep_details.isChecked():
                     self.store_details()
                 else:
                     self.clear_details()
-
-                #raise Exception("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam accumsan porta urna, iaculis tempus arcu molestie id. Vestibulum turpis ante, ornare et odio facilisis, blandit dictum turpis. Suspendisse ac mi id neque sodales aliquam eu a ante. Maecenas pretium consequat luctus. Maecenas massa lorem, faucibus non commodo at, tincidunt quis elit. Pellentesque eu lorem diam. Aliquam vestibulum iaculis efficitur. Suspendisse ut purus at purus rutrum ultrices non pharetra risus. Integer sed ullamcorper nisi, sit amet aliquam arcu. Interdum et malesuada fames ac ante ipsum primis in faucibus. Donec consequat, sapien non posuere placerat, metus leo pretium neque, facilisis porta nisi nisl semper magna. Cras ornare justo vitae est semper, sit amet feugiat tortor fringilla.")
-
-                #raise NCCA_RenderfarmConnectionFailed
-
-                self.open_main_app()
-            else:
-                raise NCCA_RenderfarmIncorrectLogin
 
         except NCCA_RenderfarmConnectionFailed:
             self.initConnectionFailedUI()
@@ -119,13 +113,6 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
             self.password.raiseError()
 
             self.warning_label.setText("Invalid username or password.")
-            return
-        except Exception as e:
-            NCCA_QMessageBox.warning(
-                self,
-                "Error",
-                str(e)
-            )
             return
         
     
@@ -148,7 +135,7 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
 
     
         self.clear_details()
-        with open('./src/.env', 'w') as f:
+        with open(os.path.join(SCRIPT_DIR, '.env'), 'w') as f:
             # Write the encryption key to the file
             f.write(f"NCCA_ENCRYPTION_KEY={gen_key.decode()}\n")
             # Write the encrypted environment variables
@@ -180,8 +167,9 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
             self.password.setText(password)
 
     def clear_details(self):
-        if os.path.isfile('./src/.env'):
-            os.remove("./src/.env")
+        env_path = os.path.join(SCRIPT_DIR, ".env")
+        if os.path.isfile(env_path):
+            os.remove(env_path)
 
     def initConnectionFailedUI(self):
         while self.main_layout.count():
@@ -224,17 +212,15 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
 
         # Add image
         image_label = QLabel()
-        pixmap = QPixmap("./src/assets/images/connection_failed.jpg").scaled(QSize(200, 200), Qt.KeepAspectRatio)  # Replace "path_to_your_image" with the actual path to your image
+        pixmap = QPixmap(os.path.join(SCRIPT_DIR, "assets/images/connection_failed.jpg")).scaled(QSize(200, 200), Qt.KeepAspectRatio)  # Replace "path_to_your_image" with the actual path to your image
         image_label.setPixmap(pixmap)
         image_label.setAlignment(Qt.AlignCenter)
         self.main_layout.addWidget(image_label)
         self.main_layout.addStretch(1)
 
-    
-
 
     def open_main_app(self):
-        self.main_app = NCCA_RenderFarmWindow(self.name)
+        self.main_app = NCCA_RenderFarmWindow(self.name, self.username.text(), self.password.text())
         self.main_app.setGeometry(self.geometry())  # Set the geometry of the main app to match the login window
         self.main_app.show()
         self.close()

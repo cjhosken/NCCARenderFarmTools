@@ -11,7 +11,7 @@ from gui.ncca_qmainwindow import NCCA_QMainWindow
 
 from gui.ncca_qdialog import NCCA_QDialog
 
-from .styles import *
+from styles import *
 
 class NCCA_QInputDialog(NCCA_QDialog):
     def __init__(self, placeholder="", text="", confirm_text="Ok", parent=None):

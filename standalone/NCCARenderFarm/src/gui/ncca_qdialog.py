@@ -4,7 +4,7 @@ from PySide6.QtGui import *
 
 from gui.ncca_qiconbutton import NCCA_QIconButton
 
-from .styles import *
+from styles import *
 
 class NCCA_QDialog(QDialog):
     def __init__(self, parent=None, size=QSize(500, 500), title=""):
@@ -42,7 +42,7 @@ class NCCA_QDialog(QDialog):
         self.title = QLabel(title)
 
         # Close button
-        self.close_button = NCCA_QIconButton("./src/assets/icons/close.svg", icon_size=APP_ICON_SIZE)
+        self.close_button = NCCA_QIconButton(os.path.join(SCRIPT_DIR, "assets/icons/close.svg"), icon_size=APP_ICON_SIZE)
         self.close_button.setFixedSize(QSize(32, 32))
         self.close_button.clicked.connect(self.close)
         

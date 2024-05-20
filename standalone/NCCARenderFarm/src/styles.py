@@ -1,5 +1,6 @@
 from PySide6.QtCore import *
 from PySide6.QtGui import *
+import os
 
 APP_BACKGROUND_COLOR = "#FFFFFF"
 APP_FOREGROUND_COLOR = "#2D2D2D"
@@ -34,9 +35,13 @@ SETTINGS_WINDOW_SIZE = QSize(500, 500)
 
 IMAGE_VIEWER_SIZE = QSize(1280, 700)
 
-WARNING_ICON = "./src/assets/icons/warning.png"
-QUESTION_ICON = "./src/assets/icons/question.svg"
-DROPDOWN_ICON = "./src/assets/icons/dropdown.svg"
 
 VIEWABLE_IMAGE_FILES = [".png", ".jpg", ".jpeg", ".tiff"]
 OPENABLE_FILES = [] + VIEWABLE_IMAGE_FILES
+
+SCRIPT_DIR = script_dir = os.path.dirname(os.path.abspath(__file__))
+
+WARNING_ICON = os.path.join(SCRIPT_DIR, "/assets/icons/warning.png")
+QUESTION_ICON = os.path.join(SCRIPT_DIR, "/assets/icons/question.svg")
+DROPDOWN_ICON = os.path.join(SCRIPT_DIR, "/assets/icons/dropdown.svg")
+CHECKED_ICON = os.path.join(SCRIPT_DIR, '/assets/icons/checked.svg')

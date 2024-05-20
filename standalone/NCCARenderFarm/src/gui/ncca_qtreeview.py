@@ -9,44 +9,26 @@ from gui.ncca_qinputdialog import NCCA_QInputDialog
 from ncca_qimageviewer import NCCA_QImageViewer
 from ncca_qsubmitwindow import NCCA_QSubmitWindow
 from gui.ncca_qprogressdialog import NCCA_QProgressDialog
+from gui.ncca_renderfarm_qfilesystemmodel import NCCA_RenderFarm_QFileSystemModel
 
-from .styles import *
+from styles import *
 
+import paramiko
+import stat
 
 from qube import open_qube
 
-class NCCA_Renderfarm_QFarmBrowser(QListView):
-    def __init__(self, root_path, parent, size):
-        super().__init__(parent)
-        self.setFixedSize(size)
-        self.setObjectName("NCCA_Renderfarm_QFarmBrowser")
 
-        self.layout = QVBoxLayout(self)
-        self.layout.setContentsMargins(0, 0, 0, 0)
-
-        self.model = NCCA_Renderfarm_QFileSystemModel()
-        self.model.setRootPath(root_path)
-
-        self.tree_view = NCCA_Renderfarm_QTreeView(self.model)
-        self.tree_view.setRootIndex(self.model.index('/home/'))
-        self.tree_view.expandAll()
-
-        self.layout.addWidget(self.tree_view)
-
-        self.setStyleSheet(f"""
-            NCCA_Renderfarm_QFarmBrowser {{
-                border: none;
-                background: transparent;
-                outline: 0;
-            }}
-        """)
-        
-
-class NCCA_Renderfarm_QTreeView(QTreeView):
-    def __init__(self, model):
+class NCCA_RenderFarm_QTreeView(QTreeView):
+    def __init__(self, path, parent, size, username, password):
         super().__init__()
-        self.setModel(model)
+        self.setModel(NCCA_RenderFarm_QFileSystemModel(username, password))
+        root_index = self.model().index(0, 0)  # Assuming 0, 0 is the index of the root directory
+        self.setRootIndex(root_index)
         self.setObjectName("NCCA_Renderfarm_QTreeView")
+
+        self.username = username
+        self.password = password
 
         self.setHeaderHidden(True)
         for column in range(1, self.model().columnCount()):
@@ -57,6 +39,7 @@ class NCCA_Renderfarm_QTreeView(QTreeView):
         self.setDropIndicatorShown(True)
         self.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.setDragDropMode(QAbstractItemView.InternalMove) 
+        self.expandAll()
         
 
         self.setCursor(Qt.PointingHandCursor)
@@ -76,8 +59,7 @@ class NCCA_Renderfarm_QTreeView(QTreeView):
                 padding-right: 16px;
                 
             }}
-                           
-
+        
             NCCA_Renderfarm_QTreeView::item:selected, NCCA_Renderfarm_QTreeView::item:selected:hover {{ 
                            background-color: {APP_PRIMARY_COLOR}; 
             }}
@@ -114,10 +96,14 @@ class NCCA_Renderfarm_QTreeView(QTreeView):
         model = self.model()
         # Get the file path corresponding to the index
         file_path = model.filePath(index)
-        # Check if the folder has children
-        if (os.path.isdir(file_path)):
-            if len(os.listdir(file_path)) > 0:
-                return False
+
+        # Check if the folder is accessible
+        if os.access(file_path, os.R_OK):
+            # Check if the path is a directory
+            if os.path.isdir(file_path):
+                # Check if the directory is empty
+                if len(os.listdir(file_path)) > 0:
+                    return False
         return True
 
     def drawBranches(self, painter, rect, index):
@@ -140,7 +126,7 @@ class NCCA_Renderfarm_QTreeView(QTreeView):
         if event.mimeData().hasUrls():
             urls = event.mimeData().urls()
 
-            root_path_index = self.model().index("/home/cjhosken/")
+            root_path_index = self.model().index(self.root_path)
             root_path = self.model().filePath(root_path_index)
 
             for url in urls:
@@ -217,7 +203,7 @@ class NCCA_Renderfarm_QTreeView(QTreeView):
 
     def createContextMenu(self, index, event):
         filepath = self.model().filePath(index)
-        root_path_index = self.model().index("/home/cjhosken/")
+        root_path_index = self.model().index(f"/home/{self.username}")
         root_path = self.model().filePath(root_path_index)
     
         self.context_menu = QMenu(self)
@@ -294,7 +280,7 @@ class NCCA_Renderfarm_QTreeView(QTreeView):
 
     def deleteIndex(self, index, confirm=True):
         filepath = self.model().filePath(index)
-        root_path_index = self.model().index("/home/cjhosken/")
+        root_path_index = self.model().index(f"/home/{self.username}")
         root_path = self.model().filePath(root_path_index)
 
         if filepath != root_path:
@@ -348,7 +334,7 @@ class NCCA_Renderfarm_QTreeView(QTreeView):
             return
 
         filepath = self.model().filePath(index)
-        root_path_index = self.model().index("/home/cjhosken/")
+        root_path_index = self.model().index(f"/home/{self.username}")
         root_path = self.model().filePath(root_path_index)
 
         if filepath == root_path:
@@ -491,48 +477,3 @@ class NCCA_Renderfarm_QTreeView(QTreeView):
     def updateProgress(self, value):
         if hasattr(self, 'progress_dialog'):
             self.progress_dialog.set_progress(value)
-
-class NCCA_Renderfarm_QFileSystemModel(QFileSystemModel):
-    def data(self, index, role=Qt.DisplayRole):
-        if role == Qt.DisplayRole:
-            fileInfo = self.fileInfo(index)
-            if fileInfo.isDir():
-                # Override the folder name here
-                if fileInfo.fileName() == "cjhosken":
-                    return "/home/cjhosken"
-    
-        elif role == Qt.DecorationRole and index.isValid():
-            filepath = self.filePath(index)
-
-            if os.path.isdir(filepath):
-                if(os.path.basename(filepath)) == "cjhosken":
-                    return QIcon("./src/assets/icons/farm.png")
-                else:
-                    return QIcon("./src/assets/icons/folder.svg") 
-            
-            if os.path.isfile(filepath):
-                _, file_ext = os.path.splitext(filepath)
-
-                if "blend" in file_ext:
-                # Provide custom icon for .blend files
-                    return QIcon("./src/assets/icons/blender.svg")  # Replace "path_to_blend_icon.png" with the actual path to your icon file
-
-                if (file_ext in VIEWABLE_IMAGE_FILES):
-                    return QIcon("./src/assets/icons/image.svg")
-
-            return QIcon("./src/assets/icons/file.svg")
-
-        return super().data(index, role)
-    
-    def flags(self, index):
-        default_flags = super().flags(index)
-        if index.isValid():
-            filepath = self.filePath(index)
-            # Enable drag-and-drop for both files and folders
-            flags = default_flags | Qt.ItemIsDragEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
-            # Optionally, enable checkability for directories
-            if self.isDir(index):
-                flags |= Qt.ItemIsUserCheckable
-            
-            return flags
-        return default_flags

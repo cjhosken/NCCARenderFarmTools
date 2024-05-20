@@ -5,7 +5,7 @@ from PySide6.QtGui import *
 from gui.ncca_qmainwindow import NCCA_QMainWindow
 from gui.ncca_qcombobox import NCCA_QComboBox
 
-from gui.styles import *
+from styles import *
 
 import os
 

@@ -2,9 +2,12 @@ from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
-from .styles import *
+from styles import *
 
 from .ncca_qiconbutton import NCCA_QIconButton
+
+import os
+
 
 
 class NCCA_QMainWindow(QMainWindow):
@@ -65,7 +68,7 @@ class NCCA_QMainWindow(QMainWindow):
         pass
 
     def endUI(self):
-        self.exit_button = NCCA_QIconButton('./src/assets/icons/close.svg', APP_ICON_SIZE)
+        self.exit_button = NCCA_QIconButton(os.path.join(SCRIPT_DIR, 'assets/icons/close.svg'), APP_ICON_SIZE)
         self.exit_button.setFixedSize(48, 48)
         self.exit_button.clicked.connect(self.close)
         # Add the exit button to the navigation bar layout

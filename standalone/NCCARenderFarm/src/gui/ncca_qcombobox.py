@@ -2,7 +2,7 @@ from PySide6.QtWidgets import QComboBox
 from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QFont, QIcon
 
-from .styles import *
+from styles import *
 
 class NCCA_QComboBox(QComboBox):
     def __init__(self, parent=None):

@@ -1,6 +1,7 @@
 from PySide6.QtWidgets import QCheckBox
 
-from .styles import *
+from styles import *
+import os
 
 
 class NCCA_QCheckBox(QCheckBox):
@@ -26,7 +27,7 @@ class NCCA_QCheckBox(QCheckBox):
         NCCA_QCheckBox::indicator:checked {{
             background-color: {APP_PRIMARY_COLOR};
             color: white;
-            image: url(./src/assets/icons/checked.svg);
+            image: url({CHECKED_ICON});
             border-color: transparent;
         }}
         NCCA_QCheckBox::indicator:unchecked {{
