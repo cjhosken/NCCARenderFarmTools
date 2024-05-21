@@ -2,6 +2,9 @@ from PySide6.QtWidgets import *
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 
+
+from PySide6.QtWidgets import QFileSystemModel
+
 import os, shutil
 
 from gui.ncca_qmessagebox import NCCA_QMessageBox
@@ -14,138 +17,54 @@ from styles import *
 import paramiko
 import stat
 
+import socket
 
-class NCCA_Error(Exception):
-    pass
 
-class NCCA_RenderfarmConnectionFailed(NCCA_Error):
-    pass
-
-class NCCA_RenderfarmIncorrectLogin(NCCA_Error):
-    pass
-
-from PySide6.QtCore import QAbstractItemModel, QModelIndex, Qt
-import paramiko
-
-class NCCA_RenderFarm_QFileSystemModel(QAbstractItemModel):
-    def __init__(self, username, password, parent=None):
-        super().__init__(parent)
-        self.renderfarm = None
-        self.root_path = "/"
-        self.root_item = None
-        self.username = username
-        self.password = password
-        self.setup_sftp_connection()
-        self.setupModelData()
-
-    def setup_sftp_connection(self):
-        # Setup your SFTP connection here
-        ssh = paramiko.SSHClient()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect("tete.bournemouth.ac.uk", port=22, username=self.username, password=self.password)
-        self.renderfarm = ssh.open_sftp()
-        print("CONNECTED")
-
-    def index(self, row, column, parent=QModelIndex()):
-        if not parent.isValid():
-            parent_item = self.root_item
-        else:
-            parent_item = parent.internalPointer()
-
-        if parent_item:
-            child_item = parent_item.child(row)
-            if child_item:
-                return self.createIndex(row, column, child_item)
-
-        return QModelIndex()
-
-    def parent(self, index):
-        if not index.isValid():
-            return QModelIndex()
-
-        child_item = index.internalPointer()
-        parent_item = child_item.parent_item
-
-        if parent_item == self.root_item:
-            return QModelIndex()
-
-        return self.createIndex(parent_item.row(), 0, parent_item)
-
-    def rowCount(self, parent=QModelIndex()):
-        if parent.column() > 0:
-            return 0
-
-        if not parent.isValid():
-            parent_item = self.root_item
-        else:
-            parent_item = parent.internalPointer()
-
-        return parent_item.child_count()
-
-    def columnCount(self, parent=QModelIndex()):
-        return 1
+class NCCA_RenderFarm_QFileSystemModel(QFileSystemModel):
+    def __init__(self, root_path):
+        super().__init__()
+        self.root_path = root_path
 
     def data(self, index, role=Qt.DisplayRole):
-        if not index.isValid():
-            return None
-
-        item = index.internalPointer()
-
         if role == Qt.DisplayRole:
-            return item.data()
+            fileInfo = self.fileInfo(index)
+            if fileInfo.isDir():
+                # Override the folder name here
+                if fileInfo.fileName() == os.path.basename(self.root_path):
+                    return self.root_path
+    
+        elif role == Qt.DecorationRole and index.isValid():
+            filepath = self.filePath(index)
 
-        return None
-
-    def setupModelData(self, parent):
-        self.root_item = SFTPItem(self.root_path, parent, self.renderfarm)
-
-    def fetchMore(self, parent=QModelIndex()):
-        self.setupModelData(parent)
-
-    def setupModelData(self):
-        self.root_item = SFTPItem(self.root_path, None, self.renderfarm)
-
-class SFTPItem:
-    def __init__(self, path, parent=None, sftp=None):
-        self.path = path
-        self.parent_item = parent
-        self.renderfarm = sftp
-        self.child_items = []
-        self.populate_children()
-
-    def populate_children(self):
-        if self.renderfarm is None:
-            return
-
-        try:
-            files = self.renderfarm.listdir(self.path)
-            for file in files:
-                full_path = f"{self.path}/{file}"
-                if self.renderfarm.isdir(full_path):
-                    self.child_items.append(SFTPItem(full_path, self, self.renderfarm))
+            if os.path.isdir(filepath):
+                if(os.path.basename(filepath)) == "cjhosken":
+                    return QIcon(os.path.join(SCRIPT_DIR, "assets/icons/farm.png"))
                 else:
-                    self.child_items.append(SFTPItemLeaf(full_path, self))
-        except FileNotFoundError:
-            # Handle non-existent directory
-            pass
+                    return QIcon(os.path.join(SCRIPT_DIR, "assets/icons/folder.svg")) 
+            
+            if os.path.isfile(filepath):
+                _, file_ext = os.path.splitext(filepath)
 
-    def child(self, row):
-        return self.child_items[row]
+                if "blend" in file_ext:
+                # Provide custom icon for .blend files
+                    return QIcon(os.path.join(SCRIPT_DIR, "assets/icons/blender.svg"))  # Replace "path_to_blend_icon.png" with the actual path to your icon file
 
-    def child_count(self):
-        return len(self.child_items)
+                if (file_ext in VIEWABLE_IMAGE_FILES):
+                    return QIcon(os.path.join(SCRIPT_DIR, ".assets/icons/image.svg"))
 
-    def row(self):
-        if self.parent_item:
-            return self.parent_item.child_items.index(self)
+            return QIcon(os.path.join(SCRIPT_DIR, "assets/icons/file.svg"))
 
-    def data(self):
-        return self.path
-
-class SFTPItemLeaf:
-    def __init__(self, path, parent=None):
-        self.path = path
-        self.parent_item = parent
-
-    def data(self):
-        return self.path
+        return super().data(index, role)
+    
+    def flags(self, index):
+        default_flags = super().flags(index)
+        if index.isValid():
+            filepath = self.filePath(index)
+            # Enable drag-and-drop for both files and folders
+            flags = default_flags | Qt.ItemIsDragEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
+            # Optionally, enable checkability for directories
+            if self.isDir(index):
+                flags |= Qt.ItemIsUserCheckable
+            
+            return flags
+        return default_flags

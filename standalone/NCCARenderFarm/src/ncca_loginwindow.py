@@ -12,7 +12,7 @@ from gui.ncca_qmainwindow import NCCA_QMainWindow
 from gui.ncca_qmessagebox import NCCA_QMessageBox
 
 
-from gui.ncca_renderfarm_qfilesystemmodel import NCCA_RenderfarmConnectionFailed, NCCA_RenderfarmIncorrectLogin
+from gui.ncca_renderfarm_qfarmsystemmodel import NCCA_RenderfarmConnectionFailed, NCCA_RenderfarmIncorrectLogin
 
 import os
 
@@ -105,8 +105,16 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
                     self.clear_details()
 
         except NCCA_RenderfarmConnectionFailed:
-            self.initConnectionFailedUI()
-            return
+            if (USE_LOCAL_FILESYSTEM):
+                NCCA_QMessageBox.warning(
+                    self,
+                    "Connection Error",
+                    f"Unable to connect to renderfarm. Using local file path instead."
+                )
+                app = self.open_main_app(use_local=True)
+            else:
+                self.initConnectionFailedUI()
+                
         except NCCA_RenderfarmIncorrectLogin:
             # Show warning by changing QLineEdit border color
             self.username.raiseError()
@@ -207,6 +215,10 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
         cant_connect_label_font.setPointSize(LOGIN_TEXT_SIZE)
         cant_connect_label.setFont(cant_connect_label_font)
 
+        cant_connect_label.setStyleSheet(f"""QLabel {{
+                                         padding-left: 20px; padding-right: 20px;
+        }}""")
+
         self.main_layout.addWidget(cant_connect_label)
         self.main_layout.addStretch(1)
 
@@ -219,8 +231,11 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
         self.main_layout.addStretch(1)
 
 
-    def open_main_app(self):
-        self.main_app = NCCA_RenderFarmWindow(self.name, self.username.text(), self.password.text())
+    def open_main_app(self, use_local=False):
+        if (use_local):
+            self.main_app = NCCA_RenderFarmWindow(self.name, None, None)
+        else:
+            self.main_app = NCCA_RenderFarmWindow(self.name, self.username.text(), self.password.text())
         self.main_app.setGeometry(self.geometry())  # Set the geometry of the main app to match the login window
         self.main_app.show()
         self.close()

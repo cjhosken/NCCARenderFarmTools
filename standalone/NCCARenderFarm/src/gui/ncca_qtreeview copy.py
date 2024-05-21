@@ -9,7 +9,7 @@ from gui.ncca_qinputdialog import NCCA_QInputDialog
 from ncca_qimageviewer import NCCA_QImageViewer
 from ncca_qsubmitwindow import NCCA_QSubmitWindow
 from gui.ncca_qprogressdialog import NCCA_QProgressDialog
-from gui.ncca_renderfarm_qfilesystemmodel import NCCA_RenderFarm_QFileSystemModel
+from standalone.NCCARenderFarm.src.gui.ncca_renderfarm_qfarmsystemmodel import NCCA_RenderFarm_QFileSystemModel
 
 from styles import *
 

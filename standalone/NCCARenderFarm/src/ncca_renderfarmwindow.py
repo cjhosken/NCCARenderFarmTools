@@ -5,7 +5,7 @@ from styles import *
 
 from gui.ncca_qiconbutton import NCCA_QIconButton
 from gui.ncca_qmainwindow import NCCA_QMainWindow
-from gui.ncca_qtreeview import NCCA_RenderFarm_QTreeView
+from gui.ncca_qfiletreeview import NCCA_RenderFarm_QTreeView
 from ncca_qsettingswindow import NCCA_QSettingsWindow
 
 from qube import open_qube
@@ -55,8 +55,11 @@ class NCCA_RenderFarmWindow(NCCA_QMainWindow):
         self.report_bug_button.clicked.connect(self.report_bug)
 
         self.nav_and_title_layout.addWidget(self.report_bug_button, alignment=Qt.AlignRight)
-
-        self.browser = NCCA_RenderFarm_QTreeView(f"/home/{self.username}", self, QSize(APP_PAGE_SIZE.width(), APP_PAGE_SIZE.height() - APP_NAVBAR_HEIGHT), self.username, self.password)
+        
+        if (self.username is None and self.password is None):
+            self.browser = NCCA_RenderFarm_QTreeView(get_user_home(), self, QSize(APP_PAGE_SIZE.width(), APP_PAGE_SIZE.height() - APP_NAVBAR_HEIGHT), None, None)
+        else:
+            self.browser = NCCA_RenderFarm_QTreeView(f"/home/{self.username}", self, QSize(APP_PAGE_SIZE.width(), APP_PAGE_SIZE.height() - APP_NAVBAR_HEIGHT), self.username, self.password)
         # Add the content widget to the main layout
         self.main_layout.addWidget(self.browser)
 
