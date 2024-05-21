@@ -50,7 +50,7 @@ class NCCA_RenderFarm_QFileSystemModel(QFileSystemModel):
                     return QIcon(os.path.join(SCRIPT_DIR, "assets/icons/blender.svg"))  # Replace "path_to_blend_icon.png" with the actual path to your icon file
 
                 if (file_ext in VIEWABLE_IMAGE_FILES):
-                    return QIcon(os.path.join(SCRIPT_DIR, ".assets/icons/image.svg"))
+                    return QIcon(os.path.join(SCRIPT_DIR, "assets/icons/image.svg"))
 
             return QIcon(os.path.join(SCRIPT_DIR, "assets/icons/file.svg"))
 
