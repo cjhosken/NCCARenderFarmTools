@@ -28,6 +28,17 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
         self.root_path = self.get_root_path()
         self.rootAdded = False
 
+    def refresh(self):
+        # Implement the logic to refresh the data
+        # This could involve reloading the data from the server or clearing and repopulating the model
+        self.beginResetModel()
+        self.loadData()  # Assuming you have a method to load data
+        self.endResetModel()
+        
+    def loadData(self):
+        # Implement your data loading logic here
+        pass
+
     def setup_sftp_connection(self):
         attempts = 2
         for attempt in range(attempts):
@@ -49,6 +60,9 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
                     raise NCCA_RenderfarmConnectionFailed(f"Connection failed after {attempts} attempts")
 
     def create_item(self, path, parent):
+        if (not USE_DOT):
+            if os.path.basename(path).startswith('.'):
+                return None
         return {'path': path.replace('\\', '/'), 'parent': parent, 'children': None}
 
     def get_root_path(self):
@@ -69,6 +83,8 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
 
         if row < len(parent_item['children']):
             child_item = parent_item['children'][row]
+            if child_item is None:
+                return QModelIndex()
             # Only show the contents of /home/s5605094
             if child_item['path'].startswith(f"/home/{self.username}"):
                 return self.createIndex(row, column, child_item)

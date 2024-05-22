@@ -18,6 +18,8 @@ import os
 
 from cryptography.fernet import Fernet
 
+from dotenv import load_dotenv
+
 from styles import *
 
 
@@ -96,13 +98,12 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
 
     def handle_login(self):
         try:
-            app = self.open_main_app()
+            self.open_main_app()
 
-            if (app is not None):
-                if self.keep_details.isChecked():
-                    self.store_details()
-                else:
-                    self.clear_details()
+            if self.keep_details.isChecked():
+                self.store_details()
+            else:
+                self.clear_details()
 
         except NCCA_RenderfarmConnectionFailed:
             if (USE_LOCAL_FILESYSTEM):
@@ -143,7 +144,8 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
 
     
         self.clear_details()
-        env_path = os.path.expanduser('~/.env')
+        env_path = os.path.expanduser('~/.ncca')
+        print(env_path)
         with open(env_path, 'w') as f:
             # Write the encryption key to the file
             f.write(f"NCCA_ENCRYPTION_KEY={gen_key.decode()}\n")
@@ -154,6 +156,8 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
 
     def load_details(self):
         # Load the .env file
+        env_path = os.path.expanduser('~/.ncca')  # Adjust the path as needed
+        load_dotenv(env_path)
 
         # Read the encryption key from the environment variables
         encryption_key = os.getenv("NCCA_ENCRYPTION_KEY")
@@ -176,7 +180,7 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
             self.password.setText(password)
 
     def clear_details(self):
-        env_path = os.path.expanduser('~/.env')
+        env_path = os.path.expanduser('~/.ncca')
         if os.path.isfile(env_path):
             os.remove(env_path)
 

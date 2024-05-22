@@ -14,7 +14,6 @@ from styles import SCRIPT_DIR
 
 def main():
     # Load environment variables from .env file
-    load_dotenv()
     os.chdir(SCRIPT_DIR)
     
     # Create the application instance

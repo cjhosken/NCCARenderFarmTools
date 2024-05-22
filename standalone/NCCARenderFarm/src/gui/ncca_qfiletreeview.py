@@ -272,9 +272,10 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         else:
             _, file_ext = os.path.splitext(filepath)
 
-            if "blend" in file_ext or "hip" in file_ext or file_ext in [".mb", ".ma"]:
-                self.action_submit = self.context_menu.addAction("Submit Render Job")
-                self.action_submit.triggered.connect(self.submitSelectedIndex)
+            if (not self.is_local):
+                if "blend" in file_ext or "hip" in file_ext or file_ext in [".mb", ".ma"]:
+                    self.action_submit = self.context_menu.addAction("Submit Render Job")
+                    self.action_submit.triggered.connect(self.submitSelectedIndex)
 
             if file_ext in OPENABLE_FILES:
                 self.action_open = self.context_menu.addAction("Open")
@@ -403,18 +404,37 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         rename_dialog = NCCA_QInputDialog(placeholder="Name", text=os.path.basename(filepath), parent=self)
         if rename_dialog.exec_():
             new_name = rename_dialog.getText()
-            new_filepath = os.path.join(os.path.dirname(filepath), new_name)
+            new_filepath = os.path.join(os.path.dirname(filepath), new_name).replace('\\', '/')
             if filepath != new_filepath:
-                if os.path.exists(new_filepath):
-                    NCCA_QMessageBox.warning(
-                        self,
-                        "Error",
-                            f"{new_filepath} already exists."
-                    )
-                    return
+                if (self.is_local):
+                    if os.path.exists(new_filepath):
+                        NCCA_QMessageBox.warning(
+                            self,
+                            "Error",
+                                f"{new_filepath} already exists."
+                        )
+                        return
 
-                if os.path.exists(filepath):
-                    os.rename(filepath, new_filepath)
+                    if os.path.exists(filepath):
+                        os.rename(filepath, new_filepath)
+                else:
+                    try:
+                        self.model().renderfarm.stat(new_filepath)
+                        file_exists = True
+                    except FileNotFoundError:
+                        file_exists = False
+
+                    if file_exists:
+                        NCCA_QMessageBox.warning(
+                            self,
+                            "Error",
+                            f"{new_filepath} already exists."
+                        )
+                    else:
+                        print(f"{new_filepath} > {filepath}")
+                        self.model().renderfarm.rename(filepath, new_filepath)
+                        self.model().refresh()
+                    
 
     def createFolderUnderSelectedIndex(self):
         if (self.is_local):

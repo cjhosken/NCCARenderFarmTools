@@ -47,3 +47,5 @@ DROPDOWN_ICON = os.path.join(SCRIPT_DIR, "assets/icons/dropdown.svg")
 CHECKED_ICON = os.path.join(SCRIPT_DIR, "assets", "icons", "checked.svg")
 
 USE_LOCAL_FILESYSTEM = False
+
+USE_DOT = True
