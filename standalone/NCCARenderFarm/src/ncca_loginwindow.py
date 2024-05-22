@@ -143,7 +143,8 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
 
     
         self.clear_details()
-        with open(os.path.join(SCRIPT_DIR, '.env'), 'w') as f:
+        env_path = os.path.expanduser('~/.env')
+        with open(env_path, 'w') as f:
             # Write the encryption key to the file
             f.write(f"NCCA_ENCRYPTION_KEY={gen_key.decode()}\n")
             # Write the encrypted environment variables
@@ -175,7 +176,7 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
             self.password.setText(password)
 
     def clear_details(self):
-        env_path = os.path.join(SCRIPT_DIR, ".env")
+        env_path = os.path.expanduser('~/.env')
         if os.path.isfile(env_path):
             os.remove(env_path)
 

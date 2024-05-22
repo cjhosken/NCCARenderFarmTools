@@ -35,9 +35,8 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             self.is_local = True
         else:
             self.setModel(NCCA_RenderFarm_QFarmSystemModel(username, password))
-            root_index = self.model().index(0, 0)  # Assuming 0, 0 is the index of the root directory
-            self.setRootIndex(root_index)
             self.username = username
+            self.root_path = f"/home/{self.username}"
             
         self.setObjectName("NCCA_Renderfarm_QTreeView")
 
@@ -133,7 +132,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                 # Check if the directory is empty
                 if len(os.listdir(file_path)) > 0:
                     return False
-        return True
+
 
     def drawBranches(self, painter, rect, index):
         if index.isValid():
@@ -243,7 +242,14 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
 
     def createContextMenu(self, index, event):
         filepath = self.model().filePath(index)
-        root_path_index = self.model().index(f"/home/{self.username}")
+
+        root_path_index = self.model().index(0, 0)
+
+        if (self.is_local):
+            root_path_index = self.model().index(get_user_home())
+        else:
+            root_path_index = self.model().index("/render/s5605094")
+
         root_path = self.model().filePath(root_path_index)
     
         self.context_menu = QMenu(self)
