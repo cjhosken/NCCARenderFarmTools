@@ -246,11 +246,10 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         root_path_index = self.model().index(0, 0)
 
         if (self.is_local):
-            root_path_index = self.model().index(get_user_home())
+            root_path_index = self.model().index(0, 0)  # Assuming 0 is the row and column for the root index
+            root_path = self.model().filePath(root_path_index)
         else:
-            root_path_index = self.model().index("/render/s5605094")
-
-        root_path = self.model().filePath(root_path_index)
+            root_path = f"/home/{self.username}"  # Assuming 0 is the row and column for the root index
     
         self.context_menu = QMenu(self)
         self.context_menu.setCursor(Qt.PointingHandCursor)
@@ -259,7 +258,13 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             self.action_qube = self.context_menu.addAction("Qube!")
             self.action_qube.triggered.connect(open_qube)
 
-        if os.path.isdir(filepath):
+        if (self.is_local):
+            is_dir = os.path.isdir(filepath)
+        else:
+            file_stat = self.model().renderfarm.stat(filepath)
+            is_dir = stat.S_ISDIR(file_stat.st_mode)
+        
+        if (is_dir):
             self.action_create = self.context_menu.addAction("New Folder")
             self.action_create.triggered.connect(self.createFolderUnderSelectedIndex)
             self.action_upload = self.context_menu.addAction("Upload Files")
@@ -277,6 +282,9 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
 
         self.action_download = self.context_menu.addAction("Download")
         self.action_download.triggered.connect(self.downloadSelectedIndex)
+
+        print(filepath)
+        print(root_path)
 
         if filepath != root_path:
             self.action_rename = self.context_menu.addAction("Rename")
@@ -328,8 +336,6 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
     def deleteIndex(self, index, confirm=True):
         if (self.is_local):
             filepath = self.model().filePath(index)
-            root_path_index = self.model().index(f"/home/{self.username}")
-            root_path = self.model().filePath(root_path_index)
 
             if filepath != root_path:
                 reply = QDialog.Accepted
@@ -378,34 +384,37 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
 
 
     def renameSelectedIndex(self):
-        if (self.is_local):
-            index = self.currentIndex()
-            if not index.isValid():
-                return
+        index = self.currentIndex()
+        if not index.isValid():
+            return
 
-            filepath = self.model().filePath(index)
+        
+        filepath = self.model().filePath(index)
+        if (self.is_local):
             root_path_index = self.model().index(f"/home/{self.username}")
             root_path = self.model().filePath(root_path_index)
+        else:
+            root_path = self.model().root_path
 
-            if filepath == root_path:
-                # Can't rename root directory
-                return
+        if filepath == root_path:
+            # Can't rename root directory
+            return
             
-            rename_dialog = NCCA_QInputDialog(placeholder="Name", text=os.path.basename(filepath), parent=self)
-            if rename_dialog.exec_():
-                new_name = rename_dialog.getText()
-                new_filepath = os.path.join(os.path.dirname(filepath), new_name)
-                if filepath != new_filepath:
-                    if os.path.exists(new_filepath):
-                        NCCA_QMessageBox.warning(
-                            self,
-                            "Error",
+        rename_dialog = NCCA_QInputDialog(placeholder="Name", text=os.path.basename(filepath), parent=self)
+        if rename_dialog.exec_():
+            new_name = rename_dialog.getText()
+            new_filepath = os.path.join(os.path.dirname(filepath), new_name)
+            if filepath != new_filepath:
+                if os.path.exists(new_filepath):
+                    NCCA_QMessageBox.warning(
+                        self,
+                        "Error",
                             f"{new_filepath} already exists."
-                        )
-                        return
+                    )
+                    return
 
-                    if os.path.exists(filepath):
-                        os.rename(filepath, new_filepath)
+                if os.path.exists(filepath):
+                    os.rename(filepath, new_filepath)
 
     def createFolderUnderSelectedIndex(self):
         if (self.is_local):

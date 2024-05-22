@@ -28,16 +28,24 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
         self.rootAdded = False
 
     def setup_sftp_connection(self):
-        try:
-            ssh = paramiko.SSHClient()
-            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            ssh.connect("tete.bournemouth.ac.uk", port=22, username=self.username, password=self.password)
-            self.renderfarm = ssh.open_sftp()
-            print("CONNECTED")
-            return self.create_item(f"/home/{self.username}/", None)  # Create the root item
+        attempts = 2
+        for attempt in range(attempts):
+            try:
+                ssh = paramiko.SSHClient()
+                ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                ssh.connect("tete.bournemouth.ac.uk", port=22, username=self.username, password=self.password)
+                self.renderfarm = ssh.open_sftp()
+                print("CONNECTED")
+                self.rootItem = self.create_item(f"/home/", None)  # Create the root item
+                return self.rootItem
 
-        except (paramiko.AuthenticationException, paramiko.SSHException, socket.gaierror) as e:
-            raise NCCA_RenderfarmConnectionFailed(f"Connection failed: {e}")
+            except (paramiko.AuthenticationException, paramiko.SSHException, socket.gaierror) as e:
+                print(f"Connection attempt {attempt + 1} failed: {e}")
+                if attempt < attempts - 1:
+                    print("Retrying...")
+                    time.sleep(1)  # Wait for a second before retrying
+                else:
+                    raise NCCA_RenderfarmConnectionFailed(f"Connection failed after {attempts} attempts")
 
     def create_item(self, path, parent):
         return {'path': path.replace('\\', '/'), 'parent': parent, 'children': None}
@@ -51,17 +59,18 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
         else:
             parent_item = parent.internalPointer()
 
+
         if not parent_item['children']:
             parent_path = parent_item['path']
 
-            # Explicitly specify the absolute path
-            absolute_parent_path = os.path.join("/home/s5605094", parent_path)
-
-            children = self.renderfarm.listdir(absolute_parent_path)
+            children = self.renderfarm.listdir(parent_path)
             parent_item['children'] = [self.create_item(os.path.join(parent_path, child), parent_item) for child in children]
 
         if row < len(parent_item['children']):
-            return self.createIndex(row, column, parent_item['children'][row])
+            child_item = parent_item['children'][row]
+            # Only show the contents of /home/s5605094
+            if child_item['path'].startswith(f"/home/{self.username}"):
+                return self.createIndex(row, column, child_item)
 
         return QModelIndex()
 
@@ -124,32 +133,32 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
         if not index.isValid():
             return None
 
-        item = index.internalPointer()  # Retrieve the item associated with the index
+        item = index.internalPointer()
 
         if role == Qt.DisplayRole:
-            if not item["parent"] and False:
-                if item["path"] == f"/home/{self.username}":
-                    return f"/render/{self.username}"
-            return os.path.basename(item['path'])
+            if (item['path'] == f"/home/{self.username}"):
+                return f"/render/{self.username}"
+
+            return os.path.basename(item['path'])  # Return the name of other items
 
         elif role == Qt.DecorationRole and index.isValid():
             filepath = self.filePath(index).replace('\\', '/')
             file_stat = self.renderfarm.stat(filepath)
 
             if stat.S_ISDIR(file_stat.st_mode):
-                if(filepath) == f"/home/{self.username}":
+                if filepath == f"/home/{self.username}":
                     return QIcon(os.path.join(SCRIPT_DIR, "assets/icons/farm.png"))
                 else:
                     return QIcon(os.path.join(SCRIPT_DIR, "assets/icons/folder.svg")) 
-                
+                    
             if os.path.isfile(filepath):
                 _, file_ext = os.path.splitext(filepath)
 
                 if "blend" in file_ext:
                     # Provide custom icon for .blend files
-                    return QIcon(os.path.join(SCRIPT_DIR, "assets/icons/blender.svg"))  # Replace "path_to_blend_icon.png" with the actual path to your icon file
+                    return QIcon(os.path.join(SCRIPT_DIR, "assets/icons/blender.svg"))  
 
-                if (file_ext in VIEWABLE_IMAGE_FILES):
+                if file_ext.lower() in VIEWABLE_IMAGE_FILES:
                     return QIcon(os.path.join(SCRIPT_DIR, "assets/icons/image.svg"))
 
             return QIcon(os.path.join(SCRIPT_DIR, "assets/icons/file.svg"))
@@ -161,6 +170,7 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
         default_flags = super().flags(index)
         if index.isValid():
             filepath = self.filePath(index)
+            
             # Enable drag-and-drop for both files and folders
             flags = default_flags | Qt.ItemIsDragEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
             # Optionally, enable checkability for directories
