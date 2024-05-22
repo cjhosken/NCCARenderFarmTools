@@ -46,6 +46,4 @@ QUESTION_ICON = os.path.join(SCRIPT_DIR, "assets/icons/question.svg")
 DROPDOWN_ICON = os.path.join(SCRIPT_DIR, "assets/icons/dropdown.svg")
 CHECKED_ICON = os.path.join(SCRIPT_DIR, "assets", "icons", "checked.svg")
 
-USE_LOCAL_FILESYSTEM = True
-
-from utils import get_user_home
+USE_LOCAL_FILESYSTEM = False

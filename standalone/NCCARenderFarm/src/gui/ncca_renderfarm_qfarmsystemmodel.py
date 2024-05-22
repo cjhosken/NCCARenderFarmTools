@@ -7,6 +7,7 @@ import stat
 
 from styles import *
 
+import time
 
 class NCCA_Error(Exception):
     pass
