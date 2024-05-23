@@ -9,14 +9,7 @@ from styles import *
 
 import time
 
-class NCCA_Error(Exception):
-    pass
-
-class NCCA_RenderfarmConnectionFailed(NCCA_Error):
-    pass
-
-class NCCA_RenderfarmIncorrectLogin(NCCA_Error):
-    pass
+from ncca_renderfarm import NCCA_RenderFarm
 
 class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
     def __init__(self, username, password, parent=None):
@@ -24,8 +17,8 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
         self.renderfarm = None
         self.username = username
         self.password = password
-        self.rootItem = self.setup_sftp_connection()
-        self.root_path = self.get_root_path()
+        self.renderfarm = NCCA_RenderFarm(username, password)
+        self.rootItem = self.create_item(f"/home/", None)
         self.rootAdded = False
 
     def refresh(self):
@@ -56,50 +49,6 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
         for child in parent_item['children']:
             if self.isdir(child['path']):
                 self.populateChildren(child)  # Recursively load directories
-            
-
-
-    def isdir(self, path):
-        """
-        Check if the given path is a directory.
-        """
-        try:
-            file_stat = self.renderfarm.stat(path)
-            return stat.S_ISDIR(file_stat.st_mode)
-        except (IOError, FileNotFoundError):
-            return False
-        
-    def exists(self, path):
-        print("Checking existence of:", path)  # Print the path being checked
-        try:
-            file_stat = self.renderfarm.stat(path)
-            print("File status:", file_stat)  # Print the file status if retrieved successfully
-            return True
-        except Exception as e:
-            print("Error:", e)  # Print any exceptions that occur
-            return False
-
-    def setup_sftp_connection(self):
-        attempts = 2
-        for attempt in range(attempts):
-            try:
-                ssh = paramiko.SSHClient()
-                ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                ssh.connect("tete.bournemouth.ac.uk", port=22, username=self.username, password=self.password)
-                self.renderfarm = ssh.open_sftp()
-                print("CONNECTED")
-                self.rootItem = self.create_item(f"/home/", None)  # Create the root item
-                return self.rootItem
-            except paramiko.AuthenticationException:
-                raise NCCA_RenderfarmIncorrectLogin()
-
-            except (paramiko.SSHException, socket.gaierror) as e:
-                print(f"Connection attempt {attempt + 1} failed: {e}")
-                if attempt < attempts - 1:
-                    print("Retrying...")
-                    time.sleep(1)  # Wait for a second before retrying
-                else:
-                    raise NCCA_RenderfarmConnectionFailed(f"Connection failed after {attempts} attempts")
 
     def create_item(self, path, parent):
         return {'path': path.replace('\\', '/'), 'parent': parent, 'children': None}
@@ -226,6 +175,9 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
                 if file_ext.lower() in VIEWABLE_IMAGE_FILES:
                     return QIcon(os.path.join(SCRIPT_DIR, "assets/icons/image.svg"))
 
+                if (file_ext in [".zip", ".rar"]):
+                    return QIcon(os.path.join(SCRIPT_DIR, "assets/icons/archive.png"))
+
             return QIcon(os.path.join(SCRIPT_DIR, "assets/icons/file.svg"))
 
         return None
@@ -276,43 +228,3 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
                     return found
 
         return None
-    
-
-    def upload(self, source_local_path, remote_path):
-        """Uploads the source files from local to the SFTP server"""
-        try:
-            print(f"Uploading to [(remote path: {remote_path}); (source local path: {source_local_path})]")
-            self.renderfarm.put(source_local_path, remote_path)
-            print("Upload completed")
-        except Exception as err:
-            raise Exception(f"Upload failed: {err}")
-
-    def download(self, remote_path, target_local_path):
-        """Downloads the file from remote SFTP server to local"""
-        try:
-            print(f"Downloading from [(remote path: {remote_path}); (local path: {target_local_path})]")
-
-            # Create the target directory if it does not exist
-            os.makedirs(os.path.dirname(target_local_path), exist_ok=True)
-
-            self.renderfarm.get(remote_path, target_local_path)
-            print("Download completed")
-        except Exception as err:
-            raise Exception(f"Download failed: {err}")
-
-    def delete(self, remote_path):
-        """Deletes the file or directory from the remote SFTP server"""
-        try:
-            if self.is_dir(remote_path):
-                print("Deleting dir!")
-                # Delete directory
-                self.renderfarm.rmdir(remote_path)
-                print(f"Directory deleted: {remote_path}")
-            else:
-                # Delete file
-                self.sftp.remove(remote_path)
-                print(f"File deleted: {remote_path}")
-        except FileNotFoundError:
-            print(f"File or directory not found: {remote_path}")
-        except OSError as err:
-            raise Exception(f"Failed to delete {remote_path}: {err}")

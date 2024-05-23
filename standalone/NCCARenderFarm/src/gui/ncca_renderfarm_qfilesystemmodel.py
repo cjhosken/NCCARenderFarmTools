@@ -19,7 +19,6 @@ import stat
 
 import socket
 
-
 class NCCA_RenderFarm_QFileSystemModel(QFileSystemModel):
     def __init__(self, root_path):
         super().__init__()
@@ -51,6 +50,9 @@ class NCCA_RenderFarm_QFileSystemModel(QFileSystemModel):
 
                 if (file_ext in VIEWABLE_IMAGE_FILES):
                     return QIcon(os.path.join(SCRIPT_DIR, "assets/icons/image.svg"))
+
+                if ("zip" in file_ext):
+                    return QIcon(os.path.join(SCRIPT_DIR, "assets/icons/zip.png"))
 
             return QIcon(os.path.join(SCRIPT_DIR, "assets/icons/file.svg"))
 

@@ -36,7 +36,7 @@ SETTINGS_WINDOW_SIZE = QSize(500, 500)
 IMAGE_VIEWER_SIZE = QSize(1280, 700)
 
 
-VIEWABLE_IMAGE_FILES = [".png", ".jpg", ".jpeg", ".tiff"]
+VIEWABLE_IMAGE_FILES = [".png", ".jpg", ".jpeg", ".tiff", ".svg", ".exr"]
 OPENABLE_FILES = [] + VIEWABLE_IMAGE_FILES
 
 SCRIPT_DIR = script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -44,7 +44,9 @@ SCRIPT_DIR = script_dir = os.path.dirname(os.path.abspath(__file__))
 WARNING_ICON = os.path.join(SCRIPT_DIR, "assets/icons/warning.png")
 QUESTION_ICON = os.path.join(SCRIPT_DIR, "assets/icons/question.svg")
 DROPDOWN_ICON = os.path.join(SCRIPT_DIR, "assets/icons/dropdown.svg")
-CHECKED_ICON = os.path.join(SCRIPT_DIR, "assets", "icons", "checked.svg")
+CHECKED_ICON = os.path.join(SCRIPT_DIR, "assets", "icons", "checked.svg").replace("\\", "/")
+
+MAX_CONNECTION_ATTEMPTS = 3
 
 USE_LOCAL_FILESYSTEM = False
 

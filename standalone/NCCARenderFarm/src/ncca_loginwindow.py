@@ -12,7 +12,7 @@ from gui.ncca_qmainwindow import NCCA_QMainWindow
 from gui.ncca_qmessagebox import NCCA_QMessageBox
 
 
-from gui.ncca_renderfarm_qfarmsystemmodel import NCCA_RenderfarmConnectionFailed, NCCA_RenderfarmIncorrectLogin
+from ncca_renderfarm import NCCA_RenderfarmConnectionFailed, NCCA_RenderfarmIncorrectLogin
 
 import os
 

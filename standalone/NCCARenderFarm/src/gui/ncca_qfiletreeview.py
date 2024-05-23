@@ -75,11 +75,11 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             }}
         
             NCCA_Renderfarm_QTreeView::item:selected, NCCA_Renderfarm_QTreeView::item:selected:hover {{ 
-                           background-color: {APP_PRIMARY_COLOR}; 
+                background-color: {APP_PRIMARY_COLOR}; 
             }}
 
             NCCA_Renderfarm_QTreeView::item:hover {{ 
-                           background-color: {APP_HOVER_BACKGROUND}; 
+                background-color: {APP_HOVER_BACKGROUND}; 
             }}
 
             QScrollBar:vertical {{
@@ -292,8 +292,12 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             self.action_upload = self.context_menu.addAction("Upload Files")
             self.action_upload.triggered.connect(self.uploadToSelectedIndex)
 
-            self.action_download_folder = self.context_menu.addAction("Download Folder")
+            self.action_download_folder = self.context_menu.addAction("Download")
             self.action_download_folder.triggered.connect(self.downloadSelectedFolder)
+
+            if filepath != root_path:
+                self.action_compress = self.context_menu.addAction("Compress to .zip")
+                self.action_compress.triggered.connect(self.compressSelectedIndex)
         else:
 
             _, file_ext = os.path.splitext(filepath)
@@ -302,6 +306,11 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                 if "blend" in file_ext or "hip" in file_ext or file_ext in [".mb", ".ma"]:
                     self.action_submit = self.context_menu.addAction("Submit Render Job")
                     self.action_submit.triggered.connect(self.submitSelectedIndex)
+
+            
+            if file_ext in [".zip", ".rar"]:
+                self.action_extract = self.context_menu.addAction("Extract")
+                self.action_extract.triggered.connect(self.extractSelectedIndex)
 
             if file_ext in OPENABLE_FILES:
                 self.action_open = self.context_menu.addAction("Open")
@@ -341,6 +350,12 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         """)
 
         self.context_menu.exec_(event.globalPos())
+
+    def compressSelectedIndex(self):
+        pass
+
+    def extractSelectedIndex(self):
+        pass
 
     def deleteSelectedIndexes(self):
         selected_indexes = self.selectedIndexes()
