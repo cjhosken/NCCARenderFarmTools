@@ -1,14 +1,5 @@
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
-
-from styles import *
-
+from config import *
 from .ncca_qiconbutton import NCCA_QIconButton
-
-import os
-
-
 
 class NCCA_QMainWindow(QMainWindow):
     def __init__(self, name, size : QSize):

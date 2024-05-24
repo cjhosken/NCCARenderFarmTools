@@ -1,31 +1,17 @@
-import sys
-from PySide6.QtWidgets import QApplication
-from PySide6.QtGui import QIcon
+from config import *
 from ncca_loginwindow import NCCA_LoginWindow
-from dotenv import load_dotenv
-
-# Define the version and application name
-__version__ = "2024"
-__appname__ = f"NCCA Renderfarm {__version__}"
-
-import os
-
-from styles import SCRIPT_DIR
 
 def main():
-    # Load environment variables from .env file
-    os.chdir(SCRIPT_DIR)
-    
-    # Create the application instance
+    """Starts the NCCA Renderfarm application"""
+
+    # Create the application instance and set application metadata
     app = QApplication(sys.argv)
-    
-    # Set application metadata
-    app.setWindowIcon(QIcon(os.path.join(SCRIPT_DIR, "assets/icons/farm.png")))
-    app.setApplicationName(__appname__)
-    app.setApplicationVersion(__version__)
+    app.setWindowIcon(QIcon(APPLICATION_ICON_PATH))
+    app.setApplicationName(APPLICATION_NAME)
+    app.setApplicationVersion(APPLICATION_VERSION)
     
     # Create and show the login window
-    login = NCCA_LoginWindow(__appname__)
+    login = NCCA_LoginWindow(APPLICATION_NAME)
     login.show()
     
     # Start the application event loop

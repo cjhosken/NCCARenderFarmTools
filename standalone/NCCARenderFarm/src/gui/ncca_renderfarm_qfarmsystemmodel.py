@@ -1,15 +1,8 @@
-from PySide6.QtCore import Qt, QModelIndex, QAbstractItemModel
-from PySide6.QtGui import *
-import paramiko
-import os
-import socket
-import stat
-
-from styles import *
-
-import time
+from config import *
 
 from ncca_renderfarm import NCCA_RenderFarm
+
+#TODO: CLEANUP CODE
 
 class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
     def __init__(self, username, password, parent=None):

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#TODO: CLEANUP CODE
+
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 echo "The script is running from: $SCRIPT_DIR"

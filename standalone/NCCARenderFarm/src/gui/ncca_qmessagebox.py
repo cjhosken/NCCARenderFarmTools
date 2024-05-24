@@ -3,30 +3,29 @@ from PySide6.QtCore import *
 from PySide6.QtGui import *
 
 from gui.ncca_qflatbutton import NCCA_QFlatButton
-from gui.ncca_qiconbutton import NCCA_QIconButton
-from gui.ncca_qmainwindow import NCCA_QMainWindow
 from gui.ncca_qdialog import NCCA_QDialog
 
-from styles import *
+from config import *
 
-class NCCA_QMessageBox(NCCA_QDialog):  # Use QDialog instead of QMessageBox
+class NCCA_QMessageBox(NCCA_QDialog):
+    """A custom NCCA_QDialog class that shows a messagebox"""
+
     def __init__(self, parent=None,icon=None,title=""):
+        """Initialize the messagebox"""
+
         self.icon = icon
         super().__init__(parent, size=MESSAGE_BOX_SIZE, title=title)
         
     def initUI(self):
+        """Initialize the UI"""
+
+        # Icon (optional)
         self.icon_label = QLabel()
         if self.icon:
             self.icon_label.setPixmap(QPixmap(self.icon).scaled(APP_ICON_SIZE, Qt.KeepAspectRatio, Qt.SmoothTransformation))
             self.icon_label.setAlignment(Qt.AlignCenter)
         
-        # Header layout to hold the close button
         self.header_layout.addWidget(self.icon_label)
-
-        # Scroll area for message label
-        self.scroll_area = QScrollArea()
-        self.scroll_area.setWidgetResizable(True)
-        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
         # Message label
         self.label = QLabel("")
@@ -34,6 +33,10 @@ class NCCA_QMessageBox(NCCA_QDialog):  # Use QDialog instead of QMessageBox
         self.label.setWordWrap(True)
         self.label.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
 
+        # Scroll area for message label
+        self.scroll_area = QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.scroll_area.setWidget(self.label)
         self.scroll_area.setStyleSheet("""
             QScrollArea {
@@ -49,24 +52,25 @@ class NCCA_QMessageBox(NCCA_QDialog):  # Use QDialog instead of QMessageBox
                 width: 0px;
             }
         """)
-
         self.main_layout.addWidget(self.scroll_area)
         self.main_layout.addStretch(1)
 
-        # Button box for Yes/No buttons
+        # Button box for buttons
         self.button_box = QDialogButtonBox(Qt.Horizontal)
         self.main_layout.addWidget(self.button_box, alignment=Qt.AlignCenter)
         self.main_layout.addStretch()
 
     @staticmethod
-    def question(parent, title, text):
-        msg_box = NCCA_QMessageBox(parent, QUESTION_ICON, title=title)
+    def question(parent, title, text, yes_text="Yes", no_text="No"):
+        """Creates a confirmation popup dialog"""
+
+        msg_box = NCCA_QMessageBox(parent, QUESTION_ICON_PATH, title=title)
         msg_box.label.setText(text)
 
-        yes_button = NCCA_QFlatButton("Yes")
+        yes_button = NCCA_QFlatButton(yes_text)
         yes_button.setFixedSize(QSize(125, 35))
 
-        no_button = NCCA_QFlatButton("No")
+        no_button = NCCA_QFlatButton(no_text)
         no_button.setFixedSize(QSize(125, 35))
 
         msg_box.button_box.addButton(yes_button, QDialogButtonBox.YesRole)
@@ -79,30 +83,30 @@ class NCCA_QMessageBox(NCCA_QDialog):  # Use QDialog instead of QMessageBox
     
     @staticmethod
     def info(parent, title, text, confirm_text="Ok"):
-        msg_box = NCCA_QMessageBox(parent, QUESTION_ICON, title=title)
+        """Creates an info popup dialog"""
+        msg_box = NCCA_QMessageBox(parent, QUESTION_ICON_PATH, title=title)
         msg_box.label.setText(text)
 
-        ok_button = NCCA_QFlatButton(confirm_text)
-        ok_button.setFixedSize(QSize(125, 35))
+        confirm_button = NCCA_QFlatButton(confirm_text)
+        confirm_button.setFixedSize(QSize(125, 35))
 
-        msg_box.button_box.addButton(ok_button, QDialogButtonBox.YesRole)
+        msg_box.button_box.addButton(confirm_button, QDialogButtonBox.YesRole)
 
-        ok_button.clicked.connect(msg_box.accept)
+        confirm_button.clicked.connect(msg_box.accept)
 
         return msg_box.exec_()
 
     @staticmethod
     def warning(parent, title, text, confirm_text="Ok"):
-        msg_box = NCCA_QMessageBox(parent, WARNING_ICON, title=title)
+        """Creates a warning popup dialog"""
+        msg_box = NCCA_QMessageBox(parent, WARNING_ICON_PATH, title=title)
         msg_box.label.setText(text)
 
-        print("Title: ", text)
+        confirm_button = NCCA_QFlatButton(confirm_text)
+        confirm_button.setFixedSize(QSize(125, 35))
 
-        ok_button = NCCA_QFlatButton(confirm_text)
-        ok_button.setFixedSize(QSize(125, 35))
+        msg_box.button_box.addButton(confirm_button, QDialogButtonBox.YesRole)
 
-        msg_box.button_box.addButton(ok_button, QDialogButtonBox.YesRole)
-
-        ok_button.clicked.connect(msg_box.accept)
+        confirm_button.clicked.connect(msg_box.accept)
 
         return msg_box.exec_()

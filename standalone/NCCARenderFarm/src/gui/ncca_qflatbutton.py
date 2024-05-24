@@ -1,10 +1,14 @@
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
-from styles import *
+from config import *
 
 class NCCA_QFlatButton(QPushButton):
+    """A custom QPushButton class"""
+
     def __init__(self, text="", parent=None):
+        """Initialize the flatbutton"""
+        
         super().__init__(parent)
         self.setFlat(True)
         self.setCursor(Qt.PointingHandCursor)

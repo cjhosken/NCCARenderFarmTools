@@ -1,16 +1,17 @@
-from PySide6.QtWidgets import QCheckBox
-
-from styles import *
-import os
-
+from config import *
 
 class NCCA_QCheckBox(QCheckBox):
+    """A custom QCheckBox class"""
+
     def __init__(self, text="", parent=None):
+        """Initialize the checkbox"""
         super().__init__(text, parent)
+
         self.setCheckable(True)
         self.setCursor(Qt.PointingHandCursor)
         self.setObjectName("NCCA_QCheckBox")
-
+        
+        # Need to convert CHECKED_ICON_PATH from "\\" to use  "/" for qt to use it properly.
         self.setStyleSheet(f"""
         NCCA_QCheckBox::indicator {{
             width: {LOGIN_CHECKBOX_SIZE};
@@ -27,10 +28,10 @@ class NCCA_QCheckBox(QCheckBox):
         NCCA_QCheckBox::indicator:checked {{
             background-color: {APP_PRIMARY_COLOR};
             color: white;
-            image: url({CHECKED_ICON});
+            image: url({CHECKED_ICON_PATH.replace("\\", "/")}); 
             border-color: transparent;
         }}
         NCCA_QCheckBox::indicator:unchecked {{
             image: none;
         }}
-        """)
+        """) 

@@ -1,16 +1,15 @@
-from PySide6.QtWidgets import QComboBox
-from PySide6.QtCore import Qt, QSize
-from PySide6.QtGui import QFont, QIcon
-
-from styles import *
+from config import *
 
 class NCCA_QComboBox(QComboBox):
+    """A custom QComboBox class"""
+
     def __init__(self, parent=None):
+        """Initialize the checkbox"""
         super().__init__(parent)
         self.setObjectName("NCCA_QComboBox")
         self.setCursor(Qt.PointingHandCursor)
 
-        # Customize appearance
+        # Need to convert DROPDOWN_ICON_PATH from "\\" to use  "/" for qt to use it properly.
         self.setStyleSheet(f"""
             NCCA_QComboBox {{
                 border: 2px solid {APP_GREY_COLOR};
@@ -30,7 +29,7 @@ class NCCA_QComboBox(QComboBox):
                 subcontrol-origin: padding;
                 subcontrol-position: top right;
                 width: 20px;
-                image: url({DROPDOWN_ICON});
+                image: url({DROPDOWN_ICON_PATH.replace("\\", "/")});
             }}
 
             NCCA_QComboBox QAbstractItemView {{
@@ -49,7 +48,8 @@ class NCCA_QComboBox(QComboBox):
             }}
         """)
 
-        # Customize font
+        # Custo font
+        # TODO: Move font to config.py
         font = QFont("Arial", 12)
         self.setFont(font)
 

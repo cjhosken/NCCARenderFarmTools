@@ -1,3 +1,5 @@
+#TODO: CLEANUP CODE
+
 # Define the script directory
 $SCRIPT_DIR = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
 
