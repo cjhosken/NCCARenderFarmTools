@@ -137,7 +137,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
 
 
     def drawBranches(self, painter, rect, index):
-        """"""
+        """Customizes the drawing of branch indicators in the tree view."""
         if index.isValid():
             if self.is_empty(index):
                 # Folder is collapsed and empty, so don't draw branch indicator
@@ -178,7 +178,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
 
 
     def dropEvent(self, event):
-        """"""
+        """ Handles the drop event in the tree view."""
         super().dropEvent(event)
         if (self.is_local):
             if event.mimeData().hasUrls():
@@ -262,7 +262,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
     # Context Menu Code
 
     def contextMenuEvent(self, event):
-        """"""
+        """Handles the context menu event."""
         index = self.indexAt(event.pos())
 
         if index.isValid():
@@ -271,12 +271,12 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             self.createContextMenu(index, event)
 
     def clearContextMenu(self):
-        """"""
+        """Clears the context menu if it exists."""
         if hasattr(self, 'context_menu'):
             self.context_menu.clear()
 
     def createContextMenu(self, index, event):
-        """"""
+        """Creates the context menu based on the selected item."""
         file_path = self.model().get_file_path(index)
 
         self.context_menu = QMenu(self)
@@ -352,6 +352,9 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
     # Action functions
 
     def createFolderUnderSelectedIndex(self):
+        """
+        Creates a new folder under the currently selected index.
+        """
         index = self.currentIndex()
         if not index.isValid():
             return
@@ -392,6 +395,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                     self.model().refresh()
 
     def uploadToSelectedIndex(self):
+        """Handles the process of uploading selected files to the destination folder"""
         # Open file dialog to select files
         file_dialog = QFileDialog(self)
         file_dialog.setFileMode(QFileDialog.ExistingFiles)  # Allow selecting files
@@ -432,6 +436,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                 self.model().refresh()
 
     def downloadSelectedIndex(self):
+        """Handles the process of downloading the active file to a local destination"""
         # Open folder dialog to select a destination folder
         index = self.currentIndex()
         source_path = self.model().get_file_path(index)
@@ -470,6 +475,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             print(f"File {source_path} copied successfully to {destination_path}")
 
     def compressSelectedIndex(self):
+        """Compresses the currently selected index into a zip file."""
         index = self.currentIndex()
         source_path = self.model().get_file_path(index)
         parent_path = os.path.dirname(source_path)
@@ -515,7 +521,8 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         
 
 
-    def extractSelectedIndex(self):        
+    def extractSelectedIndex(self):   
+        """Extracts the contents of the selected zip file to a folder."""     
         index = self.currentIndex()
         zip_file_path = self.model().get_file_path(index)
         zip_file_name, _ = os.path.splitext(os.path.basename(zip_file_path))
@@ -543,6 +550,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
 
 
     def deleteSelectedIndexes(self):
+        """Deletes the selected indexes."""
         selected_indexes = self.selectedIndexes()
 
         if len(selected_indexes) > 1:
@@ -560,6 +568,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             self.deleteIndex(selected_indexes[0], confirm=True)
 
     def deleteIndex(self, index, confirm=True):
+        """Deletes the specified index."""
         file_path = self.model().get_file_path(index)
         
         if file_path != self.home_path:
@@ -583,7 +592,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                         self.model().renderfarm.delete(file_path)
 
     def wipeSelectedIndex(self):
-        """"""
+        """Wipes the currently selected index."""
         index = self.currentIndex()
         file_path = self.model().file_path(index)
 
@@ -614,7 +623,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
 
         
     def renameSelectedIndex(self):
-        """"""
+        """Renames the currently selected index."""
         index = self.currentIndex()
         if not index.isValid():
             return
@@ -660,7 +669,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                         self.model().refresh()
 
     def openSelectedIndex(self):
-        """"""
+        """Opens the currently selected index."""
         index = self.currentIndex()
         if not index.isValid():
             return
