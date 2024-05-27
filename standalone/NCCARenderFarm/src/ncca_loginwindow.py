@@ -1,19 +1,13 @@
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
-import os
-from cryptography.fernet import Fernet
-from dotenv import load_dotenv
+from config import *
 
 from gui.ncca_qflatbutton import NCCA_QFlatButton
 from gui.ncca_qcheckbox import NCCA_QCheckBox
 from gui.ncca_qinput import NCCA_QInput
 from gui.ncca_qmainwindow import NCCA_QMainWindow
 from gui.ncca_qmessagebox import NCCA_QMessageBox
+from ncca_renderfarmwindow import NCCA_RenderFarmWindow
 
 from ncca_renderfarm import *
-from ncca_renderfarmwindow import NCCA_RenderFarmWindow
-from config import *
 from utils import *
 
 
@@ -30,16 +24,6 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
 
         # Fonts
         # TODO: Put fonts into config to be used globally across the application.
-        title_font = QFont()
-        title_font.setPointSize(LOGIN_TITLE_SIZE)
-        text_font = QFont()
-        text_font.setPointSize(LOGIN_TEXT_SIZE)
-        warning_font = QFont()
-        warning_font.setPointSize(WARNING_TEXT_SIZE)
-        copyright_font = QFont()
-        copyright_font.setPointSize(COPYRIGHT_TEXT_SIZE)
-        login_font = QFont()
-        login_font.setPointSize(LOGIN_TEXT_SIZE)
 
         # Center the main layout
         self.main_layout.setAlignment(Qt.AlignCenter)
@@ -47,18 +31,18 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
         # Title
         self.title = QLabel(APPLICATION_NAME)
         self.title.setAlignment(Qt.AlignCenter)
-        self.title.setFont(title_font)
+        self.title.setFont(TITLE_FONT)
         self.main_layout.addWidget(self.title)
 
         # Title sublabel
         self.label = QLabel('Sign in to access your farm.')
-        self.label.setFont(text_font)
+        self.label.setFont(TEXT_FONT)
         self.main_layout.addWidget(self.label, alignment=Qt.AlignCenter)
         self.main_layout.addStretch(1)
 
         # Warning label. Shows when the user types in incorrect login details.
         self.warning_label = QLabel('')
-        self.warning_label.setFont(warning_font)
+        self.warning_label.setFont(SMALL_FONT)
         self.warning_label.setStyleSheet(f"color: {APP_WARNING_COLOR};")
         self.main_layout.addWidget(self.warning_label, alignment=Qt.AlignCenter)
         self.main_layout.addStretch(1)
@@ -66,8 +50,7 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
         # Username input
         self.username = NCCA_QInput("Username")
         self.username.setFixedSize(300, 50)
-        self.username.setFont(text_font)
-        
+        self.username.setFont(TEXT_FONT)
         self.main_layout.addWidget(self.username, alignment=Qt.AlignCenter)
         self.main_layout.addStretch(1)
         
@@ -75,13 +58,13 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
         self.password = NCCA_QInput("Password")
         self.password.setFixedSize(300, 50)
         self.password.setEchoMode(QLineEdit.Password)
-        self.password.setFont(text_font)
+        self.password.setFont(TEXT_FONT)
         self.main_layout.addWidget(self.password, alignment=Qt.AlignCenter)
         self.main_layout.addStretch(1)
 
         # Keep details checkbox. When checked, the user's login details will be remembered.
         self.keep_details = NCCA_QCheckBox('Remember me')
-        self.keep_details.setFont(text_font)
+        self.keep_details.setFont(TEXT_FONT)
         self.main_layout.addWidget(self.keep_details)
         self.main_layout.addStretch(1)
         
@@ -89,13 +72,13 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
         self.login_button = NCCA_QFlatButton('Login')
         self.login_button.setFixedSize(300, 50)
         self.login_button.clicked.connect(self.handle_login)
-        self.login_button.setFont(login_font)
+        self.login_button.setFont(TEXT_FONT)
         self.main_layout.addWidget(self.login_button, alignment=Qt.AlignCenter)
         self.main_layout.addStretch(1)
 
         # Copyright label. By default this has been left blank, but can be used if needed.
         self.copyright = QLabel('')
-        self.copyright.setFont(copyright_font)
+        self.copyright.setFont(SMALL_FONT)
         self.main_layout.addWidget(self.copyright, alignment=Qt.AlignCenter)
         self.main_layout.addStretch(1)
 
@@ -198,30 +181,19 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
 
         # Add new layout
         self.main_layout.setAlignment(Qt.AlignCenter)
-
-
-        # Fonts
-        #TODO: Move fonts to config.py
-        title_font = QFont()
-        title_font.setPointSize(LOGIN_TITLE_SIZE)
-        cant_connect_label_font = QFont()
-        cant_connect_label_font.setPointSize(LOGIN_TEXT_SIZE)
         
         # Add title
         self.title = QLabel(APPLICATION_NAME)
         self.title.setAlignment(Qt.AlignCenter)
-        self.title.setFont(title_font)
+        self.title.setFont(TITLE_FONT)
         self.main_layout.addWidget(self.title)
 
         # Add title sublabel
         cant_connect_label = QLabel(NCCA_CONNECTION_ERROR_MESSAGE)
         cant_connect_label.setWordWrap(True)
         cant_connect_label.setAlignment(Qt.AlignCenter)
-        cant_connect_label.setFont(cant_connect_label_font)
-        cant_connect_label.setStyleSheet(f"""QLabel {{
-                                         padding-left: 20px; padding-right: 20px;
-        }}""")
-
+        cant_connect_label.setFont(TEXT_FONT)
+        cant_connect_label.setContentsMargins(25, 0, 0, 0)
         self.main_layout.addWidget(cant_connect_label)
         self.main_layout.addStretch(1)
 

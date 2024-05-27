@@ -3,7 +3,9 @@ from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 from PySide6.QtSvg import *
 import sys, os, shutil, tempfile
-import paramiko
+from cryptography.fernet import Fernet
+from dotenv import load_dotenv
+import paramiko, socket
 
 # GLOBAL
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -26,6 +28,12 @@ QUESTION_ICON_PATH = os.path.join(ICON_DIR, "question.svg")
 DROPDOWN_ICON_PATH = os.path.join(ICON_DIR, "dropdown.svg")
 CHECKED_ICON_PATH = os.path.join(ICON_DIR, "checked.svg")
 
+CLOSE_ICON_PATH = os.path.join(ICON_DIR, "close.svg")
+
+ICON_SIZE = QSize(24, 24)
+ICON_BUTTON_SIZE = QSize(48, 48)
+BROWSER_ICON_SIZE = QSize(32, 32)
+
 NO_CONNECTION_IMAGE = os.path.join(IMAGE_DIR, "connection_failed.jpg") # At the moment this is a funny image found on google. Ideally, this would be the NCCA mascot.
 
 HOME_ICON_PATH = os.path.join(ICON_DIR, "farm.png")
@@ -39,8 +47,12 @@ RENDERFARM_ADDRESS = "tete.bournemouth.ac.uk"
 RENDERFARM_PORT = 22
 MAX_CONNECTION_ATTEMPTS = 3
 
-USE_LOCAL_FILESYSTEM = False
+USE_LOCAL_FILESYSTEM = True
 USE_DOT = True
+
+
+
+
 
 # EXTERNAL LINKS
 REPORT_BUG_LINK = "https://github.com/cjhosken/NCCARenderFarmTools/issues"
@@ -49,6 +61,19 @@ INFO_LINK = "https://github.com/cjhosken/NCCARenderFarmTools"
 
 
 #TODO: CLEANUP THE BELOW CONFIG OPTIONS
+
+#FONTS
+TITLE_FONT = QFont()
+TITLE_FONT.setPointSize(18)
+TITLE_FONT.setBold(True)
+
+TEXT_FONT = QFont()
+TEXT_FONT.setPointSize(15)
+
+SMALL_FONT = QFont()
+SMALL_FONT.setPointSize(12)
+
+# COLORS
 
 APP_BACKGROUND_COLOR = "#FFFFFF"
 APP_FOREGROUND_COLOR = "#2D2D2D"
@@ -60,15 +85,8 @@ APP_GREY_COLOR="#aeaaa8"
 
 APP_WARNING_COLOR="#FF0000"
 
-APP_ICON_SIZE=QSize(28, 28)
-COPYRIGHT_TEXT_SIZE=8
-WARNING_TEXT_SIZE=12
-
-
 LOGIN_PAGE_SIZE = QSize(400, 500)
 APP_BORDER_RADIUS="10px"
-LOGIN_TITLE_SIZE = 25
-LOGIN_TEXT_SIZE = 15
 LOGIN_CHECKBOX_SIZE = "20px"
 NCCA_CONNECTION_ERROR_MESSAGE= "Unable to connect to the NCCA Renderfarm. Try again later."
 

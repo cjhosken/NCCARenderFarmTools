@@ -46,8 +46,7 @@ class NCCA_QDialog(QDialog):
         self.title = QLabel(title)
 
         # Close button
-        self.close_button = NCCA_QIconButton(os.path.join(SCRIPT_DIR, "assets/icons/close.svg"), icon_size=APP_ICON_SIZE)
-        self.close_button.setFixedSize(QSize(32, 32))
+        self.close_button = NCCA_QIconButton(CLOSE_ICON_PATH, icon_size=ICON_SIZE)
         self.close_button.clicked.connect(self.close)
         
         # Header layout to hold the close button

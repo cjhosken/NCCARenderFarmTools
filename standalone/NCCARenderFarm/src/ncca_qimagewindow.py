@@ -1,13 +1,7 @@
-from PySide6.QtWidgets import *
-from PySide6.QtCore import *
-from PySide6.QtGui import *
+from config import *
 
 from gui.ncca_qmainwindow import NCCA_QMainWindow
 from gui.ncca_qcombobox import NCCA_QComboBox
-
-from config import *
-
-import os
 
 class NCCA_QImageWindow(NCCA_QMainWindow):
     """Interface for the user to login to the application"""

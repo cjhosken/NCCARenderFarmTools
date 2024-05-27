@@ -22,7 +22,7 @@ class NCCA_RenderFarm_QFileSystemModel(QFileSystemModel):
 
         # Decorates certain files and folders with custom icons
         elif role == Qt.DecorationRole and index.isValid():
-            file_path = self.file_path(index)
+            file_path = self.get_file_path(index)
 
             # Sets folder icons
             if os.path.isdir(file_path):
@@ -32,7 +32,7 @@ class NCCA_RenderFarm_QFileSystemModel(QFileSystemModel):
                     return QIcon(FOLDER_ICON_PATH) 
             
             # Set custom file icons
-            if os.path.isfile(file_path):
+            else:
                 _, file_ext = os.path.splitext(file_path)
 
                 # Custom application icons. Only DCCs supported by the renderfarm should have custom icons.
@@ -65,3 +65,10 @@ class NCCA_RenderFarm_QFileSystemModel(QFileSystemModel):
             
             return flags
         return default_flags
+    
+    def get_file_path(self, index):
+        """Returns the full file path for a given index in the model."""
+        if not index.isValid():
+            return ""
+
+        return self.filePath(index)

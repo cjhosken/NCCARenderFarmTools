@@ -12,6 +12,8 @@ class NCCA_QCheckBox(QCheckBox):
         self.setObjectName("NCCA_QCheckBox")
         
         # Need to convert CHECKED_ICON_PATH from "\\" to use  "/" for qt to use it properly.
+        fixed_checked_icon_path = CHECKED_ICON_PATH.replace("\\", "/")
+
         self.setStyleSheet(f"""
         NCCA_QCheckBox::indicator {{
             width: {LOGIN_CHECKBOX_SIZE};
@@ -28,7 +30,7 @@ class NCCA_QCheckBox(QCheckBox):
         NCCA_QCheckBox::indicator:checked {{
             background-color: {APP_PRIMARY_COLOR};
             color: white;
-            image: url({CHECKED_ICON_PATH.replace("\\", "/")}); 
+            image: url({fixed_checked_icon_path}); 
             border-color: transparent;
         }}
         NCCA_QCheckBox::indicator:unchecked {{

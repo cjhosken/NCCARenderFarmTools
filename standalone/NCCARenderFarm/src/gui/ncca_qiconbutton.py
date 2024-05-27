@@ -1,14 +1,10 @@
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
-
 from config import *
 from utils import *
 
 class NCCA_QIconButton(QPushButton):
     """A custom QPushButton class"""
 
-    def __init__(self, icon_path=None, icon_size=QSize(16, 16), parent=None):
+    def __init__(self, icon_path=None, icon_size=ICON_SIZE, parent=None):
         """Initialize the flatbutton"""
         super().__init__(parent)
         self.setFlat(True)
@@ -20,6 +16,7 @@ class NCCA_QIconButton(QPushButton):
         self.setIconSize(icon_size)
         self.setObjectName("NCCA_QIconButton")
         self.loadIcon()
+        self.setFixedSize(ICON_BUTTON_SIZE)
 
     def eventFilter(self, obj, event):
         """Checks for mouse events over the button and styles accordingly"""

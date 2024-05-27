@@ -10,6 +10,8 @@ class NCCA_QComboBox(QComboBox):
         self.setCursor(Qt.PointingHandCursor)
 
         # Need to convert DROPDOWN_ICON_PATH from "\\" to use  "/" for qt to use it properly.
+        fixed_dropdown_icon_path = DROPDOWN_ICON_PATH.replace("\\", "/")
+        
         self.setStyleSheet(f"""
             NCCA_QComboBox {{
                 border: 2px solid {APP_GREY_COLOR};
@@ -29,7 +31,7 @@ class NCCA_QComboBox(QComboBox):
                 subcontrol-origin: padding;
                 subcontrol-position: top right;
                 width: 20px;
-                image: url({DROPDOWN_ICON_PATH.replace("\\", "/")});
+                image: url({fixed_dropdown_icon_path});
             }}
 
             NCCA_QComboBox QAbstractItemView {{

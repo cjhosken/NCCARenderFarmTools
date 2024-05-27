@@ -1,12 +1,9 @@
-from PySide6.QtWidgets import *
-from PySide6.QtCore import *
-from PySide6.QtGui import *
+from config import *
 
 from gui.ncca_qflatbutton import NCCA_QFlatButton
 from gui.ncca_qinput import NCCA_QInput
 from gui.ncca_qflatbutton import NCCA_QFlatButton
 from gui.ncca_qdialog import NCCA_QDialog
-from config import *
 
 class NCCA_QInputDialog(NCCA_QDialog):
     """A dialog for users to input text"""

@@ -1,11 +1,16 @@
 from config import *
 from .ncca_qiconbutton import NCCA_QIconButton
 
+#TODO: Cleanup Code
+
 class NCCA_QMainWindow(QMainWindow):
+    """"""
+
     def __init__(self, name, size : QSize):
-        self.name = name
+        """"""
         super().__init__()
-        
+
+        self.name = name
         self.setWindowTitle(self.name)
         self.setFixedSize(size)
 
@@ -24,7 +29,10 @@ class NCCA_QMainWindow(QMainWindow):
             """
         )
 
+        # Store an old position for mouse move events
         self.old_pos = None
+
+        # Setup the window
 
         # Create a container widget for the main content
         self.root_layout = QVBoxLayout(self.root)
@@ -56,29 +64,41 @@ class NCCA_QMainWindow(QMainWindow):
         self.endUI()
 
     def initUI(self):
+        """
+        Initializes the UI.
+        This is designed so that when the class is extended, a custom ui can be implemented without having to re-write the window code.
+        
+        For development, all qt widgets can be added to self.main_layout. The class will then deal with fitting it in the UI.
+        """
         pass
 
     def endUI(self):
-        self.exit_button = NCCA_QIconButton(os.path.join(SCRIPT_DIR, 'assets/icons/close.svg'), APP_ICON_SIZE)
-        self.exit_button.setFixedSize(48, 48)
+        """
+        Ends Initializing the UI.
+        endUI is called after initUI and is used for completing the custom UI a programmer may implement.
+        """
+        # Exit button
+        self.exit_button = NCCA_QIconButton(CLOSE_ICON_PATH, ICON_SIZE)
         self.exit_button.clicked.connect(self.close)
         # Add the exit button to the navigation bar layout
         self.nav_and_title_layout.addWidget(self.exit_button, alignment=Qt.AlignRight)
-        # Add exit button to the navigation bar
         self.root_layout.addWidget(self.nav_and_title_bar)
         self.root_layout.addWidget(self.main_widget)
 
     def mousePressEvent(self, event):
+        """Stores the mouse position in old_pos when the left mouse button is pressed."""
         if event.button() == Qt.LeftButton:
             if self.nav_and_title_bar.geometry().contains(event.pos()):
                 self.old_pos = event.globalPos()
 
     def mouseMoveEvent(self, event):
+        """Moves the window based on how much the user drags the navigation bar"""
         if self.old_pos:
             delta = event.globalPos() - self.old_pos
             self.move(self.pos() + delta)
             self.old_pos = event.globalPos()
 
     def mouseReleaseEvent(self, event):
+        """Clears old_pos when the mouse button is released"""
         if self.old_pos:
             self.old_pos = None

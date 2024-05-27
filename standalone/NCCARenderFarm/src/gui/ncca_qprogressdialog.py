@@ -1,6 +1,4 @@
-from PySide6.QtWidgets import *
-from PySide6.QtCore import *
-from PySide6.QtGui import *
+from config import *
 
 class NCCA_QProgressDialog(QDialog):
     """A custom QDialog class that shows a progress bar"""

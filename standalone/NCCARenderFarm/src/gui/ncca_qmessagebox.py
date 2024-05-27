@@ -1,11 +1,7 @@
-from PySide6.QtWidgets import *
-from PySide6.QtCore import *
-from PySide6.QtGui import *
+from config import *
 
 from gui.ncca_qflatbutton import NCCA_QFlatButton
 from gui.ncca_qdialog import NCCA_QDialog
-
-from config import *
 
 class NCCA_QMessageBox(NCCA_QDialog):
     """A custom NCCA_QDialog class that shows a messagebox"""
@@ -22,7 +18,7 @@ class NCCA_QMessageBox(NCCA_QDialog):
         # Icon (optional)
         self.icon_label = QLabel()
         if self.icon:
-            self.icon_label.setPixmap(QPixmap(self.icon).scaled(APP_ICON_SIZE, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+            self.icon_label.setPixmap(QPixmap(self.icon).scaled(ICON_SIZE, Qt.KeepAspectRatio, Qt.SmoothTransformation))
             self.icon_label.setAlignment(Qt.AlignCenter)
         
         self.header_layout.addWidget(self.icon_label)
