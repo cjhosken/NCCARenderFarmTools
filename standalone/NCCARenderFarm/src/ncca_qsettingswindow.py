@@ -8,7 +8,7 @@ class NCCA_QSettingsWindow(NCCA_QMainWindow):
 
     def __init__(self, parent=None):
         """Initializes the settings window"""
-        super().__init__("Settings", size=LOGIN_PAGE_SIZE)
+        super().__init__("Settings", size=SETTINGS_WINDOW_SIZE)
 
     def initUI(self):
         """Initializes the UI"""

@@ -16,12 +16,10 @@ class NCCA_RenderFarmWindow(NCCA_QMainWindow):
         self.username = username
         self.password = password
         self.use_local = use_local
-        super().__init__(name, APP_PAGE_SIZE)
+        super().__init__(name, MAIN_WINDOW_SIZE)
 
     def initUI(self):
         """Initializes the UI"""
-
-        # Fonts
 
         # Title
         self.title = QLabel(self.name)

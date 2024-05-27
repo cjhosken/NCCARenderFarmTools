@@ -9,7 +9,6 @@ from gui.ncca_renderfarm_qfarmsystemmodel import NCCA_RenderFarm_QFarmSystemMode
 from gui.ncca_renderfarm_qfilesystemmodel import NCCA_RenderFarm_QFileSystemModel
 
 from utils import get_user_home
-from qube import open_qube
 
 #TODO: CLEANUP CODE
 

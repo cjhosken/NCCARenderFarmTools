@@ -9,7 +9,7 @@ class NCCA_QImageWindow(NCCA_QMainWindow):
     def __init__(self, image_path=""):
         """Sets the image path and initializes the UI"""
         self.image_path = image_path
-        super().__init__(os.path.basename(self.image_path), size=IMAGE_VIEWER_SIZE)
+        super().__init__(os.path.basename(self.image_path), size=IMAGE_WINDOW_SIZE)
     
     def initUI(self):
         """Initializes the UI"""
@@ -33,7 +33,7 @@ class NCCA_QImageWindow(NCCA_QMainWindow):
     def loadImage(self, path):
         """Load an image to the ui from its path"""
         pixmap = QPixmap(path)
-        pixmap = pixmap.scaled(IMAGE_VIEWER_SIZE, Qt.KeepAspectRatio)
+        pixmap = pixmap.scaled(IMAGE_WINDOW_SIZE, Qt.KeepAspectRatio)
         self.image_label.setPixmap(pixmap)
         self.image_label.adjustSize()
 

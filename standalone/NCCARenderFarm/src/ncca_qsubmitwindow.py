@@ -10,7 +10,7 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
     def __init__(self, file_path="", parent=None):
         """Initializes the window UI"""
         self.file_path = file_path
-        super().__init__("Submit Job", size=MESSAGE_BOX_SIZE)
+        super().__init__("Submit Job", size=SUBMIT_WINDOW_SIZE)
 
     def initUI(self):
         """Initializes the UI"""

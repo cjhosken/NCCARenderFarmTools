@@ -12,8 +12,6 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 ASSET_DIR = os.path.join(SCRIPT_DIR, "assets")
 NCCA_ENVIRONMENT_PATH = os.path.expanduser('~/.ncca')
 
-QUBE_LAUNCHER_PATH = "/public/bin/2023/goQube"
-
 # APP GLOBALS
 APPLICATION_NAME = "NCCA Renderfarm 2024"
 APPLICATION_VERSION = "2024.05.24"
@@ -52,9 +50,8 @@ MAX_CONNECTION_ATTEMPTS = 3
 USE_LOCAL_FILESYSTEM = True
 USE_DOT = True
 
-
-
-
+VIEWABLE_IMAGE_FILES = [".png", ".jpg", ".jpeg", ".tiff", ".svg", ".exr"]
+OPENABLE_FILES = [] + VIEWABLE_IMAGE_FILES
 
 # EXTERNAL LINKS
 REPORT_BUG_LINK = "https://github.com/cjhosken/NCCARenderFarmTools/issues"
@@ -76,33 +73,45 @@ SMALL_FONT = QFont()
 SMALL_FONT.setPointSize(12)
 
 # COLORS
-
 APP_BACKGROUND_COLOR = "#FFFFFF"
 APP_FOREGROUND_COLOR = "#2D2D2D"
 APP_PRIMARY_COLOR="#d81476"
 APP_HOVER_BACKGROUND="#f5f5f5"
 
-
 APP_GREY_COLOR="#aeaaa8"
-
 APP_WARNING_COLOR="#FF0000"
 
-LOGIN_PAGE_SIZE = QSize(400, 500)
+# WINDOW SIZES
+MAIN_WINDOW_SIZE = QSize(800, 800)
+LOGIN_WINDOW_SIZE = QSize(400, 500)
+SETTINGS_WINDOW_SIZE = QSize(500, 500)
+SUBMIT_WINDOW_SIZE = QSize(500, 500)
+IMAGE_WINDOW_SIZE = QSize(1280, 700)
+MESSAGE_BOX_SIZE = QSize(300, 175)
+
+APP_NAVBAR_HEIGHT = 64
 APP_BORDER_RADIUS="10px"
-LOGIN_CHECKBOX_SIZE = "20px"
 NCCA_CONNECTION_ERROR_MESSAGE= "Unable to connect to the NCCA Renderfarm. Try again later."
 
 
-APP_PAGE_SIZE = QSize(800, 800)
-APP_NAVBAR_HEIGHT = 64
+# EXTERNAL APPLICATIONS
+# If renderers and applications begin to break, make sure that these paths are correct
 
+# Qube
+QUBE_LAUNCHER_PATH = "/public/bin/2023/goQube"
+QUBE_PYTHON_PATH = "/path/to/qube/python"
 
-MESSAGE_BOX_SIZE = QSize(300, 175)
+# Houdini
+HOUDINI_PATH = "/path/to/houdini"
+HOUDINI_PYTHON_PATH = "/path/to/houdini_python"
+HOUDINI_ARNOLD_PLUGIN = """/path/to/plugin"""
 
-SETTINGS_WINDOW_SIZE = QSize(500, 500)
+# Maya
+MAYA_PATH = "/path/to/maya"
+MAYA_PYTHON_PATH = "/path/to/maya/python"
+MAYA_ARNOLD_PLUGIN = """/path/to/plugin"""
+MAYA_VRAY_PLUGIN = """/path/to/plugin"""
+MAYA_RMAN_PLUGIN = """/path/to/plugin"""
 
-IMAGE_VIEWER_SIZE = QSize(1280, 700)
-
-
-VIEWABLE_IMAGE_FILES = [".png", ".jpg", ".jpeg", ".tiff", ".svg", ".exr"]
-OPENABLE_FILES = [] + VIEWABLE_IMAGE_FILES
+# Blender
+BLENDER_PATH = "/path/to/blender"

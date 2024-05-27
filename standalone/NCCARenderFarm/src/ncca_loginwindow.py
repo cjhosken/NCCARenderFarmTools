@@ -16,7 +16,7 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
 
     def __init__(self, name):
         """Initializes the login window and loads any existing environment variables."""
-        super().__init__(name, LOGIN_PAGE_SIZE)
+        super().__init__(name, LOGIN_WINDOW_SIZE)
         self.load_environment()
         
     def initUI(self):

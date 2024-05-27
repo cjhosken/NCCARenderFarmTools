@@ -16,8 +16,8 @@ class NCCA_QCheckBox(QCheckBox):
 
         self.setStyleSheet(f"""
         NCCA_QCheckBox::indicator {{
-            width: {LOGIN_CHECKBOX_SIZE};
-            height: {LOGIN_CHECKBOX_SIZE};
+            width: 20px;
+            height: 20px;
             border-radius: 5px;
             border-style: solid;
             border-width: 2px;
