@@ -5,7 +5,7 @@ from gui.ncca_qmainwindow import NCCA_QMainWindow
 from gui.ncca_qfiletreeview import NCCA_RenderFarm_QTreeView
 from ncca_qsettingswindow import NCCA_QSettingsWindow
 
-from qube import open_qube
+from qube import  launch_qube
 from utils import get_user_home
 
 class NCCA_RenderFarmWindow(NCCA_QMainWindow):
@@ -33,7 +33,7 @@ class NCCA_RenderFarmWindow(NCCA_QMainWindow):
 
         # Qube button
         self.launch_qube_button = NCCA_QIconButton(os.path.join(SCRIPT_DIR, 'assets/icons/cube.svg'), ICON_SIZE)
-        self.launch_qube_button.clicked.connect(open_qube)
+        self.launch_qube_button.clicked.connect(launch_qube)
         self.nav_and_title_layout.addWidget(self.launch_qube_button, alignment=Qt.AlignRight)
 
         # Settings button

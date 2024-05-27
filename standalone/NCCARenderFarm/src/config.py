@@ -5,12 +5,14 @@ from PySide6.QtSvg import *
 import sys, os, shutil, tempfile
 from cryptography.fernet import Fernet
 from dotenv import load_dotenv
-import paramiko, socket
+import paramiko, socket, subprocess, threading
 
 # GLOBAL
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 ASSET_DIR = os.path.join(SCRIPT_DIR, "assets")
 NCCA_ENVIRONMENT_PATH = os.path.expanduser('~/.ncca')
+
+QUBE_LAUNCHER_PATH = "/public/bin/2023/goQube"
 
 # APP GLOBALS
 APPLICATION_NAME = "NCCA Renderfarm 2024"
