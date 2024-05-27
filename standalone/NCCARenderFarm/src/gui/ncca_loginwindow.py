@@ -5,7 +5,7 @@ from gui.ncca_qcheckbox import NCCA_QCheckBox
 from gui.ncca_qinput import NCCA_QInput
 from gui.ncca_qmainwindow import NCCA_QMainWindow
 from gui.ncca_qmessagebox import NCCA_QMessageBox
-from ncca_renderfarmwindow import NCCA_RenderFarmWindow
+from gui.ncca_renderfarmwindow import NCCA_RenderFarmWindow
 
 from ncca_renderfarm import *
 from utils import *

@@ -3,7 +3,7 @@ from config import *
 from gui.ncca_qiconbutton import NCCA_QIconButton
 from gui.ncca_qmainwindow import NCCA_QMainWindow
 from gui.ncca_qfiletreeview import NCCA_RenderFarm_QTreeView
-from ncca_qsettingswindow import NCCA_QSettingsWindow
+from gui.ncca_qsettingswindow import NCCA_QSettingsWindow
 
 from qube import  launch_qube
 from utils import get_user_home

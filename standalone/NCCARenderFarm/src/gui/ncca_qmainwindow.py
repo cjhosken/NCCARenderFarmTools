@@ -1,7 +1,6 @@
 from config import *
 from .ncca_qiconbutton import NCCA_QIconButton
 
-#TODO: Cleanup Code
 
 class NCCA_QMainWindow(QMainWindow):
     """"""

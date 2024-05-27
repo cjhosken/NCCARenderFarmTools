@@ -77,7 +77,7 @@ class NCCA_QMessageBox(NCCA_QDialog):
 
         return msg_box.exec_()
     
-    @staticmethod
+    @staticmethod#TODO: Cleanup Code
     def info(parent, title, text, confirm_text="Ok"):
         """Creates an info popup dialog"""
         msg_box = NCCA_QMessageBox(parent, QUESTION_ICON_PATH, title=title)

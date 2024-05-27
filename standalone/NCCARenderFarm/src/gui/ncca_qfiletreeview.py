@@ -2,11 +2,15 @@ from config import *
 
 from gui.ncca_qmessagebox import NCCA_QMessageBox
 from gui.ncca_qinputdialog import NCCA_QInputDialog
-from ncca_qimagewindow import NCCA_QImageWindow
-from ncca_qsubmitwindow import NCCA_QSubmitWindow
+from gui.ncca_qimagewindow import NCCA_QImageWindow
+from gui.ncca_qsubmitwindow import NCCA_QSubmitWindow
 from gui.ncca_qprogressdialog import NCCA_QProgressDialog
 from gui.ncca_renderfarm_qfarmsystemmodel import NCCA_RenderFarm_QFarmSystemModel
 from gui.ncca_renderfarm_qfilesystemmodel import NCCA_RenderFarm_QFileSystemModel
+
+from jobs.ncca_qsubmit_blender import NCCA_QSubmit_Blender
+from jobs.ncca_qsubmit_houdini import NCCA_QSubmit_Houdini
+from jobs.ncca_qsubmit_maya import NCCA_QSubmit_Maya
 
 from utils import get_user_home
 from qube import launch_qube
@@ -708,7 +712,21 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         file_path = self.model().get_file_path(index)
         _, file_ext = os.path.splitext(file_path)
 
-        if "blend" in file_ext or "hip" in file_ext or file_ext in [".mb", ".ma"]:
+        if "blend" in file_ext:
+            self.job_dialog = NCCA_QSubmit_Blender()
+            self.job_dialog.setGeometry(self.geometry())
+            self.job_dialog.show()
+        
+        elif "hip" in file_ext:
+            self.job_dialog = NCCA_QSubmit_Houdini()
+            self.job_dialog.setGeometry(self.geometry())
+            self.job_dialog.show()
+        
+        elif file_ext in [".mb", ".ma"]:
+            self.job_dialog = NCCA_QSubmit_Maya()
+            self.job_dialog.setGeometry(self.geometry())
+            self.job_dialog.show()
+        else:
             self.job_dialog = NCCA_QSubmitWindow()
             self.job_dialog.setGeometry(self.geometry())
             self.job_dialog.show()

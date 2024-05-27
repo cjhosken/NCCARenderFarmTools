@@ -1,5 +1,5 @@
 from config import *
-from ncca_loginwindow import NCCA_LoginWindow
+from gui.ncca_loginwindow import NCCA_LoginWindow
 from gui.ncca_qmessagebox import NCCA_QMessageBox
 
 def main():

@@ -7,25 +7,34 @@ from gui.ncca_qmessagebox import NCCA_QMessageBox
 class NCCA_QSubmitWindow(NCCA_QMainWindow):
     """Interface for the user to submit renderfarm jobs"""
 
-    def __init__(self, file_path="", parent=None):
+    def __init__(self, file_path="", name="Submit Job", parent=None):
         """Initializes the window UI"""
         self.file_path = file_path
-        super().__init__("Submit Job", size=SUBMIT_WINDOW_SIZE)
+        self.job_id = 0
+        self.name = name
+        super().__init__(self.name, size=SUBMIT_WINDOW_SIZE)
 
     def initUI(self):
         """Initializes the UI"""
-
-
         self.main_layout.setAlignment(Qt.AlignCenter)
 
         # Title
-        self.title=QLabel("Submit Job")
+        self.title=QLabel(self.name)
         self.title.setContentsMargins(25, 0, 0, 0)
         self.title.setFont(TITLE_FONT)
         self.title.setStyleSheet(f"color: {APP_FOREGROUND_COLOR};")
         self.nav_and_title_layout.addWidget(self.title, alignment=Qt.AlignLeft)
         self.nav_and_title_layout.addStretch()
         
+        self.initJobUI()
+        self.endJobUI()
+
+    def initJobUI(self):
+        """Same purpose as initUI, however another level deeper"""
+        pass
+
+    def endJobUI(self):
+        """Same purpose as endUI, however another level deeper"""
         # Submit button
         self.button_box = QDialogButtonBox(Qt.Horizontal)
         submit_button = NCCA_QFlatButton("Submit")
@@ -47,5 +56,5 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
         NCCA_QMessageBox.info(
             self,
             "NCCA Renderfarm",
-            f"Job Submitted!"
+            f"Job Submitted!\nID: {self.job_id}"
         )
