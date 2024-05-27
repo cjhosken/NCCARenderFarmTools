@@ -9,8 +9,7 @@ from gui.ncca_renderfarm_qfarmsystemmodel import NCCA_RenderFarm_QFarmSystemMode
 from gui.ncca_renderfarm_qfilesystemmodel import NCCA_RenderFarm_QFileSystemModel
 
 from utils import get_user_home
-
-#TODO: CLEANUP CODE
+from qube import launch_qube
 
 class NCCA_RenderFarm_QTreeView(QTreeView):
     """A custom QTreeView class that shows the files in the renderfarm"""
@@ -33,7 +32,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             self.setModel(NCCA_RenderFarm_QFarmSystemModel(username, password))
             self.username = username
             
-        self.setObjectName("NCCA_Renderfarm_QTreeView")
+        self.setObjectName("NCCA_RenderFarm_QTreeView")
 
         # UI setup
         self.setHeaderHidden(True)
@@ -51,13 +50,13 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
 
         self.setIconSize(BROWSER_ICON_SIZE)  # Set the icon size
         self.setStyleSheet(f"""
-            NCCA_Renderfarm_QTreeView {{
+            NCCA_RenderFarm_QTreeView {{
                 border: none;
                 background: transparent;
                 outline: 0;
                 font-size: 16px;  /* Increase font size */
             }}
-            NCCA_Renderfarm_QTreeView::item {{
+            NCCA_RenderFarm_QTreeView::item {{
                 border: none;
                 background: transparent;
                 padding: 5px;  /* Increase item padding */
@@ -65,11 +64,11 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                 
             }}
         
-            NCCA_Renderfarm_QTreeView::item:selected, NCCA_Renderfarm_QTreeView::item:selected:hover {{ 
+            NCCA_RenderFarm_QTreeView::item:selected, NCCA_RenderFarm_QTreeView::item:selected:hover {{ 
                 background-color: {APP_PRIMARY_COLOR}; 
             }}
 
-            NCCA_Renderfarm_QTreeView::item:hover {{ 
+            NCCA_RenderFarm_QTreeView::item:hover {{ 
                 background-color: {APP_HOVER_BACKGROUND}; 
             }}
 
@@ -102,6 +101,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         self.scroll_timer.timeout.connect(self.autoScroll)
 
     def autoScroll(self):
+        """Adjust scrolling for user drags"""
         # Get the current cursor position
         cursor_pos = self.viewport().mapFromGlobal(QCursor.pos())
 
@@ -109,10 +109,10 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         scroll_speed = 10  # Adjust as needed
 
         # Scroll up if cursor is near the top edge
-        if cursor_pos.y() < self.viewport().y() + 20:  # Adjust threshold as needed
+        if cursor_pos.y() < self.viewport().y() + SCROLL_MARGIN:  # Adjust threshold as needed
             self.verticalScrollBar().setValue(self.verticalScrollBar().value() - scroll_speed)
         # Scroll down if cursor is near the bottom edge
-        elif cursor_pos.y() > self.viewport().y() + self.viewport().height() - 20:  # Adjust threshold as needed
+        elif cursor_pos.y() > self.viewport().y() + self.viewport().height() - SCROLL_MARGIN:  # Adjust threshold as needed
             self.verticalScrollBar().setValue(self.verticalScrollBar().value() + scroll_speed)
 
     def is_empty(self, index):
@@ -279,13 +279,12 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         """"""
         file_path = self.model().get_file_path(index)
 
-    
         self.context_menu = QMenu(self)
         self.context_menu.setCursor(Qt.PointingHandCursor)
 
         if file_path == self.home_path:
             self.action_qube = self.context_menu.addAction("Qube!")
-            self.action_qube.triggered.connect(open_qube)
+            self.action_qube.triggered.connect(launch_qube)
 
         if (self.is_local):
             is_dir = os.path.isdir(file_path)
@@ -293,24 +292,21 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             is_dir = self.model().isdir(file_path)
         
         if (is_dir):
-            self.action_create = self.context_menu.addAction("New Folder")
-            self.action_create.triggered.connect(self.createFolderUnderSelectedIndex)
-            self.action_upload = self.context_menu.addAction("Upload Files")
-            self.action_upload.triggered.connect(self.uploadToSelectedIndex)
-
-            self.action_download_folder = self.context_menu.addAction("Download")
-            self.action_download_folder.triggered.connect(self.downloadSelectedFolder)
-
             if file_path != self.home_path:
                 self.action_compress = self.context_menu.addAction("Compress to .zip")
                 self.action_compress.triggered.connect(self.compressSelectedIndex)
-        else:
-            _, file_ext = os.path.splitext(file_path)
+            
+            self.action_create = self.context_menu.addAction("New Folder")
+            self.action_create.triggered.connect(self.createFolderUnderSelectedIndex)
+            self.action_upload = self.context_menu.addAction("Upload to")
+            self.action_upload.triggered.connect(self.uploadToSelectedIndex)
 
-            if (not self.is_local):
-                if "blend" in file_ext or "hip" in file_ext or file_ext in [".mb", ".ma"]:
-                    self.action_submit = self.context_menu.addAction("Submit Render Job")
-                    self.action_submit.triggered.connect(self.submitSelectedIndex)
+        else:
+            _, file_ext = os.path.splitext(os.path.basename(file_path))
+
+            if "blend" in file_ext or "hip" in file_ext or file_ext in [".mb", ".ma"]:
+                self.action_submit = self.context_menu.addAction("Submit Render Job")
+                self.action_submit.triggered.connect(self.submitSelectedIndex)
 
             if file_ext in [".zip", ".rar"]:
                 self.action_extract = self.context_menu.addAction("Extract")
@@ -320,10 +316,8 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                 self.action_open = self.context_menu.addAction("Open")
                 self.action_open.triggered.connect(self.openSelectedIndex)
 
-            self.action_download = self.context_menu.addAction("Download")
-            self.action_download.triggered.connect(self.downloadSelectedIndex)
-
-
+        self.action_download = self.context_menu.addAction("Download")
+        self.action_download.triggered.connect(self.downloadSelectedIndex)
 
         if file_path != self.home_path:
             self.action_rename = self.context_menu.addAction("Rename")
@@ -362,7 +356,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         if not index.isValid():
             return
 
-        parent_path = self.model().file_path(index)
+        parent_path = self.model().get_file_path(index)
 
         if (self.is_local):
             is_dir = os.path.isdir(parent_path)
@@ -387,13 +381,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
 
                 os.mkdir(new_folder_path)
             else:
-                try:
-                    self.model().renderfarm.stat(new_folder_path)
-                    folder_exists = True
-                except FileNotFoundError:
-                    folder_exists = False
-
-                if folder_exists:
+                if self.model().renderfarm.exists(new_folder_path):
                     NCCA_QMessageBox.warning(
                         self,
                         "Error",
@@ -404,63 +392,155 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                     self.model().refresh()
 
     def uploadToSelectedIndex(self):
-        # Open file dialog to select file or folder
+        # Open file dialog to select files
         file_dialog = QFileDialog(self)
-        file_dialog.setFileMode(QFileDialog.ExistingFiles)
+        file_dialog.setFileMode(QFileDialog.ExistingFiles)  # Allow selecting files
         file_dialog.setViewMode(QFileDialog.Detail)
-        file_dialog.setWindowTitle("Select file(s) or folder to upload")
+        file_dialog.setWindowTitle("Select file(s) to upload")
         file_dialog.setOption(QFileDialog.HideNameFilterDetails, True)
 
         index = self.currentIndex()
-        destination_folder = self.model().file_path(index)
+        destination_folder = self.model().get_file_path(index)
 
-        # Show the dialog and get the selected file(s) or folder
+        # Show the dialog and get the selected file(s)
         if file_dialog.exec():
             selected_files = file_dialog.selectedFiles()
             self.showProgressDialog("Uploading Files...")
             for i, file_path in enumerate(selected_files):
-                if (self.is_local):
-                    shutil.copy(file_path, destination_folder)
+                if self.is_local:
+                    # Copy the file
+                    try:
+                        shutil.copy(file_path, destination_folder)
+                        print(f"File '{file_path}' copied successfully to '{destination_folder}'")
+                    except Exception as e:
+                        print(f"Error copying file: {e}")
                 else:
-                    dest = os.path.join(destination_folder, os.path.basename(file_path)).replace("\\", "/")
-                    print(dest)
-                    self.model().renderfarm.put(file_path, dest)
+                    # Upload the file
+                    dest_file = os.path.join(destination_folder, os.path.basename(file_path)).replace("\\", "/")
+                    try:
+                        self.model().renderfarm.put(file_path, dest_file)
+                        print(f"File '{file_path}' uploaded successfully to '{dest_file}'")
+                    except Exception as e:
+                        print(f"Error uploading file '{file_path}': {e}")
+                    
                 progress = (i + 1) * 100 // len(selected_files)
                 self.updateProgress(progress)
-                print("Upload completed successfully")
+                    
+            print("Upload completed successfully")
             self.closeProgressDialog()
-            self.model().refresh()
-
+            if not self.is_local:
+                self.model().refresh()
 
     def downloadSelectedIndex(self):
         # Open folder dialog to select a destination folder
         index = self.currentIndex()
-        source_path = self.model().file_path(index)
+        source_path = self.model().get_file_path(index)
 
         folder_dialog = QFileDialog(self)
-        folder_dialog.setFileMode(QFileDialog.AnyFile)
+
+        if self.is_local:
+            is_dir = os.path.isdir(source_path)
+        else:
+            is_dir = self.model().renderfarm.isdir(source_path)
+
+        if is_dir:
+            folder_dialog.setFileMode(QFileDialog.Directory)
+        else:
+            folder_dialog.setFileMode(QFileDialog.AnyFile)
+        
         folder_dialog.setViewMode(QFileDialog.Detail)
         folder_dialog.setWindowTitle("Select destination folder for download")
         folder_dialog.setOption(QFileDialog.ShowDirsOnly, True)
-        folder_dialog.selectFile(os.path.join(get_user_home(), os.path.basename(source_path)))
+        folder_dialog.selectFile(os.path.basename(source_path))
 
+        destination_path, _ = folder_dialog.getSaveFileName(self, "Select destination and rename",
+                                                            os.path.join(get_user_home(), os.path.basename(source_path)), f"All Files (*)",
+                                                            options=QFileDialog.DontConfirmOverwrite)
 
-        # Show the dialog and get the selected folder
-        if folder_dialog.exec():
-            destination_path = folder_dialog.selectedFiles()[0]  # Get the first selected folder
-            if (self.is_local):
-                shutil.copy(source_path, destination_path)
+        # If a destination path is selected
+        if destination_path:
+            if self.is_local:
+                if os.path.isdir(source_path):
+                    shutil.copytree(source_path, destination_path)
+                else:
+                    shutil.copy(source_path, destination_path)
             else:
-                self.model().renderfarm.get(source_path, destination_path)
+                self.model().renderfarm.download(source_path, destination_path)
 
             print(f"File {source_path} copied successfully to {destination_path}")
 
-
     def compressSelectedIndex(self):
-        pass
+        index = self.currentIndex()
+        source_path = self.model().get_file_path(index)
+        parent_path = os.path.dirname(source_path)
+        source_name, _ = os.path.splitext(os.path.basename(source_path))
+        
 
-    def extractSelectedIndex(self):
-        pass
+        create_zip_dialog = NCCA_QInputDialog(placeholder="Zip Name", text=f"{source_name}.zip", confirm_text="Compress", parent=self)
+        if create_zip_dialog.exec_():
+            zip_name = create_zip_dialog.getText()
+            output_zip_file = os.path.join(parent_path, zip_name)
+            if (self.is_local):
+                if os.path.exists(output_zip_file):
+                    NCCA_QMessageBox.warning(
+                        self,
+                        "Error",
+                        f"{output_zip_file} already exists."
+                    )
+
+                 # Create a ZipFile object to write to the output zip file
+                else:
+                    with zipfile.ZipFile(output_zip_file, 'w') as zipf:
+                        # Iterate over selected indices
+                        file_path = os.path.join(self.model().get_file_path(index))
+                        if os.path.exists(file_path):  # Check if the file or folder exists
+                            if os.path.isdir(file_path):  # If it's a directory, recursively add its contents
+                                for root, dir, files in os.walk(file_path):
+                                    for file in files:
+                                        zipf.write(os.path.join(root, file), arcname=os.path.relpath(os.path.join(root, file), file_path))
+                            else:  # If it's a file, add it to the zip file
+                                zipf.write(os.path.join(file_path), arcname=os.path.basename(file_path))
+
+                    print(f"Selected items compressed to '{output_zip_file}'")
+            else:
+                if self.model().renderfarm.exists(output_zip_file):
+                    NCCA_QMessageBox.warning(
+                        self,
+                        "Error",
+                        f"{output_zip_file} already exists."
+                    )
+                else:
+                    self.model().renderfarm.mkdir(output_zip_file)
+                    self.model().refresh()
+        
+
+
+    def extractSelectedIndex(self):        
+        index = self.currentIndex()
+        zip_file_path = self.model().get_file_path(index)
+        zip_file_name, _ = os.path.splitext(os.path.basename(zip_file_path))
+        
+        parent_path = os.path.dirname(zip_file_path)
+
+
+        create_folder_dialog = NCCA_QInputDialog(placeholder="Folder Name", text=os.path.basename(zip_file_name), confirm_text="Extract", parent=self)
+        if create_folder_dialog.exec_():
+            folder_name = create_folder_dialog.getText()
+            output_folder = os.path.join(parent_path, folder_name).replace('\\', '/')
+            if (self.is_local):
+                if os.path.exists(output_folder):
+                    NCCA_QMessageBox.warning(
+                        self,
+                        "Error",
+                        f"{output_folder} already exists."
+                    )
+                else:
+                    os.makedirs(output_folder, exist_ok=True)
+                    with zipfile.ZipFile(zip_file_path, 'r') as zipf:
+                        zipf.extractall(output_folder)
+            else:
+                pass
+
 
     def deleteSelectedIndexes(self):
         selected_indexes = self.selectedIndexes()
@@ -480,19 +560,18 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             self.deleteIndex(selected_indexes[0], confirm=True)
 
     def deleteIndex(self, index, confirm=True):
-        file_path = self.model().file_path(index)
+        file_path = self.model().get_file_path(index)
         
-        if file_path != f"/home/{self.username}":
+        if file_path != self.home_path:
             reply = QDialog.Accepted
             if (confirm):
                 reply = NCCA_QMessageBox.question(
-                                    self,
-                                    "Confirm Deletion",
-                                    f"Are you sure you want to delete {file_path}?",
-                                )
+                    self,
+                    "Confirm Deletion",
+                    f"Are you sure you want to delete {file_path}?",
+                )
                 
             if reply == QDialog.Accepted:
-                file_path = self.model().file_path(index)
                 if (self.is_local):
                     if os.path.exists(file_path):
                         if os.path.isdir(file_path):
@@ -500,10 +579,8 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                         else:
                             os.remove(file_path)
                 else:
-                    if self.model().exists(file_path):
-                        self.model().delete(file_path)
-
-                                
+                    if self.model().renderfarm.exists(file_path):
+                        self.model().renderfarm.delete(file_path)
 
     def wipeSelectedIndex(self):
         """"""
@@ -543,17 +620,12 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             return
 
         file_path = self.model().get_file_path(index)
-        if (self.is_local):
-            root_path_index = self.model().index(f"/home/{self.username}")
-            root_path = self.model().file_path(root_path_index)
-        else:
-            root_path = self.model().root_path
 
-        if file_path == root_path:
+        if file_path == self.home_path:
             # Can't rename root directory
             return
             
-        rename_dialog = NCCA_QInputDialog(placeholder="Name", text=os.path.basename(file_path), parent=self)
+        rename_dialog = NCCA_QInputDialog(placeholder="Rename", text=os.path.basename(file_path), parent=self)
         if rename_dialog.exec_():
             new_name = rename_dialog.getText()
             new_file_path = os.path.join(os.path.dirname(file_path), new_name).replace('\\', '/')

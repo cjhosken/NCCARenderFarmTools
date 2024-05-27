@@ -25,11 +25,11 @@ class NCCA_QSettingsWindow(NCCA_QMainWindow):
         self.nav_and_title_layout.addStretch()
         
         # Template checkbox
-        self.keep_details = NCCA_QCheckBox('Tick me!')
-        self.keep_details.setFont(TEXT_FONT)
-        self.main_layout.addStretch(1)
+        self.show_hidden = NCCA_QCheckBox('Show hidden files')
+        self.show_hidden.setFont(TEXT_FONT)
+        self.show_hidden.addStretch(1)
 
-        self.main_layout.addWidget(self.keep_details, alignment=Qt.AlignCenter)
+        self.main_layout.addWidget(self.show_hidden, alignment=Qt.AlignCenter)
         self.main_layout.addStretch(1)
 
         self.nav_and_title_layout.addStretch()

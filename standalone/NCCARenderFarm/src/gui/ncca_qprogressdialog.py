@@ -17,6 +17,6 @@ class NCCA_QProgressDialog(QDialog):
         layout = QVBoxLayout(self)
         layout.addWidget(self.progress_bar)
 
-    def setProgress(self, value):
+    def set_progress(self, value):
         """Sets the current progress in the progress bar"""
         self.progress_bar.setValue(value)

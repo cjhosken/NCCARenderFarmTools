@@ -5,7 +5,7 @@ from PySide6.QtSvg import *
 import sys, os, shutil, tempfile
 from cryptography.fernet import Fernet
 from dotenv import load_dotenv
-import paramiko, socket, subprocess, threading
+import paramiko, socket, subprocess, threading, zipfile
 
 # GLOBAL
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -93,6 +93,7 @@ APP_NAVBAR_HEIGHT = 64
 APP_BORDER_RADIUS="10px"
 NCCA_CONNECTION_ERROR_MESSAGE= "Unable to connect to the NCCA Renderfarm. Try again later."
 
+SCROLL_MARGIN = 50
 
 # EXTERNAL APPLICATIONS
 # If renderers and applications begin to break, make sure that these paths are correct
