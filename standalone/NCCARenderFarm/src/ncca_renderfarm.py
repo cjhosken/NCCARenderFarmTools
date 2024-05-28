@@ -57,8 +57,27 @@ class NCCA_RenderFarm(paramiko.SSHClient):
             return False
 
     def upload(self, source_local_path, remote_path):
-        """Uploads the source files from local to the SFTP server"""
-        self.sftp.put(source_local_path, remote_path)
+        """Uploads the source files and directories from local to the SFTP server"""
+        if os.path.isfile(source_local_path):
+            # If the source is a file, upload it directly
+            self.sftp.put(source_local_path, remote_path)
+        elif os.path.isdir(source_local_path):
+            # If the source is a directory, upload its contents recursively
+            for root, dirs, files in os.walk(source_local_path):
+                # Calculate remote directory path
+                # Create remote directory if it doesn't exist
+                try:
+                    self.sftp.mkdir(remote_path)
+                except IOError:
+                    # Directory already exists
+                    pass
+                # Upload files in the current directory
+                for file in files:
+                    local_file_path = os.path.join(root, file)
+                    remote_file_path = os.path.join(remote_path, file)
+                    self.sftp.put(local_file_path, remote_file_path)
+        else:
+            print("Source path is neither a file nor a directory.")
 
     def download(self, remote_path, target_local_path):
         """Downloads the file or directory from remote SFTP server to local"""
@@ -106,6 +125,7 @@ class NCCA_RenderFarm(paramiko.SSHClient):
         """Extracts a .zip or .tar on the remote SFTP server"""
 
         tmp_dir = os.path.join(get_user_home(), "tmp")
+        os.makedirs(tmp_dir, exist_ok=True)
 
         # Download the archive to the local system
         local_zip_path = os.path.join(tmp_dir, "temp.zip")
@@ -133,6 +153,7 @@ class NCCA_RenderFarm(paramiko.SSHClient):
                 self.upload(local_file_path, remote_file_path)
         
         # Cleanup: Delete the local temporary directory
+        shutil.rmtree(extract_dir)
         shutil.rmtree(tmp_dir)
 
     def compress(self, remote_path, remote_zip_path):
@@ -153,5 +174,5 @@ class NCCA_RenderFarm(paramiko.SSHClient):
         
         # Upload the compressed file back to the server
         self.upload(zip_file_path, remote_zip_path)
-
+        
         shutil.rmtree(tmp_dir)

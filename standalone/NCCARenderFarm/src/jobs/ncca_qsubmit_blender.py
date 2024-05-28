@@ -7,6 +7,7 @@ class NCCA_QSubmit_Blender(NCCA_QSubmitWindow):
         super().__init__(file_path, name="Submit Blender Job",  parent=parent)
 
     def initJobUI(self):
+        #self.renderer = NCCA_QComboBox
         pass
 
     def submit_job(self):

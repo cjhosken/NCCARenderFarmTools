@@ -25,6 +25,10 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
         self.title.setStyleSheet(f"color: {APP_FOREGROUND_COLOR};")
         self.nav_and_title_layout.addWidget(self.title, alignment=Qt.AlignLeft)
         self.nav_and_title_layout.addStretch()
+
+        #self.job_name = NCCA_QInputDialog()
+        #self.num_cpus = NCCA_QComboBox()
+        #self.frame_range = 
         
         self.initJobUI()
         self.endJobUI()
