@@ -1,4 +1,5 @@
 from config import *
+from utils import get_user_home
 
 # Custom exceptions to be caught in the login page.
 class NCCA_RenderfarmFailedConnection(Exception):
@@ -73,17 +74,25 @@ class NCCA_RenderFarm(paramiko.SSHClient):
         else:
             self.sftp.get(remote_path, target_local_path)
 
+
     def delete(self, remote_path):
         """Deletes the file or directory from the remote SFTP server"""
         if self.exists(remote_path):
-            self.exec_command(f"rm -rf {remote_path}")
+            if self.isdir(remote_path):
+                self.delete_dir_contents(remote_path)
+                self.sftp.rmdir(remote_path)
+            else:
+                self.sftp.remove(remote_path)
 
     def delete_dir_contents(self, remote_path):
         """Recursively delete all contents of a directory"""
         for item in self.sftp.listdir_attr(remote_path):
             item_path = remote_path + '/' + item.filename
             if stat.S_ISDIR(item.st_mode):
-                self.delete(item_path)
+                self.delete_dir_contents(item_path)
+                self.sftp.rmdir(item_path)
+            else:
+                self.sftp.remove(item_path)
 
     def mkdir(self, remote_path):
         """Creates a directory on the remote SFTP server"""
@@ -96,19 +105,53 @@ class NCCA_RenderFarm(paramiko.SSHClient):
     def extract(self, remote_zip_path, remote_path):
         """Extracts a .zip or .tar on the remote SFTP server"""
 
-        command = ""
+        tmp_dir = os.path.join(get_user_home(), "tmp")
 
+        # Download the archive to the local system
+        local_zip_path = os.path.join(tmp_dir, "temp.zip")
+        self.download(remote_zip_path, local_zip_path)
+        
+        # Create a temporary directory for extraction
+        extract_dir = os.path.join(tmp_dir, "extracted")
+        os.makedirs(extract_dir, exist_ok=True)
+        
+        # Determine the extraction method based on the file extension
         if remote_zip_path.endswith('.zip'):
-            command = f'unzip -o {remote_zip_path} -d {remote_path}'
+            with zipfile.ZipFile(local_zip_path, 'r') as zip_ref:
+                zip_ref.extractall(extract_dir)
         elif remote_zip_path.endswith('.tar'):
-            command = f'tar -xf {remote_zip_path} -C {remote_path}'
-
-        self.exec_command(command)
+            with tarfile.open(local_zip_path, 'r') as tar_ref:
+                tar_ref.extractall(extract_dir)
+        else:
+            raise ValueError("Unsupported archive format")
+        
+        # Upload the extracted files to the remote server
+        for root, dirs, files in os.walk(extract_dir):
+            for file in files:
+                local_file_path = os.path.join(root, file)
+                remote_file_path = os.path.join(remote_path, os.path.relpath(local_file_path, extract_dir)).replace("\\", "/")
+                self.upload(local_file_path, remote_file_path)
+        
+        # Cleanup: Delete the local temporary directory
+        shutil.rmtree(tmp_dir)
 
     def compress(self, remote_path, remote_zip_path):
         """Compresses the remote directory into a .zip on the remote SFTP server"""
+        # Download the directory to local system
 
-        if self.isdir(remote_path):
-            command = f'zip -r {remote_path} {remote_zip_path}'
+        tmp_dir = os.path.join(get_user_home(), "tmp")
 
-            self.exec_command(command)
+        os.makedirs(tmp_dir, exist_ok=True)
+
+        local_dir_path = os.path.join(get_user_home(),"tmp", "temp_dir")  # Adjust as needed
+        os.makedirs(local_dir_path, exist_ok=True)
+        self.download(remote_path, local_dir_path)
+        
+        # Compress the directory
+        zip_file_path = os.path.join(get_user_home(), "tmp", "temp.zip")  # Adjust as needed
+        shutil.make_archive(zip_file_path, 'zip', local_dir_path)
+        
+        # Upload the compressed file back to the server
+        self.upload(zip_file_path, remote_zip_path)
+
+        shutil.rmtree(tmp_dir)
