@@ -5,7 +5,7 @@ from PySide6.QtSvg import *
 import sys, os, shutil, tempfile
 from cryptography.fernet import Fernet
 from dotenv import load_dotenv
-import paramiko, socket, subprocess, threading, zipfile
+import paramiko, socket, subprocess, threading, zipfile, stat
 
 # GLOBAL
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))

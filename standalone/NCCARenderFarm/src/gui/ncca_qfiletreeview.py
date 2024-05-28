@@ -293,7 +293,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         if (self.is_local):
             is_dir = os.path.isdir(file_path)
         else:
-            is_dir = self.model().isdir(file_path)
+            is_dir = self.model().renderfarm.isdir(file_path)
         
         if (is_dir):
             if file_path != self.home_path:
@@ -368,7 +368,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         if (self.is_local):
             is_dir = os.path.isdir(parent_path)
         else:
-            is_dir = self.renderfarm.isdir(parent_path)
+            is_dir = self.model().renderfarm.isdir(parent_path)
 
         if (not is_dir):
             return
@@ -426,7 +426,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                     # Upload the file
                     dest_file = os.path.join(destination_folder, os.path.basename(file_path)).replace("\\", "/")
                     try:
-                        self.model().renderfarm.put(file_path, dest_file)
+                        self.model().renderfarm.upload(file_path, dest_file)
                         print(f"File '{file_path}' uploaded successfully to '{dest_file}'")
                     except Exception as e:
                         print(f"Error uploading file '{file_path}': {e}")
@@ -474,7 +474,14 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                 else:
                     shutil.copy(source_path, destination_path)
             else:
-                self.model().renderfarm.download(source_path, destination_path)
+                if (os.path.exists(destination_path)):
+                    NCCA_QMessageBox.warning(
+                        self,
+                        "Error",
+                        f"{destination_path} already exists."
+                    )
+                else:
+                    self.model().renderfarm.download(source_path, destination_path)
 
             print(f"File {source_path} copied successfully to {destination_path}")
 
@@ -489,7 +496,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         create_zip_dialog = NCCA_QInputDialog(placeholder="Zip Name", text=f"{source_name}.zip", confirm_text="Compress", parent=self)
         if create_zip_dialog.exec_():
             zip_name = create_zip_dialog.getText()
-            output_zip_file = os.path.join(parent_path, zip_name)
+            output_zip_file = os.path.join(parent_path, zip_name).replace("\\", "/")
             if (self.is_local):
                 if os.path.exists(output_zip_file):
                     NCCA_QMessageBox.warning(
@@ -520,7 +527,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                         f"{output_zip_file} already exists."
                     )
                 else:
-                    self.model().renderfarm.mkdir(output_zip_file)
+                    self.model().renderfarm.compress(source_path, output_zip_file)
                     self.model().refresh()
         
 
@@ -550,7 +557,15 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                     with zipfile.ZipFile(zip_file_path, 'r') as zipf:
                         zipf.extractall(output_folder)
             else:
-                pass
+                if self.model().renderfarm.exists(output_folder):
+                    NCCA_QMessageBox.warning(
+                        self,
+                        "Error",
+                        f"{output_folder} already exists."
+                    )
+                else:
+                    self.model().renderfarm.extract(zip_file_path, output_folder)
+                    self.model().refresh()
 
 
     def deleteSelectedIndexes(self):
@@ -592,8 +607,8 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                         else:
                             os.remove(file_path)
                 else:
-                    if self.model().renderfarm.exists(file_path):
-                        self.model().renderfarm.delete(file_path)
+                    self.model().renderfarm.delete(file_path)
+                    self.model().refresh()
 
     def wipeSelectedIndex(self):
         """Wipes the currently selected index."""
@@ -668,7 +683,6 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                             f"{new_file_path} already exists."
                         )
                     else:
-                        print(f"{new_file_path} > {file_path}")
                         self.model().renderfarm.rename(file_path, new_file_path)
                         self.model().refresh()
 
@@ -692,7 +706,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
 
                 local_path = os.path.join(temp_dir.name, file_name)
 
-                self.model().download(file_path, local_path)
+                self.model().renderfarm.download(file_path, local_path)
 
                 self.image_dialog = NCCA_QImageWindow(image_path=local_path)
 

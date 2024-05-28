@@ -45,7 +45,7 @@ class NCCA_RenderFarm(paramiko.SSHClient):
     def isdir(self, remote_path):
         """Checks if the given path is a directory on the remote SFTP server"""
         file_stat = self.sftp.stat(remote_path)
-        return paramiko.stat.S_ISDIR(file_stat.st_mode)
+        return stat.S_ISDIR(file_stat.st_mode)
             
     def exists(self, remote_path):
         """Checks if the given path exists on the remote SFTP server"""
@@ -60,22 +60,59 @@ class NCCA_RenderFarm(paramiko.SSHClient):
         self.sftp.put(source_local_path, remote_path)
 
     def download(self, remote_path, target_local_path):
-        """Downloads the file from remote SFTP server to local"""
-        os.makedirs(os.path.dirname(target_local_path), exist_ok=True)
-        self.sftp.get(remote_path, target_local_path)
+        """Downloads the file or directory from remote SFTP server to local"""
+        if self.isdir(remote_path):
+            os.makedirs(target_local_path, exist_ok=True)
+            for item in self.sftp.listdir_attr(remote_path):
+                remote_item_path = os.path.join(remote_path, item.filename).replace("\\", "/")
+                local_item_path = os.path.join(target_local_path, item.filename)
+                if stat.S_ISDIR(item.st_mode):
+                    self.download(remote_item_path, local_item_path)
+                else:
+                    self.sftp.get(remote_item_path, local_item_path)
+        else:
+            self.sftp.get(remote_path, target_local_path)
 
     def delete(self, remote_path):
         """Deletes the file or directory from the remote SFTP server"""
         if self.exists(remote_path):
             if self.isdir(remote_path):
+                self.delete_dir_contents(remote_path)
                 self.sftp.rmdir(remote_path)
             else:
                 self.sftp.remove(remote_path)
 
-    def extract(self, remote_path):
-        """TODO: Extracts a .zip or .tar on the remote SFTP server"""
-        pass
+    def delete_dir_contents(self, remote_path):
+        """Recursively delete all contents of a directory"""
+        for item in self.sftp.listdir_attr(remote_path):
+            item_path = remote_path + '/' + item.filename
+            if stat.S_ISDIR(item.st_mode):
+                self.delete(item_path)
 
-    def compress(self, remote_path):
-        """TODO: Compresses the remote directory into a .zip on the remote SFTP server"""
-        pass
+    def mkdir(self, remote_path):
+        """Creates a directory on the remote SFTP server"""
+        self.sftp.mkdir(remote_path)
+
+    def rename(self, old_remote_path, new_remote_path):
+        """Renames a file or directory on the remote SFTP server"""
+        self.sftp.rename(old_remote_path, new_remote_path)
+
+    def extract(self, remote_zip_path, remote_path):
+        """Extracts a .zip or .tar on the remote SFTP server"""
+
+        command = ""
+
+        if remote_zip_path.endswith('.zip'):
+            command = f'unzip -o {remote_zip_path} -d {remote_path}'
+        elif remote_zip_path.endswith('.tar'):
+            command = f'tar -xf {remote_zip_path} -C {remote_path}'
+
+        self.exec_command(command)
+
+    def compress(self, remote_path, remote_zip_path):
+        """Compresses the remote directory into a .zip on the remote SFTP server"""
+
+        if self.isdir(remote_path):
+            command = f'zip -r {remote_path} {remote_zip_path}'
+
+            self.exec_command(command)

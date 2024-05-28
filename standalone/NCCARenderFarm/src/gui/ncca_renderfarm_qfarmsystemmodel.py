@@ -38,7 +38,7 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
                 parent_item['children'].append(self.create_item(child_path, parent_item))
             
         for child in parent_item['children']:
-            if self.isdir(child['path']):
+            if self.renderfarm.isdir(child['path']):
                 self.populateChildren(child)  # Recursively load directories
 
     def create_item(self, path, parent):
@@ -119,7 +119,7 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
             # Check if parent_path is a directory
             try:
                 parent_stat = self.renderfarm.stat(parent_path)
-                if paramiko.stat.S_ISDIR(parent_stat.st_mode):
+                if stat.S_ISDIR(parent_stat.st_mode):
                     children = self.renderfarm.listdir(parent_path)
                     parent_item['children'] = [self.create_item(os.path.join(parent_path, child), parent_item) for child in children]
                 else:
