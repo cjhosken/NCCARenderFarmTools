@@ -13,12 +13,17 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
         self.password = password
         self.renderfarm = NCCA_RenderFarm(self.username, self.password)
         self.rootItem = self.create_item(f"/home/", None)
+        self.expanded_paths = set()
 
     def refresh(self):
         """Refresh reloads the items in the browser so that file changes are instantly visible"""
+        self.expanded_paths = self.get_expanded_paths(self.rootItem)
+
         self.beginResetModel()
         self.loadData() 
         self.endResetModel()
+
+        self.restore_expanded_paths(self.rootItem)
         
     def loadData(self):
         """loads all the children data into the filebrowser"""
@@ -40,6 +45,31 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
         for child in parent_item['children']:
             if self.renderfarm.isdir(child['path']):
                 self.populateChildren(child)  # Recursively load directories
+
+    
+    def get_expanded_paths(self, item):
+        """Recursively gather paths of expanded items."""
+        expanded_paths = set()
+        
+        # Include the path of the current item if it's expanded
+        if item['children']:
+            expanded_paths.add(item['path'])
+
+        # Recursively gather paths of expanded children
+        if item['children']:
+            for child in item['children']:
+                if child['children']:  # If the child has loaded children, consider it expanded
+                    expanded_paths.add(child['path'])
+                    expanded_paths.update(self.get_expanded_paths(child))
+        return expanded_paths
+
+    def restore_expanded_paths(self, item):
+        """Recursively restore expanded state for items."""
+        if item['children']:
+            for child in item['children']:
+                if child['path'] in self.expanded_paths:
+                    self.populateChildren(child)  # Load children to restore expansion
+                    self.restore_expanded_paths(child)
 
     def create_item(self, path, parent):
         """Creates a custom item to be shown in the file browser"""

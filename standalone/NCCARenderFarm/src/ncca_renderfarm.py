@@ -76,11 +76,7 @@ class NCCA_RenderFarm(paramiko.SSHClient):
     def delete(self, remote_path):
         """Deletes the file or directory from the remote SFTP server"""
         if self.exists(remote_path):
-            if self.isdir(remote_path):
-                self.delete_dir_contents(remote_path)
-                self.sftp.rmdir(remote_path)
-            else:
-                self.sftp.remove(remote_path)
+            self.exec_command(f"rm -rf {remote_path}")
 
     def delete_dir_contents(self, remote_path):
         """Recursively delete all contents of a directory"""
