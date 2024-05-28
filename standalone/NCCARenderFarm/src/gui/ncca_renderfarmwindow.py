@@ -19,6 +19,7 @@ class NCCA_RenderFarmWindow(NCCA_QMainWindow):
         super().__init__(name, MAIN_WINDOW_SIZE)
 
     def initUI(self):
+        super().initUI()
         """Initializes the UI"""
 
         # Title

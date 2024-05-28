@@ -302,8 +302,10 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             
             self.action_create = self.context_menu.addAction("New Folder")
             self.action_create.triggered.connect(self.createFolderUnderSelectedIndex)
-            self.action_upload = self.context_menu.addAction("Upload to")
-            self.action_upload.triggered.connect(self.uploadToSelectedIndex)
+            self.action_upload = self.context_menu.addAction("Upload Files")
+            self.action_upload.triggered.connect(self.uploadFilesToSelectedIndex)
+            self.action_upload = self.context_menu.addAction("Upload Folders")
+            self.action_upload.triggered.connect(self.uploadFoldersToSelectedIndex)
 
         else:
             _, file_ext = os.path.splitext(os.path.basename(file_path))
@@ -331,6 +333,8 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         else:
             self.action_wipe = self.context_menu.addAction("Wipe Farm")
             self.action_wipe.triggered.connect(self.wipeSelectedIndex)
+            self.action_refresh = self.context_menu.addAction("Reload Farm")
+            self.action_refresh.triggered.connect(self.refreshFarm)
 
 
         self.context_menu.setStyleSheet(f"""
@@ -398,7 +402,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                     self.model().renderfarm.mkdir(new_folder_path)
                     self.model().refresh()
 
-    def uploadToSelectedIndex(self):
+    def uploadFilesToSelectedIndex(self):
         """Handles the process of uploading selected files to the destination folder"""
         # Open file dialog to select files
         file_dialog = QFileDialog(self)
@@ -410,34 +414,76 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         index = self.currentIndex()
         destination_folder = self.model().get_file_path(index)
 
-        # Show the dialog and get the selected file(s)
+        # Show the dialog and get the selected files
         if file_dialog.exec():
             selected_files = file_dialog.selectedFiles()
-            self.showProgressDialog("Uploading Files...")
-            for i, file_path in enumerate(selected_files):
-                if self.is_local:
-                    # Copy the file
-                    try:
-                        shutil.copy(file_path, destination_folder)
-                        print(f"File '{file_path}' copied successfully to '{destination_folder}'")
-                    except Exception as e:
-                        print(f"Error copying file: {e}")
-                else:
-                    # Upload the file
-                    dest_file = os.path.join(destination_folder, os.path.basename(file_path)).replace("\\", "/")
-                    try:
-                        self.model().renderfarm.upload(file_path, dest_file)
-                        print(f"File '{file_path}' uploaded successfully to '{dest_file}'")
-                    except Exception as e:
-                        print(f"Error uploading file '{file_path}': {e}")
-                    
-                progress = (i + 1) * 100 // len(selected_files)
-                self.updateProgress(progress)
-                    
-            print("Upload completed successfully")
-            self.closeProgressDialog()
-            if not self.is_local:
-                self.model().refresh()
+            self.uploadFiles(selected_files, destination_folder)
+
+    def uploadFoldersToSelectedIndex(self):
+        """Handles the process of uploading selected folders to the destination folder"""
+        # Open file dialog to select folders
+        folder_dialog = QFileDialog(self)
+        folder_dialog.setFileMode(QFileDialog.Directory)  # Allow selecting directories
+        folder_dialog.setViewMode(QFileDialog.Detail)
+        folder_dialog.setWindowTitle("Select folder(s) to upload")
+        folder_dialog.setOption(QFileDialog.HideNameFilterDetails, True)
+
+        index = self.currentIndex()
+        
+
+        # Show the dialog and get the selected folders
+        if folder_dialog.exec():
+            selected_folders = folder_dialog.selectedFiles()
+            for folder in selected_folders:
+                destination_folder = os.path.join(self.model().get_file_path(index), os.path.basename(folders)).replace("\\", "/")
+                self.uploadFolders(selected_folders, destination_folder)
+
+    def uploadFiles(self, selected_files, destination_folder):
+        """Uploads the selected files to the destination folder"""
+        self.showProgressDialog("Uploading Files...")
+        for i, file_path in enumerate(selected_files):
+            if self.is_local:
+                # Copy the file
+                try:
+                    shutil.copy(file_path, destination_folder)
+                    print(f"File '{file_path}' copied successfully to '{destination_folder}'")
+                except Exception as e:
+                    print(f"Error copying file: {e}")
+            else:
+                # Upload the file
+                dest_file = os.path.join(destination_folder, os.path.basename(file_path)).replace("\\", "/")
+                try:
+                    self.model().renderfarm.upload(file_path, dest_file)
+                    print(f"File '{file_path}' uploaded successfully to '{dest_file}'")
+                except Exception as e:
+                    print(f"Error uploading file '{file_path}': {e}")
+            
+            progress = (i + 1) * 100 // len(selected_files)
+            self.updateProgress(progress)
+                
+        print("Upload completed successfully")
+        self.closeProgressDialog()
+        if not self.is_local:
+            self.model().refresh()
+
+    def uploadFolders(self, selected_folders, destination_folder):
+        """Uploads the selected folders to the destination folder"""
+        self.showProgressDialog("Uploading Folders...")
+        for i, folder_path in enumerate(selected_folders):
+            # Upload the folder and its contents recursively
+            try:
+                self.model().renderfarm.upload_folder_recursive(folder_path, destination_folder)
+                print(f"Folder '{folder_path}' uploaded successfully to '{destination_folder}'")
+            except Exception as e:
+                print(f"Error uploading folder '{folder_path}': {e}")
+            
+            progress = (i + 1) * 100 // len(selected_folders)
+            self.updateProgress(progress)
+                
+        print("Upload completed successfully")
+        self.closeProgressDialog()
+        if not self.is_local:
+            self.model().refresh()
 
     def downloadSelectedIndex(self):
         """Handles the process of downloading the active file to a local destination"""
@@ -613,7 +659,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
     def wipeSelectedIndex(self):
         """Wipes the currently selected index."""
         index = self.currentIndex()
-        file_path = self.model().file_path(index)
+        file_path = self.model().get_file_path(index)
 
         if (self.is_local):
             is_dir = os.path.isdir(file_path)
@@ -639,8 +685,12 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                         for child in self.model().renderfarm.listdir(file_path):
                             child_path = os.path.join(file_path, child).replace("\\", "/")
                             self.model().renderfarm.delete(child_path)
+                            self.model().refresh()
 
-        
+
+    def refreshFarm(self):
+        self.model().refresh()
+
     def renameSelectedIndex(self):
         """Renames the currently selected index."""
         index = self.currentIndex()
@@ -727,20 +777,20 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         _, file_ext = os.path.splitext(file_path)
 
         if "blend" in file_ext:
-            self.job_dialog = NCCA_QSubmit_Blender()
+            self.job_dialog = NCCA_QSubmit_Blender(username=self.username, file_path=file_path)
             self.job_dialog.setGeometry(self.geometry())
             self.job_dialog.show()
         
         elif "hip" in file_ext:
-            self.job_dialog = NCCA_QSubmit_Houdini()
+            self.job_dialog = NCCA_QSubmit_Houdini(username=self.username, file_path=file_path)
             self.job_dialog.setGeometry(self.geometry())
             self.job_dialog.show()
         
         elif file_ext in [".mb", ".ma"]:
-            self.job_dialog = NCCA_QSubmit_Maya()
+            self.job_dialog = NCCA_QSubmit_Maya(username=self.username, file_path=file_path)
             self.job_dialog.setGeometry(self.geometry())
             self.job_dialog.show()
         else:
-            self.job_dialog = NCCA_QSubmitWindow()
+            self.job_dialog = NCCA_QSubmitWindow(username=self.username, file_path=file_path)
             self.job_dialog.setGeometry(self.geometry())
             self.job_dialog.show()

@@ -12,6 +12,7 @@ class NCCA_QImageWindow(NCCA_QMainWindow):
         super().__init__(os.path.basename(self.image_path), size=IMAGE_WINDOW_SIZE)
     
     def initUI(self):
+        super().initUI()
         """Initializes the UI"""
         
         # Image name

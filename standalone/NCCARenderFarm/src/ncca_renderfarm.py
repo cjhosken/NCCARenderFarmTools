@@ -53,7 +53,7 @@ class NCCA_RenderFarm(paramiko.SSHClient):
         try:
             _ = self.sftp.stat(remote_path)
             return True
-        except Exception:
+        except IOError:
             return False
 
     def upload(self, source_local_path, remote_path):
@@ -62,22 +62,25 @@ class NCCA_RenderFarm(paramiko.SSHClient):
             # If the source is a file, upload it directly
             self.sftp.put(source_local_path, remote_path)
         elif os.path.isdir(source_local_path):
-            # If the source is a directory, upload its contents recursively
-            for root, dirs, files in os.walk(source_local_path):
-                # Calculate remote directory path
-                # Create remote directory if it doesn't exist
-                try:
-                    self.sftp.mkdir(remote_path)
-                except IOError:
-                    # Directory already exists
-                    pass
-                # Upload files in the current directory
-                for file in files:
-                    local_file_path = os.path.join(root, file)
-                    remote_file_path = os.path.join(remote_path, file)
-                    self.sftp.put(local_file_path, remote_file_path)
+            upload_folder_recursive(source_local_path, remote_path)
         else:
             print("Source path is neither a file nor a directory.")
+
+    def upload_folder_recursive(self, local_folder_path, remote_folder_path):
+        print(remote_folder_path)
+        """Recursively uploads a local folder and its contents to a remote folder"""
+        if not self.exists(remote_folder_path):
+            self.mkdir(remote_folder_path)
+
+        for item in os.listdir(local_folder_path):
+            local_item_path = os.path.join(local_folder_path, item)
+            remote_item_path = os.path.join(remote_folder_path, item).replace("\\", "/")
+            if os.path.isfile(local_item_path):
+                # Upload the file
+                self.sftp.put(local_item_path, remote_item_path)
+            elif os.path.isdir(local_item_path):
+                # Recursively upload subdirectory
+                self.upload_folder_recursive(local_item_path, remote_item_path)
 
     def download(self, remote_path, target_local_path):
         """Downloads the file or directory from remote SFTP server to local"""

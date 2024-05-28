@@ -20,10 +20,8 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
         self.load_environment()
         
     def initUI(self):
+        super().initUI()
         """Initializes the UI"""
-
-        # Fonts
-        # TODO: Put fonts into config to be used globally across the application.
 
         # Center the main layout
         self.main_layout.setAlignment(Qt.AlignCenter)

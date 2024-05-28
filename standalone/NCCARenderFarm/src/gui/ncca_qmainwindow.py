@@ -8,16 +8,30 @@ class NCCA_QMainWindow(QMainWindow):
     def __init__(self, name, size : QSize):
         """"""
         super().__init__()
-
         self.name = name
+        self.size = size
+
+
+        self.initUI()
+        self.endUI()
+
+    def initUI(self):
+        """
+        Initializes the UI.
+        This is designed so that when the class is extended, a custom ui can be implemented without having to re-write the window code.
+        
+        For development, all qt widgets can be added to self.main_layout. The class will then deal with fitting it in the UI.
+        """
         self.setWindowTitle(self.name)
-        self.setFixedSize(size)
+        self.setFixedSize(self.size)
 
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
+        self.old_pos = None
+
 
         self.root = QWidget(self)
-        self.root.resize(size)
+        self.root.resize(self.size)
         self.root.setObjectName("NCCA_QRootWidget")
         self.root.setStyleSheet(
             f"""#NCCA_QRootWidget{{
@@ -41,7 +55,7 @@ class NCCA_QMainWindow(QMainWindow):
 
         # Create the navigation bar and title bar
         self.nav_and_title_bar = QWidget(self)
-        self.nav_and_title_bar.setFixedSize(size.width(), APP_NAVBAR_HEIGHT)
+        self.nav_and_title_bar.setFixedSize(self.size.width(), APP_NAVBAR_HEIGHT)
         self.nav_and_title_bar.setStyleSheet(
             f"""
             border-top-left-radius: {APP_BORDER_RADIUS};
@@ -58,18 +72,6 @@ class NCCA_QMainWindow(QMainWindow):
         self.main_layout = QVBoxLayout(self.main_widget)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(0)
-
-        self.initUI()
-        self.endUI()
-
-    def initUI(self):
-        """
-        Initializes the UI.
-        This is designed so that when the class is extended, a custom ui can be implemented without having to re-write the window code.
-        
-        For development, all qt widgets can be added to self.main_layout. The class will then deal with fitting it in the UI.
-        """
-        pass
 
     def endUI(self):
         """

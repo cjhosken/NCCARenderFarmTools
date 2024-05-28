@@ -11,6 +11,7 @@ class NCCA_QSettingsWindow(NCCA_QMainWindow):
         super().__init__("Settings", size=SETTINGS_WINDOW_SIZE)
 
     def initUI(self):
+        super().initUI()
         """Initializes the UI"""
 
         self.main_layout.setAlignment(Qt.AlignCenter)
