@@ -115,17 +115,18 @@ SCROLL_MARGIN = 50
 
 # Qube
 QUBE_LAUNCHER_PATH = "/public/bin/2023/goQube"
+QUBE_PYTHON_BIN = "/public/devel/2022/pfx/qube/api/python/"
 
 # Make sure that Qube is already installed from apps anywhere
 if (OPERATING_SYSTEM == "windows"):
     QUBE_LAUNCHER_PATH = "c:/Program Files (x86)/pfx/qube/bin/qube.exe"
 
-#sys.path.append(LIBS_PYTHON_PATH)
-#import qb
+sys.path.append(QUBE_PYTHON_BIN)
+import qb
 
 # Houdini
 HOUDINI_PATH = "/opt/software/hfs19.5.605/"
-LOCAL_HYTHON_PATH = "/path/to/houdini_python"
+LOCAL_HYTHON_PATH = "/opt/hfs19.5.605/bin/hython"
 
 if OPERATING_SYSTEM == "windows":
     LOCAL_HYTHON_PATH = "C:/Program Files/Side Effects Software/Houdini 20.0.506/bin/hython.exe"
@@ -135,7 +136,7 @@ HOUDINI_ARNOLD_PLUGIN = """/path/to/plugin"""
 # Maya
 MAYA_PATH = "/opt/autodesk/maya2023/bin"
 MAYA_PLUGIN_PATH = "/opt/autodesk/arnold/maya2023/plug-ins"
-LOCAL_MAYAPY_PATH = "/path/to/mayapy"
+LOCAL_MAYAPY_PATH = "/opt/autodesk/maya2023/bin/mayapy"
 
 if (OPERATING_SYSTEM == "windows"):
     LOCAL_MAYAPY_PATH = "C:/Program Files/Autodesk/Maya2023/bin/mayapy.exe"
