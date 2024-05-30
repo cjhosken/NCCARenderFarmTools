@@ -47,6 +47,9 @@ RENDERFARM_ADDRESS = "tete.bournemouth.ac.uk"
 RENDERFARM_PORT = 22
 MAX_CONNECTION_ATTEMPTS = 3
 
+FARM_CPUS = 8
+DEFAULT_CPU_USAGE = 2
+
 USE_LOCAL_FILESYSTEM = True
 USE_DOT = True
 
@@ -114,5 +117,54 @@ MAYA_ARNOLD_PLUGIN = """/path/to/plugin"""
 MAYA_VRAY_PLUGIN = """/path/to/plugin"""
 MAYA_RMAN_PLUGIN = """/path/to/plugin"""
 
+MAYA_RENDER_ENGINES = {
+    "Set by file": "file",
+    "Maya Software": "sw",
+    "Maya Hardware": "hw",
+    "Maya Hardware 2.0": "hw2",
+    "Arnold": "arnold",
+    "Renderman": "renderman",
+    "VRay": "vray",
+    "Vector Renderer": "vr"
+}
+
+MAYA_FILE_EXTENSIONS= {
+    ".exr": "exr",
+    ".png": "png",
+    ".tif": "tif",
+    ".jpg": "jpeg",
+    ".jpeg": "jpeg",
+    ".deepexr": "deepexr",
+    ".maya": "maya"
+}
+
 # Blender
 BLENDER_PATH = "/path/to/blender"
+
+BLENDER_RENDER_ENGINES = {
+    "Set by file": "",
+    "Cycles": "CYCLES",
+    "EEVEE": "BLENDER_EEVEE",
+    "Workbench": "BLENDER_WORKBENCH"
+}
+
+BLENDER_FILE_EXTENSIONS = {
+    ".bmp": "BMP",
+    ".sgi": "IRIS",
+    ".png": "PNG",
+    ".jpg": "JPEG",
+    ".jpeg": "JPEG",
+    ".jp2": "JPEG2000",
+    ".j2k": "JPEG2000",
+    ".tga": "TARGA",
+    ".cin": "CINEON",
+    ".dpx": "DPX",
+    ".exr": "OPEN_EXR",
+    ".hdr": "HDR",
+    ".tif": "TIFF",
+    ".tiff": "TIFF"
+}
+
+# If arnold and renderman support are wanted and implemented
+# "Arnold" : "ARNOLD"
+# "Renderman" : "PRMAN_RENDER"

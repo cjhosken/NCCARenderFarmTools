@@ -37,12 +37,20 @@ class NCCA_RenderFarm_QFileSystemModel(QFileSystemModel):
 
                 # Custom application icons. Only DCCs supported by the renderfarm should have custom icons.
                 # TODO: INCLUDE OTHER SUPPORTED APPLICATIONS
-                if "blend" in file_ext:
-                    return QIcon(os.path.join(SCRIPT_DIR, "assets/icons/blender.svg"))  # Replace "path_to_blend_icon.png" with the actual path to your icon file
 
-                # Custom image icon
-                if (file_ext in VIEWABLE_IMAGE_FILES):
+                if "blend" in file_ext:
+                    # Provide custom icon for .blend files
+                    return QIcon(os.path.join(SCRIPT_DIR, "assets/icons/blender.svg"))  
+                
+                if "hip" in file_ext:
+                    return QIcon(os.path.join(SCRIPT_DIR, "assets/icons/houdini.png"))  
+                
+                if file_ext in [".ma", ".mb"]:
+                    return QIcon(os.path.join(SCRIPT_DIR, "assets/icons/maya.png"))  
+
+                if file_ext.lower() in VIEWABLE_IMAGE_FILES:
                     return QIcon(IMAGE_ICON_PATH)
+
 
                 # Custom archive icon
                 if (file_ext in [".zip" ".tar"]):

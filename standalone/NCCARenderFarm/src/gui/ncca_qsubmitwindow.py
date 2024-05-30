@@ -30,19 +30,52 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
         self.nav_and_title_layout.addWidget(self.title, alignment=Qt.AlignLeft)
         self.nav_and_title_layout.addStretch()
 
+        self.job_row_layout = QHBoxLayout()
+        self.job_row_widget = QWidget()
+
+        self.job_name_label = QLabel("Job Name")
+        self.job_row_layout.addWidget(self.job_name_label)
         self.job_name = NCCA_QInput(placeholder="Job Name", text=f"{self.username}_{os.path.basename(self.file_path)}")
-        self.main_layout.addWidget(self.job_name)
+        self.job_row_layout.addWidget(self.job_name)
+
+        self.cpu_label = QLabel("CPUs")
+        self.job_row_layout.addWidget(self.cpu_label)
         self.num_cpus = NCCA_QComboBox()
-        self.num_cpus.addItems(["1", "2", "3", "4", "5", "6", "7", "8"])
-        self.main_layout.addWidget(self.num_cpus)
+        self.num_cpus.addItems([str(i) for i in range(1, FARM_CPUS)])
+        self.num_cpus.setCurrentText(str(DEFAULT_CPU_USAGE))
+        self.job_row_layout.addWidget(self.num_cpus)
+
+        self.job_row_widget.setLayout(self.job_row_layout)
+        self.main_layout.addWidget(self.job_row_widget)
         
-        self.frame_range = NCCA_QInput(placeholder="Frame Range", text="1-125x1")
-        self.main_layout.addWidget(self.frame_range)
+        self.frame_row_layout = QHBoxLayout()
+        self.frame_row_widget = QWidget()
+
+        self.frame_label = QLabel("Frame Range")
+        self.frame_row_layout.addWidget(self.frame_label)
+
+        self.frame_start = NCCA_QInput(placeholder="Frame Start", text="1")
+        self.frame_start.setValidator(QIntValidator())
+        self.frame_row_layout.addWidget(self.frame_start)
+
+        self.frame_end = NCCA_QInput(placeholder="Frame End", text="125")
+        self.frame_end.setValidator(QIntValidator())
+        self.frame_row_layout.addWidget(self.frame_end)
+
+        self.frame_step = NCCA_QInput(placeholder="Frame Step", text="1")
+        self.frame_step.setValidator(QIntValidator())
+        self.frame_row_layout.addWidget(self.frame_step)
+
+        self.frame_row_widget.setLayout(self.frame_row_layout)
+
+        self.main_layout.addWidget(self.frame_row_widget)
 
     def endUI(self):
         """Same purpose as endUI, however another level deeper"""
-        # Submit button
         self.button_box = QDialogButtonBox(Qt.Horizontal)
+        
+
+        # Submit button
         submit_button = NCCA_QFlatButton("Submit")
         submit_button.setFixedSize(QSize(125, 35))
         submit_button.clicked.connect(self.submit_job)
@@ -53,6 +86,7 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
         cancel_button.setFixedSize(QSize(125, 35))
         cancel_button.clicked.connect(self.close)
         self.button_box.addButton(cancel_button, QDialogButtonBox.NoRole)
+
 
         self.main_layout.addWidget(self.button_box, alignment=Qt.AlignCenter)
 
