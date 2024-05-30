@@ -13,7 +13,7 @@ from jobs.ncca_qsubmit_houdini import NCCA_QSubmit_Houdini
 from jobs.ncca_qsubmit_maya import NCCA_QSubmit_Maya
 
 from utils import get_user_home
-from qube import launch_qube
+from qube_app import launch_qube
 
 class NCCA_RenderFarm_QTreeView(QTreeView):
     """A custom QTreeView class that shows the files in the renderfarm"""

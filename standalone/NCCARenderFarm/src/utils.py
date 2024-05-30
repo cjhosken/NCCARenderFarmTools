@@ -16,3 +16,4 @@ def svg_to_pixmap(svg_filename: str, size: QSize, color: QColor) -> QPixmap:
     painter.fillRect(pixmap.rect(), color)
     painter.end()    
     return pixmap
+

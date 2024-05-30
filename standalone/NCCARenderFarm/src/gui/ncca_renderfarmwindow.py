@@ -5,7 +5,7 @@ from gui.ncca_qmainwindow import NCCA_QMainWindow
 from gui.ncca_qfiletreeview import NCCA_RenderFarm_QTreeView
 from gui.ncca_qsettingswindow import NCCA_QSettingsWindow
 
-from qube import  launch_qube
+from qube_app import  launch_qube
 from utils import get_user_home
 
 class NCCA_RenderFarmWindow(NCCA_QMainWindow):

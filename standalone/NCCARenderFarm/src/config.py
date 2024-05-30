@@ -2,15 +2,32 @@ from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 from PySide6.QtSvg import *
-import sys, os, shutil, tempfile
+import sys, os, shutil, tempfile, re
 from cryptography.fernet import Fernet
 from dotenv import load_dotenv
 import paramiko, socket, subprocess, threading, zipfile, stat
+
+def get_os():
+    if os.name == 'posix':
+        uname = os.uname()
+        if uname.sysname == 'Darwin':
+            return 'macos'
+        elif uname.sysname == 'Linux':
+            return 'linux'
+        else:
+            return 'Other POSIX'
+    elif os.name == 'nt':
+        return 'windows'
+    else:
+        return 'unknown'
+
+OPERATING_SYSTEM = get_os()
 
 # GLOBAL
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 ASSET_DIR = os.path.join(SCRIPT_DIR, "assets")
 NCCA_ENVIRONMENT_PATH = os.path.expanduser('~/.ncca')
+LIBS_PYTHON_PATH = os.path.join(SCRIPT_DIR, "libs")
 
 # APP GLOBALS
 APPLICATION_NAME = "NCCA Renderfarm 2024"
@@ -102,8 +119,16 @@ SCROLL_MARGIN = 50
 # If renderers and applications begin to break, make sure that these paths are correct
 
 # Qube
+
+
 QUBE_LAUNCHER_PATH = "/public/bin/2023/goQube"
-QUBE_PYTHON_PATH = "/path/to/qube/python"
+
+# Make sure that Qube is already installed from apps anywhere
+if (OPERATING_SYSTEM == "windows"):
+    QUBE_LAUNCHER_PATH = "c:/Program Files (x86)/pfx/qube/bin/qube.exe"
+
+sys.path.append(LIBS_PYTHON_PATH)
+import qb
 
 # Houdini
 HOUDINI_PATH = "/path/to/houdini"
