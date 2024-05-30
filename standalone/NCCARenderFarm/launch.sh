@@ -38,14 +38,14 @@ fi
 source ~/.bashrc
 
 # Check if Python 3.8 is already installed
-if pyenv versions | grep -q 3.11; then
-    echo "Python 3.11 is already installed."
+if pyenv versions | grep -q 3.8; then
+    echo "Python 3.8 is already installed."
 else
-    echo "Python 3.11 is not installed. Installing..."
-    pyenv install 3.11
+    echo "Python 3.8 is not installed. Installing..."
+    pyenv install 3.8
 fi
 
-pyenv local 3.11
+pyenv local 3.8
 python3 --version
 
 echo "Installing Requirements"
