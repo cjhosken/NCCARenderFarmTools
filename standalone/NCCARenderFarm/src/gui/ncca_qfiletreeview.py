@@ -435,7 +435,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         if folder_dialog.exec():
             selected_folders = folder_dialog.selectedFiles()
             for folder in selected_folders:
-                destination_folder = os.path.join(self.model().get_file_path(index), os.path.basename(folders)).replace("\\", "/")
+                destination_folder = os.path.join(self.model().get_file_path(index), os.path.basename(folder)).replace("\\", "/")
                 self.uploadFolders(selected_folders, destination_folder)
 
     def uploadFiles(self, selected_files, destination_folder):
@@ -470,9 +470,13 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         """Uploads the selected folders to the destination folder"""
         self.showProgressDialog("Uploading Folders...")
         for i, folder_path in enumerate(selected_folders):
+            
             # Upload the folder and its contents recursively
             try:
-                self.model().renderfarm.upload_folder_recursive(folder_path, destination_folder)
+                if (self.is_local):
+                    shutil.copytree(folder_path, destination_folder)
+                else:
+                    self.model().renderfarm.upload_folder_recursive(folder_path, destination_folder)
                 print(f"Folder '{folder_path}' uploaded successfully to '{destination_folder}'")
             except Exception as e:
                 print(f"Error uploading folder '{folder_path}': {e}")
