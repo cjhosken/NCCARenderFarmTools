@@ -120,6 +120,7 @@ QUBE_PYTHON_BIN = "/public/devel/2022/pfx/qube/api/python/"
 # Make sure that Qube is already installed from apps anywhere
 if (OPERATING_SYSTEM == "windows"):
     QUBE_LAUNCHER_PATH = "c:/Program Files (x86)/pfx/qube/bin/qube.exe"
+    QUBE_PYTHON_BIN = "c:/Program Files/pfx/qube/api/python"
 
 sys.path.append(QUBE_PYTHON_BIN)
 import qb

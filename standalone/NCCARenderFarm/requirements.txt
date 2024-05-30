@@ -1,8 +1,6 @@
-tk
 paramiko
 python-dotenv
 Pillow
 opencv-python
 numpy
 PySide6
-qube
