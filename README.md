@@ -20,4 +20,22 @@ For Windows run `. "./standalone/NCCARenderFarm/launch.ps1"` to run the standalo
 ## Known Limitations
 At the current moment, Qt (and c++) is not behaving correctly on the RedHat machines in the NCCA lab. 
 There seems to be a problem with cstdio and stdio in the gcc-toolset. 
-I'll include the error message below when I have time.
+I'll include the error messages below when I have time.
+
+
+This is the error that appears when running launch.sh
+
+```
+qt.qpa.plugin: From 6.5.0, xcb-cursor0 or libxcb-cursor0 is needed to load the Qt xcb platform plugin.
+qt.qpa.plugin: Could not load the Qt platform plugin "xcb" in "" even though it was found.
+This application failed to start because no Qt platform plugin could be initialized. Reinstalling the application may fix this problem.
+
+Available platform plugins are: eglfs, linuxfb, minimal, minimalegl, offscreen, vkkhrdisplay, vnc, wayland-egl, wayland, xcb.
+```
+
+The quick fix for this should be `sudo yum install xcb-cursor0`
+
+
+
+
+Another issue that occurs (which has been happened for most of the year), is 
