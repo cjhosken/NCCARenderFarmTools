@@ -11,7 +11,7 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
 
     def __init__(self, file_path="", name="Submit Job", username="", parent=None):
         """Initializes the window UI"""
-        self.file_path = file_path
+        self.file_path = file_path.replace("home", "render")
         self.job_id = 0
         self.name = name
         self.username = username
@@ -72,13 +72,36 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
 
     def endUI(self):
         """Same purpose as endUI, however another level deeper"""
+        self.output_path_row_layout = QHBoxLayout()
+        self.output_path_row_widget = QWidget()
+
+        self.output_path_label = QLabel("Output Path")
+        self.output_path_row_layout.addWidget(self.output_path_label)
+        self.output_path = NCCA_QInput(placeholder="Output Path")
+        self.output_path.setText("output/frame_####.exr")
+        self.output_path_row_layout.addWidget(self.output_path)
+
+        self.output_path_row_widget.setLayout(self.output_path_row_layout)
+        self.main_layout.addWidget(self.output_path_row_widget)
+
+        self.command_row_layout = QHBoxLayout()
+        self.command_row_widget = QWidget()
+
+        self.command_label = QLabel("Extra Commands")
+        self.command_row_layout.addWidget(self.command_label)
+        self.command = NCCA_QInput(placeholder="Extra Commands")
+        self.command_row_layout.addWidget(self.command)
+
+        self.command_row_widget.setLayout(self.command_row_layout)
+        self.main_layout.addWidget(self.command_row_widget)
+
         self.button_box = QDialogButtonBox(Qt.Horizontal)
         
 
         # Submit button
         submit_button = NCCA_QFlatButton("Submit")
         submit_button.setFixedSize(QSize(125, 35))
-        submit_button.clicked.connect(self.submit_job)
+        submit_button.clicked.connect(self.prepare_job)
         self.button_box.addButton(submit_button, QDialogButtonBox.YesRole)
 
         # Cancel button
@@ -92,11 +115,21 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
 
         super().endUI()
 
-    def submit_job(self):
+    def prepare_job(self):
+        pass
+
+    def submit_job(self, job):
         """ Submits the job to the renderfarm"""
+        listOfJobsToSubmit = []
+        listOfJobsToSubmit.append(job)
+        listOfSubmittedJobs = qb.submit(listOfJobsToSubmit)
+        id_list=[]
+        for job in listOfSubmittedJobs:
+            id_list.append(job['id'])
+
         self.close()
         NCCA_QMessageBox.info(
             self,
             "NCCA Renderfarm",
-            f"Job Submitted!\nID: {self.job_id}"
+            f"Job Submitted!\nID: {id_list}"
         )

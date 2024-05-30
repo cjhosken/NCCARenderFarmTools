@@ -7,13 +7,13 @@ from gui.ncca_qinput import NCCA_QInput
 from libs.blend_render_info import read_blend_rend_chunk
 
 class NCCA_QSubmit_Blender(NCCA_QSubmitWindow):
-    def __init__(self, file_path="", username="", parent=None):
+    def __init__(self, file_path="", username="", file_data=None, parent=None):
         super().__init__(file_path, name="Submit Blender Job", username=username, parent=parent)
 
-        file_data = self.read_blender_data()[0]
-        self.frame_start.setText(str(file_data[0]))
-
-        self.frame_end.setText(str(file_data[1]))
+        if file_data is not None:
+            file_data = file_data[0]
+            self.frame_start.setText(str(file_data[0]))
+            self.frame_end.setText(str(file_data[1]))
 
         
 
@@ -31,44 +31,69 @@ class NCCA_QSubmit_Blender(NCCA_QSubmitWindow):
         self.active_renderer_row_widget.setLayout(self.active_renderer_row_layout)
         self.main_layout.addWidget(self.active_renderer_row_widget)
 
-        self.output_path_row_layout = QHBoxLayout()
-        self.output_path_row_widget = QWidget()
+    def prepare_job(self):
+        job_name = self.job_name.text()
+        num_cpus = self.num_cpus.currentText()
+        frame_start = self.frame_start.text()
+        frame_end = self.frame_end.text()
+        frame_step = self.frame_step.text()
 
-        self.output_path_label = QLabel("Output Path")
-        self.output_path_row_layout.addWidget(self.output_path_label)
-        self.output_path = NCCA_QInput(placeholder="Output Path")
-        self.output_path_row_layout.addWidget(self.output_path)
+        renderer = BLENDER_RENDER_ENGINES.get(self.active_renderer.currentText())
+        output_path = self.output_path.text()
+        external_commands = self.command.text()
+        
 
-        self.output_path_row_widget.setLayout(self.output_path_row_layout)
-        self.main_layout.addWidget(self.output_path_row_widget)
+        if (not output_path.startswith(f"/render/{self.username}")):
+            output_path = os.path.join(f"/render/{self.username}", output_path).replace("\\", "/")
 
-    def submit_job(self):
-        self.job_id = 1
-        super().submit_job()
 
-    def read_blender_data(self):
-        data = None
-        try:
-            # Get the file name from the remote path
-            file_name = os.path.basename(self.render_path)
+        output_file = os.path.basename(output_path)
 
-            # Create a temporary directory
-            temp_dir = tempfile.TemporaryDirectory(dir="/tmp")
+        frame_padding = max(output_file.count("#"), len(str(int(frame_end)*int(frame_step))) + 1)
 
-            # Construct the local path for the downloaded file
-            local_path = os.path.join(temp_dir.name, file_name)
+        output_file = re.sub(r'#+', '#'*frame_padding, output_file)
+        output_dir = os.path.dirname(output_path)
 
-            farm_path = self.render_path.replace(f'/render/{self.username}', '.')
+        output_path = os.path.join(output_dir, output_file).replace("\\", "/")
 
-            # Download the file to the temporary directory
-            self.renderfarm.download(farm_path, local_path)
+        frame_range = f"{frame_start}-{frame_end}x{frame_step}"
 
-            data = read_blend_rend_chunk(local_path)
-            print(data)
+        output_file_name = os.path.basename(output_path)
+        output_file_name_without_extension, output_file_extension = os.path.splitext(output_file_name)
 
-        except Exception as err:
-            print(f"Failed to open {self.render_path}: {err}")
-        finally:
-            temp_dir.cleanup()
+        override_extension = BLENDER_FILE_EXTENSIONS.get(output_file_extension, "")
 
-            return data
+        job = {}
+        job['name'] = job_name
+        job['cpus'] = num_cpus
+
+        job['prototype'] = 'cmdrange'
+        package = {}
+        package['shell']="/bin/bash"
+        pre_render=""
+
+        # https://docs.blender.org/manual/en/latest/advanced/command_line/render.html
+
+        render_command=f"{BLENDER_PATH} -b {self.file_path} -f QB_FRAME_NUMBER"
+
+        render_output_path = os.path.join(os.path.dirname(output_path), output_file_name_without_extension).replace("\\", "/")
+
+        render_command+=f" -o {render_output_path}" if (output_path) else ""
+        render_command+=f" -F {override_extension}" if override_extension else ""
+        render_command+=f" -E {renderer}" if renderer else ""
+        render_command+=f" {external_commands}" if external_commands else ""
+
+        package['cmdline']=f"{pre_render} {render_command}"
+
+        print(render_command)
+                
+        job['package'] = package
+        
+        env={"HOME" :f"/render/{self.username}"}
+        
+        job['env']=env
+        job["cwd"] = f"/render/{self.username}"
+
+        job['agenda'] = qb.genframes(frame_range)
+
+        self.submit_job(job)

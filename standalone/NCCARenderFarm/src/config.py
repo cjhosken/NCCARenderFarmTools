@@ -2,7 +2,7 @@ from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 from PySide6.QtSvg import *
-import sys, os, shutil, tempfile, re
+import sys, os, shutil, tempfile, re, json
 from cryptography.fernet import Fernet
 from dotenv import load_dotenv
 import paramiko, socket, subprocess, threading, zipfile, stat
@@ -27,7 +27,6 @@ OPERATING_SYSTEM = get_os()
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 ASSET_DIR = os.path.join(SCRIPT_DIR, "assets")
 NCCA_ENVIRONMENT_PATH = os.path.expanduser('~/.ncca')
-LIBS_PYTHON_PATH = os.path.join(SCRIPT_DIR, "libs")
 
 # APP GLOBALS
 APPLICATION_NAME = "NCCA Renderfarm 2024"
@@ -77,10 +76,6 @@ OPENABLE_FILES = [] + VIEWABLE_IMAGE_FILES
 REPORT_BUG_LINK = "https://github.com/cjhosken/NCCARenderFarmTools/issues"
 INFO_LINK = "https://github.com/cjhosken/NCCARenderFarmTools"
 
-
-
-#TODO: CLEANUP THE BELOW CONFIG OPTIONS
-
 #FONTS
 TITLE_FONT = QFont()
 TITLE_FONT.setPointSize(18)
@@ -105,7 +100,7 @@ APP_WARNING_COLOR="#FF0000"
 MAIN_WINDOW_SIZE = QSize(800, 800)
 LOGIN_WINDOW_SIZE = QSize(400, 500)
 SETTINGS_WINDOW_SIZE = QSize(500, 500)
-SUBMIT_WINDOW_SIZE = QSize(500, 500)
+SUBMIT_WINDOW_SIZE = QSize(500, 600)
 IMAGE_WINDOW_SIZE = QSize(1280, 700)
 MESSAGE_BOX_SIZE = QSize(300, 175)
 
@@ -119,28 +114,31 @@ SCROLL_MARGIN = 50
 # If renderers and applications begin to break, make sure that these paths are correct
 
 # Qube
-
-
 QUBE_LAUNCHER_PATH = "/public/bin/2023/goQube"
 
 # Make sure that Qube is already installed from apps anywhere
 if (OPERATING_SYSTEM == "windows"):
     QUBE_LAUNCHER_PATH = "c:/Program Files (x86)/pfx/qube/bin/qube.exe"
 
-sys.path.append(LIBS_PYTHON_PATH)
-import qb
+#sys.path.append(LIBS_PYTHON_PATH)
+#import qb
 
 # Houdini
-HOUDINI_PATH = "/path/to/houdini"
-HOUDINI_PYTHON_PATH = "/path/to/houdini_python"
+HOUDINI_PATH = "/opt/software/hfs19.5.605/"
+LOCAL_HYTHON_PATH = "/path/to/houdini_python"
+
+if OPERATING_SYSTEM == "windows":
+    LOCAL_HYTHON_PATH = "C:/Program Files/Side Effects Software/Houdini 20.0.506/bin/hython.exe"
+
 HOUDINI_ARNOLD_PLUGIN = """/path/to/plugin"""
 
 # Maya
-MAYA_PATH = "/path/to/maya"
-MAYA_PYTHON_PATH = "/path/to/maya/python"
-MAYA_ARNOLD_PLUGIN = """/path/to/plugin"""
-MAYA_VRAY_PLUGIN = """/path/to/plugin"""
-MAYA_RMAN_PLUGIN = """/path/to/plugin"""
+MAYA_PATH = "/opt/autodesk/maya2023/bin"
+MAYA_PLUGIN_PATH = "/opt/autodesk/arnold/maya2023/plug-ins"
+LOCAL_MAYAPY_PATH = "/path/to/mayapy"
+
+if (OPERATING_SYSTEM == "windows"):
+    LOCAL_MAYAPY_PATH = "C:/Program Files/Autodesk/Maya2023/bin/mayapy.exe"
 
 MAYA_RENDER_ENGINES = {
     "Set by file": "file",
@@ -148,7 +146,7 @@ MAYA_RENDER_ENGINES = {
     "Maya Hardware": "hw",
     "Maya Hardware 2.0": "hw2",
     "Arnold": "arnold",
-    "Renderman": "renderman",
+    "RenderMan": "renderman",
     "VRay": "vray",
     "Vector Renderer": "vr"
 }

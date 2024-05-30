@@ -14,6 +14,7 @@ from jobs.ncca_qsubmit_maya import NCCA_QSubmit_Maya
 
 from utils import get_user_home
 from qube_app import launch_qube
+from libs.blend_render_info import read_blend_rend_chunk
 
 class NCCA_RenderFarm_QTreeView(QTreeView):
     """A custom QTreeView class that shows the files in the renderfarm"""
@@ -296,10 +297,6 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             is_dir = self.model().renderfarm.isdir(file_path)
         
         if (is_dir):
-            if file_path != self.home_path:
-                self.action_compress = self.context_menu.addAction("Compress to .zip")
-                self.action_compress.triggered.connect(self.compressSelectedIndex)
-            
             self.action_create = self.context_menu.addAction("New Folder")
             self.action_create.triggered.connect(self.createFolderUnderSelectedIndex)
             self.action_upload = self.context_menu.addAction("Upload Files")
@@ -313,10 +310,6 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             if "blend" in file_ext or "hip" in file_ext or file_ext in [".mb", ".ma"]:
                 self.action_submit = self.context_menu.addAction("Submit Render Job")
                 self.action_submit.triggered.connect(self.submitSelectedIndex)
-
-            if file_ext in [".zip", ".rar"]:
-                self.action_extract = self.context_menu.addAction("Extract")
-                self.action_extract.triggered.connect(self.extractSelectedIndex)
 
             if file_ext in OPENABLE_FILES:
                 self.action_open = self.context_menu.addAction("Open")
@@ -535,89 +528,6 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
 
             print(f"File {source_path} copied successfully to {destination_path}")
 
-    def compressSelectedIndex(self):
-        """Compresses the currently selected index into a zip file."""
-        index = self.currentIndex()
-        source_path = self.model().get_file_path(index)
-        parent_path = os.path.dirname(source_path)
-        source_name, _ = os.path.splitext(os.path.basename(source_path))
-        
-
-        create_zip_dialog = NCCA_QInputDialog(placeholder="Zip Name", text=f"{source_name}.zip", confirm_text="Compress", parent=self)
-        if create_zip_dialog.exec_():
-            zip_name = create_zip_dialog.getText()
-            output_zip_file = os.path.join(parent_path, zip_name).replace("\\", "/")
-            if (self.is_local):
-                if os.path.exists(output_zip_file):
-                    NCCA_QMessageBox.warning(
-                        self,
-                        "Error",
-                        f"{output_zip_file} already exists."
-                    )
-
-                 # Create a ZipFile object to write to the output zip file
-                else:
-                    with zipfile.ZipFile(output_zip_file, 'w') as zipf:
-                        # Iterate over selected indices
-                        file_path = os.path.join(self.model().get_file_path(index))
-                        if os.path.exists(file_path):  # Check if the file or folder exists
-                            if os.path.isdir(file_path):  # If it's a directory, recursively add its contents
-                                for root, dir, files in os.walk(file_path):
-                                    for file in files:
-                                        zipf.write(os.path.join(root, file), arcname=os.path.relpath(os.path.join(root, file), file_path))
-                            else:  # If it's a file, add it to the zip file
-                                zipf.write(os.path.join(file_path), arcname=os.path.basename(file_path))
-
-                    print(f"Selected items compressed to '{output_zip_file}'")
-            else:
-                if self.model().renderfarm.exists(output_zip_file):
-                    NCCA_QMessageBox.warning(
-                        self,
-                        "Error",
-                        f"{output_zip_file} already exists."
-                    )
-                else:
-                    self.model().renderfarm.compress(source_path, output_zip_file)
-                    self.model().refresh()
-        
-
-
-    def extractSelectedIndex(self):   
-        """Extracts the contents of the selected zip file to a folder."""     
-        index = self.currentIndex()
-        zip_file_path = self.model().get_file_path(index)
-        zip_file_name, _ = os.path.splitext(os.path.basename(zip_file_path))
-        
-        parent_path = os.path.dirname(zip_file_path)
-
-
-        create_folder_dialog = NCCA_QInputDialog(placeholder="Folder Name", text=os.path.basename(zip_file_name), confirm_text="Extract", parent=self)
-        if create_folder_dialog.exec_():
-            folder_name = create_folder_dialog.getText()
-            output_folder = os.path.join(parent_path, folder_name).replace('\\', '/')
-            if (self.is_local):
-                if os.path.exists(output_folder):
-                    NCCA_QMessageBox.warning(
-                        self,
-                        "Error",
-                        f"{output_folder} already exists."
-                    )
-                else:
-                    os.makedirs(output_folder, exist_ok=True)
-                    with zipfile.ZipFile(zip_file_path, 'r') as zipf:
-                        zipf.extractall(output_folder)
-            else:
-                if self.model().renderfarm.exists(output_folder):
-                    NCCA_QMessageBox.warning(
-                        self,
-                        "Error",
-                        f"{output_folder} already exists."
-                    )
-                else:
-                    self.model().renderfarm.extract(zip_file_path, output_folder)
-                    self.model().refresh()
-
-
     def deleteSelectedIndexes(self):
         """Deletes the selected indexes."""
         selected_indexes = self.selectedIndexes()
@@ -778,23 +688,68 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             return
 
         file_path = self.model().get_file_path(index)
-        _, file_ext = os.path.splitext(file_path)
+        _, file_ext = os.path.splitext(os.path.basename(file_path))
 
+
+        # Get the file name from the remote path
+        file_name = os.path.basename(file_path)
+
+        # Create a temporary directory
+        temp_dir = tempfile.TemporaryDirectory(dir=os.path.join(get_user_home(), "tmp"))
+
+        # Construct the local path for the downloaded file
+        local_path = os.path.join(temp_dir.name, file_name).replace("\\", "/")
+
+        # Download the file to the temporary directory
+        self.model().renderfarm.download(file_path, local_path)
+
+        data = None
+        self.setCursor(QCursor(Qt.WaitCursor))
         if "blend" in file_ext:
-            self.job_dialog = NCCA_QSubmit_Blender(username=self.username, file_path=file_path)
+            data = read_blend_rend_chunk(local_path)
+
+            temp_dir.cleanup()
+
+            self.job_dialog = NCCA_QSubmit_Blender(username=self.username, file_path=file_path, file_data=data)
             self.job_dialog.setGeometry(self.geometry())
             self.job_dialog.show()
         
         elif "hip" in file_ext:
-            self.job_dialog = NCCA_QSubmit_Houdini(username=self.username, file_path=file_path)
+            command = [LOCAL_HYTHON_PATH, os.path.join(SCRIPT_DIR, "libs", "houdini_render_info.py").replace("\\", "/"), local_path]
+            
+            # Execute the command
+            output = subprocess.check_output(command, stderr=subprocess.STDOUT, universal_newlines=True).strip()
+                
+            match = re.search(r'{\s*"NCCA_RENDERFARM":\s*{.*?}\s*}', output, re.DOTALL)
+                
+            if match:
+                json_data = match.group()
+                # Load JSON data
+                data = json.loads(json_data)
+                    
+            self.job_dialog = NCCA_QSubmit_Houdini(username=self.username, file_path=file_path, file_data=data)
             self.job_dialog.setGeometry(self.geometry())
             self.job_dialog.show()
+
         
         elif file_ext in [".mb", ".ma"]:
-            self.job_dialog = NCCA_QSubmit_Maya(username=self.username, file_path=file_path)
+            
+            command = [LOCAL_MAYAPY_PATH, os.path.join(SCRIPT_DIR, "libs", "maya_render_info.py").replace("\\", "/"), local_path]
+            # Execute the command
+            output = subprocess.check_output(command, stderr=subprocess.STDOUT, universal_newlines=True).strip()
+            match = re.search(r'{\s*"NCCA_RENDERFARM":\s*{.*?}\s*}', output, re.DOTALL)
+
+            if match:
+                json_data = match.group()
+                # Load JSON data
+                data = json.loads(json_data)
+
+            self.job_dialog = NCCA_QSubmit_Maya(username=self.username, file_path=file_path, file_data=data)
             self.job_dialog.setGeometry(self.geometry())
             self.job_dialog.show()
         else:
             self.job_dialog = NCCA_QSubmitWindow(username=self.username, file_path=file_path)
             self.job_dialog.setGeometry(self.geometry())
             self.job_dialog.show()
+        
+        self.setCursor(QCursor(Qt.ArrowCursor))

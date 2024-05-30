@@ -62,7 +62,7 @@ class NCCA_RenderFarm(paramiko.SSHClient):
             # If the source is a file, upload it directly
             self.sftp.put(source_local_path, remote_path)
         elif os.path.isdir(source_local_path):
-            upload_folder_recursive(source_local_path, remote_path)
+            self.upload_folder_recursive(source_local_path, remote_path)
         else:
             print("Source path is neither a file nor a directory.")
 
@@ -123,59 +123,3 @@ class NCCA_RenderFarm(paramiko.SSHClient):
     def rename(self, old_remote_path, new_remote_path):
         """Renames a file or directory on the remote SFTP server"""
         self.sftp.rename(old_remote_path, new_remote_path)
-
-    def extract(self, remote_zip_path, remote_path):
-        """Extracts a .zip or .tar on the remote SFTP server"""
-
-        tmp_dir = os.path.join(get_user_home(), "tmp")
-        os.makedirs(tmp_dir, exist_ok=True)
-
-        # Download the archive to the local system
-        local_zip_path = os.path.join(tmp_dir, "temp.zip")
-        self.download(remote_zip_path, local_zip_path)
-        
-        # Create a temporary directory for extraction
-        extract_dir = os.path.join(tmp_dir, "extracted")
-        os.makedirs(extract_dir, exist_ok=True)
-        
-        # Determine the extraction method based on the file extension
-        if remote_zip_path.endswith('.zip'):
-            with zipfile.ZipFile(local_zip_path, 'r') as zip_ref:
-                zip_ref.extractall(extract_dir)
-        elif remote_zip_path.endswith('.tar'):
-            with tarfile.open(local_zip_path, 'r') as tar_ref:
-                tar_ref.extractall(extract_dir)
-        else:
-            raise ValueError("Unsupported archive format")
-        
-        # Upload the extracted files to the remote server
-        for root, dirs, files in os.walk(extract_dir):
-            for file in files:
-                local_file_path = os.path.join(root, file)
-                remote_file_path = os.path.join(remote_path, os.path.relpath(local_file_path, extract_dir)).replace("\\", "/")
-                self.upload(local_file_path, remote_file_path)
-        
-        # Cleanup: Delete the local temporary directory
-        shutil.rmtree(extract_dir)
-        shutil.rmtree(tmp_dir)
-
-    def compress(self, remote_path, remote_zip_path):
-        """Compresses the remote directory into a .zip on the remote SFTP server"""
-        # Download the directory to local system
-
-        tmp_dir = os.path.join(get_user_home(), "tmp")
-
-        os.makedirs(tmp_dir, exist_ok=True)
-
-        local_dir_path = os.path.join(get_user_home(),"tmp", "temp_dir")  # Adjust as needed
-        os.makedirs(local_dir_path, exist_ok=True)
-        self.download(remote_path, local_dir_path)
-        
-        # Compress the directory
-        zip_file_path = os.path.join(get_user_home(), "tmp", "temp.zip")  # Adjust as needed
-        shutil.make_archive(zip_file_path, 'zip', local_dir_path)
-        
-        # Upload the compressed file back to the server
-        self.upload(zip_file_path, remote_zip_path)
-        
-        shutil.rmtree(tmp_dir)
