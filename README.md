@@ -39,3 +39,6 @@ The quick fix for this should be `sudo yum install xcb-cursor0`
 
 
 Another issue that occurs (which has been happened for most of the year), is 
+
+/opt/rh/gcc-toolset-12/root/usr/include/c++/12/cstdlib:75:15: fatal error: stdlib.h: No such file or directory
+   75 | #include_next <stdlib.h>
