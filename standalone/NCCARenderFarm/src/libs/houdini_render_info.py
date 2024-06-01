@@ -24,7 +24,7 @@ if __name__ == "__main__":
             print(f"{node}: {node.type().category()}")
             if isinstance(node, hou.RopNode):
                 # Add the name of the ROP node to the list
-                rop_nodes.append(node.name())
+                rop_nodes.append(node.path())
 
         # Generate JSON data
         json_data = {

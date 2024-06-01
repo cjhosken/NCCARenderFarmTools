@@ -9,12 +9,14 @@ from gui.ncca_qinput import NCCA_QInput
 class NCCA_QSubmitWindow(NCCA_QMainWindow):
     """Interface for the user to submit renderfarm jobs"""
 
-    def __init__(self, file_path="", name="Submit Job", username="", parent=None):
+    def __init__(self, renderfarm=None, file_path="", folder_path="", name="Submit Job", username="", parent=None):
         """Initializes the window UI"""
-        self.file_path = file_path.replace("home", "render")
+        self.file_path = file_path
+        self.folder_path = folder_path
         self.job_id = 0
         self.name = name
         self.username = username
+        self.renderfarm = renderfarm
         super().__init__(self.name, size=SUBMIT_WINDOW_SIZE)
 
     def initUI(self):
@@ -47,6 +49,18 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
 
         self.job_row_widget.setLayout(self.job_row_layout)
         self.main_layout.addWidget(self.job_row_widget)
+
+        self.job_path_row_layout = QHBoxLayout()
+        self.job_path_row_widget = QWidget()
+
+        self.job_path_label = QLabel("Job Path")
+        self.job_path_row_layout.addWidget(self.job_path_label)
+        self.job_path = NCCA_QInput(placeholder="Job Path")
+        self.job_path.setText("/" + os.path.basename(self.folder_path))
+        self.job_path_row_layout.addWidget(self.job_path)
+
+        self.job_path_row_widget.setLayout(self.job_path_row_layout)
+        self.main_layout.addWidget(self.job_path_row_widget)
         
         self.frame_row_layout = QHBoxLayout()
         self.frame_row_widget = QWidget()
@@ -72,18 +86,6 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
 
     def endUI(self):
         """Same purpose as endUI, however another level deeper"""
-        self.output_path_row_layout = QHBoxLayout()
-        self.output_path_row_widget = QWidget()
-
-        self.output_path_label = QLabel("Output Path")
-        self.output_path_row_layout.addWidget(self.output_path_label)
-        self.output_path = NCCA_QInput(placeholder="Output Path")
-        self.output_path.setText("output/frame_####.exr")
-        self.output_path_row_layout.addWidget(self.output_path)
-
-        self.output_path_row_widget.setLayout(self.output_path_row_layout)
-        self.main_layout.addWidget(self.output_path_row_widget)
-
         self.command_row_layout = QHBoxLayout()
         self.command_row_widget = QWidget()
 
@@ -116,7 +118,27 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
         super().endUI()
 
     def prepare_job(self):
-        pass
+        remote_job_path = os.path.join(f"/home/{self.username}", RENDERFARM_HOME_DIR, self.job_path.text().lstrip("/"))
+        print(remote_job_path)
+        # Upload the files to the renderfarm
+
+        upload = True
+        if (self.renderfarm.exists(remote_job_path)):
+            response = NCCA_QMessageBox.override(
+                self,
+                "Override?",
+                f"{remote_job_path} already exists. What do you want to do?"
+            )
+
+            if (response ==QDialogButtonBox.YesRole):
+                pass
+            else:
+                upload = False
+        
+        if (upload):
+            self.renderfarm.upload_folder(self.folder_path, remote_job_path)
+
+        
 
     def submit_job(self, job):
         """ Submits the job to the renderfarm"""

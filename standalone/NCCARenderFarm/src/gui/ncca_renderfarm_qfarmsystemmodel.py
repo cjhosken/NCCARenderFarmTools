@@ -5,71 +5,31 @@ from ncca_renderfarm import NCCA_RenderFarm
 class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
     """A custom QFileSystemModel class used for accessing the remote SFTP server"""
 
-    def __init__(self, username, password, parent=None):
+    def __init__(self, home_path, username, password, parent=None):
         """Initializes the farmsystemmodel and connects to the renderfarm"""
 
         super().__init__(parent)
         self.username = username
         self.password = password
         self.renderfarm = NCCA_RenderFarm(self.username, self.password)
-        self.rootItem = self.create_item(f"/home/", None)
+        self.home_path = home_path
+        self.rootItem = self.create_item(f"/home/{username}", None)
         self.expanded_paths = set()
-
-    def refresh(self):
-        """Refresh reloads the items in the browser so that file changes are instantly visible"""
-        self.expanded_paths = self.get_expanded_paths(self.rootItem)
-
-        self.beginResetModel()
-        self.loadData() 
-        self.endResetModel()
-
-        self.restore_expanded_paths(self.rootItem)
-        
-    def loadData(self):
-        """loads all the children data into the filebrowser"""
-        self.rootItem['children'] = None  # Clear the current children
-        self.populateChildren(self.rootItem)  # Repopulate with fresh data
 
     def populateChildren(self, parent_item):
         """Recursively populate children for a given parent item."""
         parent_path = parent_item['path']
         
-        children = self.renderfarm.listdir(parent_path)
-        parent_item['children'] = []
-            
-        for child in children:
-            child_path = os.path.join(parent_path, child)
-            if f"/home/{self.username}" in child_path:
-                parent_item['children'].append(self.create_item(child_path, parent_item))
-            
-        for child in parent_item['children']:
-            if self.renderfarm.isdir(child['path']):
-                self.populateChildren(child)  # Recursively load directories
-
-    
-    def get_expanded_paths(self, item):
-        """Recursively gather paths of expanded items."""
-        expanded_paths = set()
+        # Only load children if the parent item does not have placeholder children
+        if parent_item['children'] is None or parent_item['children'] == [None]:
+            parent_item['children'] = [None]  # Placeholder item indicating the directory is not loaded yet
+        else:
+            return  # Children are already loaded, no need to populate again
         
-        # Include the path of the current item if it's expanded
-        if item['children']:
-            expanded_paths.add(item['path'])
-
-        # Recursively gather paths of expanded children
-        if item['children']:
-            for child in item['children']:
-                if child['children']:  # If the child has loaded children, consider it expanded
-                    expanded_paths.add(child['path'])
-                    expanded_paths.update(self.get_expanded_paths(child))
-        return expanded_paths
-
-    def restore_expanded_paths(self, item):
-        """Recursively restore expanded state for items."""
-        if item['children']:
-            for child in item['children']:
-                if child['path'] in self.expanded_paths:
-                    self.populateChildren(child)  # Load children to restore expansion
-                    self.restore_expanded_paths(child)
+        # If the parent item represents a directory, populate its children
+        if self.renderfarm.isdir(parent_path):
+            children = self.renderfarm.listdir(parent_path)
+            parent_item['children'] = [self.create_item(os.path.join(parent_path, child), parent_item) for child in children]
 
     def create_item(self, path, parent):
         """Creates a custom item to be shown in the file browser"""
@@ -102,7 +62,7 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
                 return QModelIndex()
             
             # Only show files that exist within /home/username
-            if child_item['path'].startswith(f"/home/{self.username}"):
+            if child_item['path'].startswith(self.home_path):
                 return self.createIndex(row, column, child_item)
 
         return QModelIndex()
@@ -110,8 +70,7 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
 
     def parent(self, index):
         """
-        Returns the parent of the model item with the given index. 
-        If the item has no parent, an invalid QModelIndex is returned.
+        Returns the parent of the model item with the given index.
         """
         if not index.isValid():
             return QModelIndex()
@@ -126,11 +85,16 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
             return QModelIndex()
 
         grandparent_item = parent_item['parent']
+        
         if grandparent_item is None:
             return QModelIndex()
 
-        row = grandparent_item['children'].index(parent_item)
-        return self.createIndex(row, 0, parent_item)
+        # Check if children list exists before accessing its attributes
+        if 'children' in grandparent_item and parent_item in grandparent_item['children']:
+            row = grandparent_item['children'].index(parent_item)
+            return self.createIndex(row, 0, parent_item)
+
+        return QModelIndex()
 
     def rowCount(self, parent=QModelIndex()):
         """
@@ -180,8 +144,8 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
         item = index.internalPointer()
 
         if role == Qt.DisplayRole:
-            if (item['path'] == f"/home/{self.username}"):
-                return f"/render/{self.username}"
+            if (item['path'] == self.home_path):
+                return f"/render/{self.username}/farm"
 
             return os.path.basename(item['path'])  # Return the name of other items
 
@@ -190,7 +154,7 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
 
             # Sets folder icons
             if self.renderfarm.isdir(file_path):
-                if file_path == f"/home/{self.username}":
+                if file_path == self.home_path:
                     return QIcon(HOME_ICON_PATH) # Custom icon for the home folder
                 else:
                     return QIcon(FOLDER_ICON_PATH) 
@@ -227,10 +191,33 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
         
             flags = default_flags | Qt.ItemIsDragEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
 
-            # TODO: Check if this is needed
-            if self.renderfarm.isdir(file_path):
-                flags |= Qt.ItemIsUserCheckable
-
             return flags
         
         return default_flags
+
+
+    def findIndex(self, path, parent=QModelIndex()):
+        """
+        Finds the QModelIndex corresponding to the given path.
+        """
+        if not path:
+            return QModelIndex()
+
+        # Start from the root item if no parent is specified
+        if not parent.isValid():
+            parent_item = self.rootItem
+        else:
+            parent_item = parent.internalPointer()
+
+        # Traverse the model to find the index corresponding to the path
+        for row in range(self.rowCount(parent)):
+            child_index = self.index(row, 0, parent)
+            if child_index.isValid():
+                child_item = child_index.internalPointer()
+                if child_item['path'] == path:
+                    return child_index
+                elif self.renderfarm.isdir(child_item['path']) and path.startswith(child_item['path']):
+                    # Recursively search for the index in child items
+                    return self.findIndex(path, child_index)
+
+        return QModelIndex()

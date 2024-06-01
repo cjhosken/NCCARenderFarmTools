@@ -7,16 +7,15 @@ from gui.ncca_qinput import NCCA_QInput
 from libs.blend_render_info import read_blend_rend_chunk
 
 class NCCA_QSubmit_Blender(NCCA_QSubmitWindow):
-    def __init__(self, file_path="", username="", file_data=None, parent=None):
-        super().__init__(file_path, name="Submit Blender Job", username=username, parent=parent)
+    def __init__(self, renderfarm=None,file_path="", folder_path="", username="", file_data=None, parent=None):
+        super().__init__(renderfarm, file_path, folder_path, name="Submit Blender Job", username=username, parent=parent)
 
         if file_data is not None:
             file_data = file_data[0]
             self.frame_start.setText(str(file_data[0]))
             self.frame_end.setText(str(file_data[1]))
 
-        
-
+    
     def initUI(self):
         super().initUI()
         self.active_renderer_row_layout = QHBoxLayout()
@@ -31,7 +30,20 @@ class NCCA_QSubmit_Blender(NCCA_QSubmitWindow):
         self.active_renderer_row_widget.setLayout(self.active_renderer_row_layout)
         self.main_layout.addWidget(self.active_renderer_row_widget)
 
+        self.output_path_row_layout = QHBoxLayout()
+        self.output_path_row_widget = QWidget()
+
+        self.output_path_label = QLabel("Output Path")
+        self.output_path_row_layout.addWidget(self.output_path_label)
+        self.output_path = NCCA_QInput(placeholder="Output Path")
+        self.output_path.setText("output/frame_####.exr")
+        self.output_path_row_layout.addWidget(self.output_path)
+
+        self.output_path_row_widget.setLayout(self.output_path_row_layout)
+        self.main_layout.addWidget(self.output_path_row_widget)
+
     def prepare_job(self):
+        super().prepare_job()
         job_name = self.job_name.text()
         num_cpus = self.num_cpus.currentText()
         frame_start = self.frame_start.text()
@@ -70,7 +82,7 @@ class NCCA_QSubmit_Blender(NCCA_QSubmitWindow):
         job['prototype'] = 'cmdrange'
         package = {}
         package['shell']="/bin/bash"
-        pre_render=""
+        pre_render=f"chmod +x {BLENDER_PATH};"
 
         # https://docs.blender.org/manual/en/latest/advanced/command_line/render.html
 

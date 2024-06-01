@@ -2,10 +2,15 @@ from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 from PySide6.QtSvg import *
+
 import sys, os, shutil, tempfile, re, json
 from cryptography.fernet import Fernet
 from dotenv import load_dotenv
 import paramiko, socket, subprocess, threading, zipfile, stat
+
+os.environ["OPENCV_IO_ENABLE_OPENEXR"] = "1" 
+from PIL import Image, ImageTk
+import cv2, numpy as np
 
 def get_os():
     if os.name == 'posix':
@@ -45,6 +50,10 @@ DROPDOWN_ICON_PATH = os.path.join(ICON_DIR, "dropdown.svg")
 CHECKED_ICON_PATH = os.path.join(ICON_DIR, "checked.svg")
 
 CLOSE_ICON_PATH = os.path.join(ICON_DIR, "close.svg")
+QUBE_ICON_PATH = os.path.join(ICON_DIR, "cube.svg")
+BUG_ICON_PATH = os.path.join(ICON_DIR, "bug.svg")
+INFO_ICON_PATH = os.path.join(ICON_DIR, "info.svg")
+SUBMIT_ICON_PATH = os.path.join(ICON_DIR, "add.svg")
 
 ICON_SIZE = QSize(24, 24)
 ICON_BUTTON_SIZE = QSize(48, 48)
@@ -58,13 +67,17 @@ FILE_ICON_PATH = os.path.join(ICON_DIR, "file.svg")
 IMAGE_ICON_PATH = os.path.join(ICON_DIR, "image.svg")
 ARCHIVE_ICON_PATH = os.path.join(ICON_DIR, "archive.png")
 
+FOLDERUI_ICON_PATH = os.path.join(ICON_DIR, "folderui.svg")
+
 # RENDERFARM AND FILESYSTEMS
 RENDERFARM_ADDRESS = "tete.bournemouth.ac.uk"
 RENDERFARM_PORT = 22
 MAX_CONNECTION_ATTEMPTS = 3
+RENDERFARM_HOME_DIR = "farm"
 
 FARM_CPUS = 8
 DEFAULT_CPU_USAGE = 2
+LOAD_BATCH_SIZE = 5
 
 USE_LOCAL_FILESYSTEM = True
 USE_DOT = True
@@ -126,8 +139,8 @@ sys.path.append(QUBE_PYTHON_BIN)
 import qb
 
 # Houdini
-HOUDINI_PATH = "/opt/software/hfs19.5.605/"
-LOCAL_HYTHON_PATH = "/opt/hfs19.5.605/bin/hython"
+HOUDINI_PATH = "/opt/software/hfs20.0.506/"
+LOCAL_HYTHON_PATH = "/opt/hfs20.0.506/bin/hython"
 
 if OPERATING_SYSTEM == "windows":
     LOCAL_HYTHON_PATH = "C:/Program Files/Side Effects Software/Houdini 20.0.506/bin/hython.exe"
@@ -137,6 +150,7 @@ HOUDINI_ARNOLD_PLUGIN = """/path/to/plugin"""
 # Maya
 MAYA_PATH = "/opt/autodesk/maya2023/bin"
 MAYA_PLUGIN_PATH = "/opt/autodesk/arnold/maya2023/plug-ins"
+MAYA_MODULE_PATH = "/opt/autodesk/arnold/maya2023"
 LOCAL_MAYAPY_PATH = "/opt/autodesk/maya2023/bin/mayapy"
 
 if (OPERATING_SYSTEM == "windows"):
@@ -164,7 +178,7 @@ MAYA_FILE_EXTENSIONS= {
 }
 
 # Blender
-BLENDER_PATH = "/path/to/blender"
+BLENDER_PATH = "/render/s5605094/blender/blender"
 
 BLENDER_RENDER_ENGINES = {
     "Set by file": "",

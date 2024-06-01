@@ -106,3 +106,28 @@ class NCCA_QMessageBox(NCCA_QDialog):
         confirm_button.clicked.connect(msg_box.accept)
 
         return msg_box.exec_()
+    
+    @staticmethod
+    def override(parent, title, text, override_text="Override Project", use_text="Use Project", cancel_text="Cancel"):
+        """Creates a warning popup dialog"""
+        msg_box = NCCA_QMessageBox(parent, WARNING_ICON_PATH, title=title)
+        msg_box.label.setText(text)
+
+
+        override_button = NCCA_QFlatButton(override_text)
+        override_button.setFixedSize(QSize(125, 35))
+
+        use_button = NCCA_QFlatButton(use_text)
+        use_button.setFixedSize(QSize(125, 35))
+
+        cancel_button = NCCA_QFlatButton(cancel_text)
+        cancel_button.setFixedSize(QSize(125, 35))
+
+        msg_box.button_box.addButton(override_button, QDialogButtonBox.YesRole)
+        msg_box.button_box.addButton(use_button, QDialogButtonBox.NoRole)
+        msg_box.button_box.addButton(cancel_button, QDialogButtonBox.NoRole)
+
+        override_button.clicked.connect(msg_box.accept)
+
+        return msg_box.exec_()
+

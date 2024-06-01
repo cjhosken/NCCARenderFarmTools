@@ -5,8 +5,8 @@ from gui.ncca_qcombobox import NCCA_QComboBox
 from gui.ncca_qinput import NCCA_QInput
 
 class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
-    def __init__(self, file_path="", username="", file_data=None, parent=None):
-        super().__init__(file_path, name="Submit Maya Job", username=username, parent=parent)
+    def __init__(self, renderfarm=None, file_path="", folder_path="", username="", file_data=None, parent=None):
+        super().__init__(renderfarm, file_path, folder_path=folder_path, name="Submit Maya Job", username=username, parent=parent)
 
         self.project_location.setText(os.path.dirname(self.file_path).replace(f"/render/{self.username}", ""))
 
@@ -59,6 +59,18 @@ class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
         self.project_location_row_widget.setLayout(self.project_location_row_layout)
         self.main_layout.addWidget(self.project_location_row_widget)
 
+        self.output_path_row_layout = QHBoxLayout()
+        self.output_path_row_widget = QWidget()
+
+        self.output_path_label = QLabel("Output Path")
+        self.output_path_row_layout.addWidget(self.output_path_label)
+        self.output_path = NCCA_QInput(placeholder="Output Path")
+        self.output_path.setText("output/frame_####.exr")
+        self.output_path_row_layout.addWidget(self.output_path)
+
+        self.output_path_row_widget.setLayout(self.output_path_row_layout)
+        self.main_layout.addWidget(self.output_path_row_widget)
+
     def convert_render_path(self, render_path):
         # Define regular expressions to identify patterns
         frame_pattern = re.compile(r"(#+|\d+|_\d+|_\#|\.\#|\.\d+)")
@@ -106,6 +118,7 @@ class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
         return output_dir, image_name, file_extension, frame_number_format
         
     def prepare_job(self):
+        super().prepare_job()
         job_name = self.job_name.text()
         num_cpus = self.num_cpus.currentText()
         frame_start = self.frame_start.text()
@@ -118,11 +131,22 @@ class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
         extra_commands = self.command.text()
         output_path = self.output_path.text()
 
-        if (not output_path.startswith(f"/render/{self.username}")):
-            output_path = os.path.join(f"/render/{self.username}", output_path)
+        import os
 
-        if (not project_path.startswith(f"/render/{self.username}")):
-            project_path = os.path.join(f"/render/{self.username}", project_path)
+        # Ensure the output_path starts with the desired prefix
+        if not output_path.startswith(f"/render/{self.username}"):
+            output_path = os.path.join(f"/render/{self.username}", output_path.lstrip("/")).replace("\\", "/")
+
+        # Ensure the project_path starts with the desired prefix
+        if not project_path.startswith(f"/render/{self.username}"):
+            project_path = os.path.join(f"/render/{self.username}", project_path.lstrip("/")).replace("\\", "/")
+
+        # Normalize the paths to handle any path formatting issues
+        output_path = os.path.normpath(output_path).replace("\\", "/")
+        project_path = os.path.normpath(project_path).replace("\\", "/") + "/"
+
+        print(project_path)
+
 
         frame_range = f"{frame_start}-{frame_start}x{frame_step}"
         output_file = os.path.basename(output_path)
@@ -130,15 +154,17 @@ class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
         frame_padding = max(output_file.count("#"), len(str(int(frame_end)*int(frame_step))) + 1)
 
         output_file = re.sub(r'#+', '#', output_file)
-        output_dir = os.path.dirname(output_file)
+        output_dir = os.path.dirname(output_path)
 
         output_path = os.path.join(output_dir, output_file)
         
         output_dir, image_name, output_file_extension, frame_number_format = self.convert_render_path(output_path)
 
+        output_dir += "/"
+
         override_extension = MAYA_FILE_EXTENSIONS.get(output_file_extension.lower(), "")
         render_options = ""
-        render_options += f" -r {renderer}" if renderer else ""
+        render_options += f"-r {renderer}"
         render_options += f" -proj {project_path}" if project_path else ""
         render_options += f" -rd {output_dir}" if output_dir else ""
         render_options += f" -im {image_name}" if image_name else ""
@@ -157,8 +183,10 @@ class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
 
         pre_render = f"export PATH={MAYA_PATH}:$PATH;"
         pre_render += f"export MAYA_PLUG_IN_PATH={MAYA_PLUGIN_PATH}:$MAYA_PLUG_IN_PATH;"
+        pre_render += f"export MAYA_MODULE_PATH={MAYA_MODULE_PATH}:$MAYA_MODULE_PATH;"
+        pre_render += """mayapy -c 'import maya.standalone; import maya.cmds as cmds; maya.standalone.initialize(); cmds.loadPlugin(allPlugins=True); print("Maya standalone initialized and all plugins loaded successfully.");'"""
 
-        render_command = f"Render {self.file_path} {render_options} {extra_commands}"
+        render_command = f"Render {render_options} {extra_commands} {self.file_path}"
 
         print(render_command)
 
@@ -175,12 +203,5 @@ class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
         job["cwd"] = f"/render/{self.username}"
         
         job['agenda'] = qb.genframes(frame_range)
-    
-        listOfJobsToSubmit = []
-        listOfJobsToSubmit.append(job)
-        listOfSubmittedJobs = qb.submit(listOfJobsToSubmit)
-        id_list=[]
-        for job in listOfSubmittedJobs:
-            id_list.append(job['id'])
         
         self.submit_job(job)
