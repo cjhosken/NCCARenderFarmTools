@@ -1,23 +1,20 @@
 from config import *
 
 class NCCA_QComboBox(QComboBox):
-    """A custom QComboBox class"""
+    """A custom QComboBox class for NCCA applications."""
 
     def __init__(self, parent=None):
-        """Initialize the checkbox"""
+        """Initialize the custom QComboBox."""
         super().__init__(parent)
         self.setObjectName("NCCA_QComboBox")
         self.setCursor(Qt.PointingHandCursor)
-
-        # Need to convert DROPDOWN_ICON_PATH from "\\" to use  "/" for qt to use it properly.
-        fixed_dropdown_icon_path = DROPDOWN_ICON_PATH.replace("\\", "/")
         
+        # Set up stylesheet
         self.setStyleSheet(f"""
             NCCA_QComboBox {{
                 border: 2px solid {APP_GREY_COLOR};
                 border-radius: 10px;
                 padding: 5px;
-                font-size: 16px;
                 background-color: {APP_BACKGROUND_COLOR};
                 color: {APP_FOREGROUND_COLOR};
             }}
@@ -31,7 +28,7 @@ class NCCA_QComboBox(QComboBox):
                 subcontrol-origin: padding;
                 subcontrol-position: top right;
                 width: 20px;
-                image: url({fixed_dropdown_icon_path});
+                image: url({DROPDOWN_ICON_PATH});
             }}
 
             NCCA_QComboBox QAbstractItemView {{
@@ -50,10 +47,8 @@ class NCCA_QComboBox(QComboBox):
             }}
         """)
 
-        # Custo font
-        # TODO: Move font to config.py
-        font = QFont("Arial", 12)
-        self.setFont(font)
+        self.setFont(TEXT_FONT)
 
     def setIconSize(self, size: QSize):
+        """Set the icon size."""
         super().setIconSize(size)

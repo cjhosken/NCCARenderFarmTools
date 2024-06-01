@@ -1,10 +1,11 @@
 from config import *
-
 from gui.ncca_qflatbutton import NCCA_QFlatButton
 from gui.ncca_qmainwindow import NCCA_QMainWindow
 from gui.ncca_qmessagebox import NCCA_QMessageBox
-from gui.ncca_qcombobox import NCCA_QComboBox
 from gui.ncca_qinput import NCCA_QInput
+from gui.ncca_qcombobox import NCCA_QComboBox
+
+from qube import import_qb
 
 class NCCA_QSubmitWindow(NCCA_QMainWindow):
     """Interface for the user to submit renderfarm jobs"""
@@ -20,18 +21,28 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
         super().__init__(self.name, size=SUBMIT_WINDOW_SIZE)
 
     def initUI(self):
-        super().initUI()
         """Initializes the UI"""
+        super().initUI()
+        self.setupJobInputs()
+
+    def setupJobInputs(self):
+        """Set up job input fields."""
         self.main_layout.setAlignment(Qt.AlignCenter)
 
         # Title
-        self.title=QLabel(self.name)
+        self.title = QLabel(self.name)
         self.title.setContentsMargins(25, 0, 0, 0)
         self.title.setFont(TITLE_FONT)
         self.title.setStyleSheet(f"color: {APP_FOREGROUND_COLOR};")
         self.nav_and_title_layout.addWidget(self.title, alignment=Qt.AlignLeft)
         self.nav_and_title_layout.addStretch()
 
+        self.setupJobNameInput()
+        self.setupJobPathInput()
+        self.setupFrameRangeInput()
+
+    def setupJobNameInput(self):
+        """Set up job name input."""
         self.job_row_layout = QHBoxLayout()
         self.job_row_widget = QWidget()
 
@@ -50,6 +61,8 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
         self.job_row_widget.setLayout(self.job_row_layout)
         self.main_layout.addWidget(self.job_row_widget)
 
+    def setupJobPathInput(self):
+        """Set up job path input."""
         self.job_path_row_layout = QHBoxLayout()
         self.job_path_row_widget = QWidget()
 
@@ -61,7 +74,9 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
 
         self.job_path_row_widget.setLayout(self.job_path_row_layout)
         self.main_layout.addWidget(self.job_path_row_widget)
-        
+
+    def setupFrameRangeInput(self):
+        """Set up frame range input."""
         self.frame_row_layout = QHBoxLayout()
         self.frame_row_widget = QWidget()
 
@@ -81,11 +96,16 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
         self.frame_row_layout.addWidget(self.frame_step)
 
         self.frame_row_widget.setLayout(self.frame_row_layout)
-
         self.main_layout.addWidget(self.frame_row_widget)
 
     def endUI(self):
-        """Same purpose as endUI, however another level deeper"""
+        """Finalize UI elements."""
+        self.setupCommandInput()
+        self.setupButtons()
+        super().endUI()
+
+    def setupCommandInput(self):
+        """Set up extra command input."""
         self.command_row_layout = QHBoxLayout()
         self.command_row_widget = QWidget()
 
@@ -97,8 +117,9 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
         self.command_row_widget.setLayout(self.command_row_layout)
         self.main_layout.addWidget(self.command_row_widget)
 
+    def setupButtons(self):
+        """Set up submit and cancel buttons."""
         self.button_box = QDialogButtonBox(Qt.Horizontal)
-        
 
         # Submit button
         submit_button = NCCA_QFlatButton("Submit")
@@ -112,50 +133,49 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
         cancel_button.clicked.connect(self.close)
         self.button_box.addButton(cancel_button, QDialogButtonBox.NoRole)
 
-
         self.main_layout.addWidget(self.button_box, alignment=Qt.AlignCenter)
 
-        super().endUI()
-
     def prepare_job(self):
-        if self.renderfarm is not None:
-            remote_job_path = os.path.join("/home", self.username, RENDERFARM_HOME_DIR, self.job_path.text().lstrip("/")).replace("\\", "/")
-            # Upload the files to the renderfarm
-
-            upload = True
-            if (self.renderfarm.exists(remote_job_path)):
-                response = NCCA_QMessageBox.override(
-                    self,
-                    "Override?",
-                    f"{remote_job_path} already exists. What do you want to do?"
-                )
-
-                if (response ==QDialogButtonBox.YesRole):
-                    pass
-                else:
-                    upload = False
-            
-            if (upload):
-                self.renderfarm.upload_folder(self.folder_path, remote_job_path, None)
-
-            remote_render_path = os.path.join("/render", self.username, RENDERFARM_HOME_DIR, self.job_path.text().lstrip("/")).replace("\\", "/")
-            common_prefix = os.path.commonprefix([self.folder_path, self.file_path])
-            render_file_path = self.file_path[len(common_prefix)+1:]
-
-            self.render_path = os.path.join(remote_render_path, render_file_path).replace("\\", "/")
-        else:
-            self.render_path = self.file_path.replace(f"/home/{self.username}", f"/render/{self.username}")
+        import_qb()
         
+        """Prepare job for submission."""
+        if self.renderfarm is None:
+            self.render_path = self.file_path.replace(os.path.normpath(os.path.join("/home", self.username)),
+                                                    os.path.normpath(os.path.join("/render", self.username)))
+            return
+
+        remote_job_path = os.path.normpath(os.path.join("/home", self.username, RENDERFARM_HOME_DIR, self.job_path.text()))
+
+        if self.renderfarm.exists(remote_job_path):
+            response = NCCA_QMessageBox.override(
+                self,
+                "Override?",
+                f"{remote_job_path} already exists. What do you want to do?"
+            )
+
+            if response == QDialogButtonBox.YesRole:
+                self.renderfarm.delete(remote_job_path)
+                self.renderfarm.upload_folder(self.folder_path, remote_job_path, None)
+            elif response == QDialogButtonBox.NoRole: 
+                remote_render_path = os.path.normpath(os.path.join("/render", self.username, RENDERFARM_HOME_DIR,
+                                                self.job_path.text()))
+
+                common_prefix = os.path.commonprefix([self.folder_path, self.file_path])
+                render_file_path = self.file_path[len(common_prefix) + 1:]
+
+                self.render_path = os.path.normpath(os.path.join(remote_render_path, render_file_path))
+            
+            else:
+                self.render_path == None
+
 
     def submit_job(self, job):
-        env={"HOME" :f"/render/{self.username}"}
-    
-        job['env']=env
+        """Submit the job to the renderfarm."""
+        job['env'] = {"HOME": os.path.normpath(os.path.join("/render", self.username))}
 
-        """ Submits the job to the renderfarm"""
         listOfJobsToSubmit = [job]
         listOfSubmittedJobs = qb.submit(listOfJobsToSubmit)
-        id_list=[]
+        id_list = []
         for job in listOfSubmittedJobs:
             id_list.append(job['id'])
 
@@ -165,12 +185,3 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
             "NCCA Renderfarm",
             f"Job Submitted!\nID: {id_list}"
         )
-
-
-    def expand_env_vars(self, env_dict):
-        for key, value in env_dict.items():
-            if isinstance(value, str):
-                env_dict[key] = os.path.expandvars(value)
-            elif isinstance(value, list):
-                env_dict[key] = [os.path.expandvars(item) for item in value]
-        return env_dict

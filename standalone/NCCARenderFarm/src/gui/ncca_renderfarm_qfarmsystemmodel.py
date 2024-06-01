@@ -198,7 +198,6 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
         
         return default_flags
 
-
     def findIndex(self, path, parent=QModelIndex()):
         """
         Finds the QModelIndex corresponding to the given path.

@@ -3,7 +3,6 @@ from config import *
 from gui.ncca_qiconbutton import NCCA_QIconButton
 from gui.ncca_qmainwindow import NCCA_QMainWindow
 from gui.ncca_qfiletreeview import NCCA_RenderFarm_QTreeView
-from gui.ncca_qsubmitwindow import NCCA_QSubmitWindow
 from gui.ncca_qmessagebox import NCCA_QMessageBox
 from jobs.ncca_qsubmit_blender import NCCA_QSubmit_Blender
 from jobs.ncca_qsubmit_houdini import NCCA_QSubmit_Houdini
@@ -11,7 +10,7 @@ from jobs.ncca_qsubmit_maya import NCCA_QSubmit_Maya
 
 from libs.blend_render_info import read_blend_rend_chunk
 
-from qube_app import  launch_qube
+from qube import  launch_qube
 from utils import get_user_home
 
 class NCCA_RenderFarmWindow(NCCA_QMainWindow):
@@ -63,7 +62,7 @@ class NCCA_RenderFarmWindow(NCCA_QMainWindow):
         self.nav_and_title_layout.addWidget(self.report_bug_button, alignment=Qt.AlignRight)
         
         # File browser
-        self.browser = NCCA_RenderFarm_QTreeView(self.home_path, self.username, self.password, self.use_local)
+        self.browser = NCCA_RenderFarm_QTreeView(self.home_path, self.username, self.password)
         self.main_layout.addWidget(self.browser)
 
     def report_bug(self):
@@ -89,8 +88,7 @@ class NCCA_RenderFarmWindow(NCCA_QMainWindow):
         renderfarm = self.browser.model().renderfarm
 
         project_folder = folder_path
-        project_path = file_path
-        project_name, project_ext = os.path.splitext(os.path.basename(file_path))
+        _, project_ext = os.path.splitext(os.path.basename(file_path))
 
         data = None
 

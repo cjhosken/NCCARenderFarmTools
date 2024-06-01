@@ -3,67 +3,72 @@ from gui.ncca_qiconbutton import NCCA_QIconButton
 
 
 class NCCA_QDialog(QDialog):
-    """A custom QDialog class"""
+    """A custom QDialog class for NCCA applications."""
 
     def __init__(self, parent=None, size=QSize(500, 500), title=""):
-        """Initialize the dialog"""
-
+        """Initialize the dialog."""
         super().__init__(parent)
         self.setWindowTitle(title)
         self.setFixedSize(size)
-        self.setObjectName("NCCA_QMessageBox")
+        self.setObjectName("NCCA_QDialog")
 
-
-        # Make the window borderless and have bevelled corners
+        # Set window attributes
         self.setWindowFlag(Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
+
+        # Set window styles
         self.setStyleSheet(f"""
-            NCCA_QMessageBox {{
+            NCCA_QDialog {{
                 background-color: transparent;
             }}
-        """)
-
-        root = QWidget(self)
-        root.resize(size)
-        root.setObjectName("NCCA_QDialogRootWidget")
-        root.setStyleSheet(
-            f"""#NCCA_QDialogRootWidget{{
+            #NCCA_QDialogRootWidget {{
                 background: {APP_BACKGROUND_COLOR};
                 border-radius: {APP_BORDER_RADIUS};
                 border: 2px solid {APP_GREY_COLOR};
-                }}
-            """
-        )
+            }}
+        """)
 
-        self.root_layout = QVBoxLayout(root)
-        root.setLayout(self.root_layout)
+        # Root widget
+        root = QWidget(self)
+        root.resize(size)
+        root.setObjectName("NCCA_QDialogRootWidget")
 
-        # Main layout for the QDialog
-        self.main_layout = QVBoxLayout()
-        self.main_layout.addStretch(1)
+        # Root layout
+        root_layout = QVBoxLayout(root)
+        root.setLayout(root_layout)
 
-        # Title
-        self.title = QLabel(title)
+        # Header layout
+        header_layout = QHBoxLayout()
+
+        # Title label
+        self.title_label = QLabel(title)
 
         # Close button
         self.close_button = NCCA_QIconButton(CLOSE_ICON_PATH, icon_size=ICON_SIZE)
         self.close_button.clicked.connect(self.close)
-        
-        # Header layout to hold the close button
-        self.header_layout = QHBoxLayout()
-        
-        self.initUI()
-        self.endUI()
 
-    def initUI(self):
-        """Allows customization in classes that inherit from NCCA_QCheckBox"""
+        # Add widgets to layouts
+        header_layout.addWidget(self.title_label)
+        header_layout.addStretch()
+        header_layout.addWidget(self.close_button)
+
+        # Main layout
+        main_layout = QVBoxLayout()
+        main_layout.addStretch(1)
+
+        # Set up main layout
+        self.init_ui(main_layout)
+        self.end_ui()
+
+        # Add layouts to root layout
+        root_layout.addLayout(header_layout)
+        root_layout.addLayout(main_layout)
+
+    def init_ui(self, main_layout):
+        """Allows customization in classes that inherit from NCCA_QDialog."""
         pass
 
-    def endUI(self):
-        """Runs after the customization in classes that inherit from"""
-        self.header_layout.addWidget(self.title)
-        self.header_layout.addStretch()
-        self.header_layout.addWidget(self.close_button)
-
+    def end_ui(self):
+        """Runs after the customization in classes that inherit from NCCA_QDialog."""
         self.root_layout.addLayout(self.header_layout)
         self.root_layout.addLayout(self.main_layout)

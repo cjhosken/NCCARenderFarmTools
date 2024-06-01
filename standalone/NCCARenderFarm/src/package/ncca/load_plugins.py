@@ -1,25 +1,27 @@
 import maya.standalone
-maya.standalone.initialize(name='python')
-
 import maya.cmds as cmds
 
-def enable_mtoa_plugin():
-    # Load mtoa plugin
-    if not cmds.pluginInfo('mtoa', query=True, loaded=True):
-        cmds.loadPlugin('mtoa')
+# List of plugins to be enabled
+PLUGINS = [
+    "vrayformaya", "vrayvolumegrid", "xgenVRay", "mota"
+]
 
-def enable_vray_plugin():
-    plugins = ["vrayformaya", "vrayvolumegrid", "xgenVRay"]
+def initialize_maya():
+    """Initializes Maya in standalone mode."""
+    maya.standalone.initialize(name='python')
 
-    for plug in plugins:
-        if not cmds.pluginInfo(plug, query=True, loaded=True):
-            cmds.loadPlugin(plug)
+def uninitialize_maya():
+    """Uninitializes Maya standalone mode."""
+    maya.standalone.uninitialize()
 
-def enable_vw_plugin():
-    if not cmds.pluginInfo("VectorRender", query=True, loaded=True):
-        cmds.loadPlugin("VectorRender")
+def load_plugins():
+    """Loads the necessary plugins for Maya."""
+    for plugin in PLUGINS:
+        if not cmds.pluginInfo(plugin, query=True, loaded=True):
+            cmds.loadPlugin(plugin)
+            print(f"NCCA | {plugin} loaded successfully.")
 
 if __name__ == "__main__":
-    enable_mtoa_plugin()
-    enable_vray_plugin()
-    enable_vw_plugin()
+    initialize_maya()
+    load_plugins()
+    uninitialize_maya()

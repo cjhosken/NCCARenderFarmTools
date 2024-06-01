@@ -60,6 +60,7 @@ ICON_BUTTON_SIZE = QSize(48, 48)
 BROWSER_ICON_SIZE = QSize(32, 32)
 
 NO_CONNECTION_IMAGE = os.path.join(IMAGE_DIR, "connection_failed.jpg") # At the moment this is a funny image found on google. Ideally, this would be the NCCA mascot.
+NO_CONNECTION_IMAGE_SIZE = QSize(256, 256)
 
 HOME_ICON_PATH = os.path.join(ICON_DIR, "farm.png")
 FOLDER_ICON_PATH = os.path.join(ICON_DIR, "folder.svg")
@@ -74,6 +75,7 @@ RENDERFARM_ADDRESS = "tete.bournemouth.ac.uk"
 RENDERFARM_PORT = 22
 MAX_CONNECTION_ATTEMPTS = 3
 RENDERFARM_HOME_DIR = "farm"
+NCCA_PACKAGE_DIR = ".ncca"
 
 FARM_CPUS = 8
 DEFAULT_CPU_USAGE = 2
@@ -135,9 +137,6 @@ QUBE_PYTHON_BIN = "/public/devel/2022/pfx/qube/api/python/"
 if (OPERATING_SYSTEM == "windows"):
     QUBE_LAUNCHER_PATH = "c:/Program Files (x86)/pfx/qube/bin/qube.exe"
     QUBE_PYTHON_BIN = "c:/Program Files/pfx/qube/api/python"
-
-sys.path.append(QUBE_PYTHON_BIN)
-import qb
 
 # Houdini
 LOCAL_HYTHON_PATH = "/opt/hfs20.0.506/bin/hython"
