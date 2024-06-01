@@ -1,57 +1,44 @@
 #!/bin/bash
 
-#TODO: CLEANUP CODE
-
+# Define the script directory
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 echo "The script is running from: $SCRIPT_DIR"
 
-echo "Installing PyEnv..."
-cd ~
-pwd
-git clone "https://github.com/pyenv/pyenv.git" ~/.pyenv
-cd .pyenv
-src/configure
-make -C src
+# Read the Python version from the .python-version file
+PYTHON_VERSION=$(cat "$SCRIPT_DIR/.python-version")
 
+echo "Using Python version: $PYTHON_VERSION"
 
-# Check if the lines already exist in ~/.bashrc
-if ! grep -qxF 'export PYENV_ROOT="$HOME/.pyenv"' ~/.bashrc; then
-    # If not, append the line to set PYENV_ROOT
-    echo '' >> ~/.bashrc
-    echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
-fi
-
-if ! grep -qxF 'export PATH="$PYENV_ROOT/bin:$PATH"' ~/.bashrc; then
-    # If not, append the line to add pyenv to PATH
-    echo '' >> ~/.bashrc
-    echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
-fi
-
-if ! grep -qxF 'eval "$(pyenv init -)"' ~/.bashrc; then
-    # If not, append the line to initialize pyenv
-    echo '' >> ~/.bashrc
-    echo 'eval "$(pyenv init -)"' >> ~/.bashrc
-fi
-
-
-source ~/.bashrc
-
-# Check if Python 3.8 is already installed
-if pyenv versions | grep -q 3.8; then
-    echo "Python 3.8 is already installed."
+# Install or activate the specified Python version using PyEnv
+if pyenv versions | grep -q "$PYTHON_VERSION"; then
+    echo "Python $PYTHON_VERSION is already installed."
 else
-    echo "Python 3.8 is not installed. Installing..."
-    pyenv install 3.8
+    echo "Python $PYTHON_VERSION is not installed. Installing..."
+    pyenv install "$PYTHON_VERSION"
 fi
 
-pyenv local 3.8
-python3 --version
+pyenv local "$PYTHON_VERSION"
+
+python --version  # Confirm Python version
 
 echo "Installing Requirements"
 
-python3 -m pip install --upgrade pip
+python -m pip install --upgrade pip
 
-python3 -m pip install -r $SCRIPT_DIR/requirements.txt
+requirements_file="$SCRIPT_DIR/requirements.txt"
 
-python3 $SCRIPT_DIR/src/main.py
+if [ -f "$requirements_file" ]; then
+    python -m pip install -r "$requirements_file"
+else
+    echo "Requirements file not found: $requirements_file"
+    exit 1
+fi
+
+main_script="$SCRIPT_DIR/src/main.py"
+if [ -f "$main_script" ]; then
+    python "$main_script"
+else
+    echo "Main script not found: $main_script"
+    exit 1
+fi
