@@ -2,12 +2,10 @@ from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 from PySide6.QtSvg import *
-
 import sys, os, shutil, tempfile, re, json
 from cryptography.fernet import Fernet
 from dotenv import load_dotenv
 import paramiko, socket, subprocess, threading, zipfile, stat
-
 os.environ["OPENCV_IO_ENABLE_OPENEXR"] = "1" 
 from PIL import Image, ImageTk
 import cv2, numpy as np
@@ -59,7 +57,7 @@ ICON_SIZE = QSize(24, 24)
 ICON_BUTTON_SIZE = QSize(48, 48)
 BROWSER_ICON_SIZE = QSize(32, 32)
 
-NO_CONNECTION_IMAGE = os.path.join(IMAGE_DIR, "connection_failed.jpg") # At the moment this is a funny image found on google. Ideally, this would be the NCCA mascot.
+NO_CONNECTION_IMAGE = os.path.join(IMAGE_DIR, "connection_failed.jpg")
 NO_CONNECTION_IMAGE_SIZE = QSize(256, 256)
 
 HOME_ICON_PATH = os.path.join(ICON_DIR, "farm.png")
@@ -91,7 +89,7 @@ OPENABLE_FILES = [] + VIEWABLE_IMAGE_FILES
 REPORT_BUG_LINK = "https://github.com/cjhosken/NCCARenderFarmTools/issues"
 INFO_LINK = "https://github.com/cjhosken/NCCARenderFarmTools"
 
-#FONTS
+# FONTS
 TITLE_FONT = QFont()
 TITLE_FONT.setPointSize(18)
 TITLE_FONT.setBold(True)
@@ -120,25 +118,19 @@ SUBMIT_WINDOW_SIZE = QSize(500, 600)
 IMAGE_WINDOW_SIZE = QSize(1280, 720 + APP_NAVBAR_HEIGHT)
 MESSAGE_BOX_SIZE = QSize(300, 175)
 
-
 APP_BORDER_RADIUS="10px"
 NCCA_CONNECTION_ERROR_MESSAGE= "Unable to connect to the NCCA Renderfarm. Try again later."
 
 SCROLL_MARGIN = 50
 
 # EXTERNAL APPLICATIONS
-# If renderers and applications begin to break, make sure that these paths are correct
-
-# Qube
 QUBE_LAUNCHER_PATH = "/public/bin/2023/goQube"
 QUBE_PYTHON_BIN = "/public/devel/2022/pfx/qube/api/python/"
 
-# Make sure that Qube is already installed from apps anywhere
-if (OPERATING_SYSTEM == "windows"):
+if OPERATING_SYSTEM == "windows":
     QUBE_LAUNCHER_PATH = "c:/Program Files (x86)/pfx/qube/bin/qube.exe"
     QUBE_PYTHON_BIN = "c:/Program Files/pfx/qube/api/python"
 
-# Houdini
 LOCAL_HYTHON_PATH = "/opt/hfs20.0.506/bin/hython"
 LOCAL_MAYAPY_PATH = "/opt/autodesk/maya2023/bin/mayapy"
 
@@ -146,16 +138,12 @@ if OPERATING_SYSTEM == "windows":
     LOCAL_HYTHON_PATH = "C:/Program Files/Side Effects Software/Houdini 20.0.506/bin/hython.exe"
     LOCAL_MAYAPY_PATH = "C:/Program Files/Autodesk/Maya2023/bin/mayapy.exe"
 
-# I dont see a need to enable maya hardware or vector renderer as nobody uses them
 MAYA_RENDER_ENGINES = {
     "Set by file": "file",
     "Arnold": "arnold",
     "RenderMan": "renderman",
     "VRay": "vray",
     "Maya Software": "sw"
-    #"Maya Hardware": "hw", It seems Maya Hardware is unsupported
-    #"Maya Hardware 2.0": "hw2",
-    #"Vector Renderer": "vr"
 }
 
 MAYA_FILE_EXTENSIONS= {
@@ -168,7 +156,6 @@ MAYA_FILE_EXTENSIONS= {
     ".maya": "maya"
 }
 
-# Blender
 BLENDER_PATH = "/render/s5605094/blender/blender"
 
 BLENDER_RENDER_ENGINES = {
@@ -193,8 +180,4 @@ BLENDER_FILE_EXTENSIONS = {
     ".hdr": "HDR",
     ".tif": "TIFF",
     ".tiff": "TIFF"
-}
-
-# If arnold and renderman support are wanted and implemented
-# "Arnold" : "ARNOLD"
-# "Renderman" : "PRMAN_RENDER"
+    }

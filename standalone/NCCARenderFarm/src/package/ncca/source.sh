@@ -1,20 +1,28 @@
 #!/bin/bash
 
-# Set environment variables
-export INSTALL_ROOT="C:/Program Files/Chaos Group/V-Ray/Houdini 19.5.403"
-export VRAY_APPSDK="$INSTALL_ROOT/appsdk"
-export VRAY_SDK="$INSTALL_ROOT/appsdk"
-export VRAY_OSL_PATH="$INSTALL_ROOT/appsdk/bin"
-export VRAY_UI_DS_PATH="$INSTALL_ROOT/ui"
-export VFH_HOME="$INSTALL_ROOT/vfh_home"
+# Set Environment Variables
 
+# Licenses
 export ARNOLD_LICENSE_ORDER=""
 export ARNOLD_LICENSE_ORDER_MANAGER=""
 export solidangle_LICENSE=""
 export RLM_LICENSE=""
 export ADSKFLEX_LICENSE_FILE=""
 export LM_LICENSE_FILE=""
+export SESI_LMHOST="lepe.bournemouth.ac.uk"
+export PIXAR_LICENSE_FILE="9010@talavera.bournemouth.ac.uk"
+export ARNOLD_LICENSE_HOST=""
+export ARNOLD_LICENSE_PORT=""
 
+# Vray
+export INSTALL_ROOT=""
+export VRAY_APPSDK="$INSTALL_ROOT/appsdk"
+export VRAY_SDK="$INSTALL_ROOT/appsdk"
+export VRAY_OSL_PATH="$INSTALL_ROOT/appsdk/bin"
+export VRAY_UI_DS_PATH="$INSTALL_ROOT/ui"
+export VFH_HOME="$INSTALL_ROOT/vfh_home"
+
+# Renderman
 export RMAN_VERSION="24.1"
 export RFMTREE="/opt/software/pixar/RenderManForMaya-$RMAN_VERSION"
 export RMANTREE="/opt/software/pixar/RenderManProServer-$RMAN_VERSION"
@@ -30,14 +38,13 @@ export HOUDINI_PATH=""
 export HTOA=""
 export HOUDINI_ROOT="/opt/software/hfs$HOUDINI_VERSION/"
 
-export ARNOLD_LICENSE_HOST=""
-export ARNOLD_LICENSE_PORT=""
-
 export RFHTREE="/opt/software/RenderManForHoudini-$RMAN_VERSION"
 export HOUDINI_DEFAULT_RIB_RENDER=""
 export RMAN_PROCEDURALPATH="/opt/software/RenderManForHoudini-$RMAN_VERSION/3.9/$HOUDINI_VERSION/openvdb"
 
 export PATH="$INSTALL_ROOT/vfh_home:$HFS/bin:$VRAY_APPSDK/bin:/opt/autodesk/maya2023/bin:/opt/software/ChaosGroup/V-Ray/Maya2023-x64/maya_vray/bin:/opt/software/ChaosGroup/V-Ray/Maya2023-x64/vray/lib:$PATH"
+
+# Maya Plugins
 export MAYA_MODULE_PATH="/opt/autodesk/maya2023/modules:$RFMTREE/etc:/opt/software/ChaosGroup/V-Ray/Maya2023-x64/maya_vray/etc:$MAYA_MODULE_PATH"
 export MAYA_PLUG_IN_PATH="/opt/autodesk/maya2023/plug-ins:/opt/autodesk/arnold/maya2023/plug-ins:/opt/software/ChaosGroup/V-Ray/Maya2023-x64/maya_vray/plug-ins:$MAYA_PLUG_IN_PATH"
 export MAYA_SCRIPT_PATH="/opt/autodesk/maya2023/scripts:/opt/autodesk/arnold/maya2023/scripts:/opt/software/pixar/RenderManForMaya-24.1/scripts:/opt/software/ChaosGroup/V-Ray/Maya2023-x64/maya_vray/scripts:$MAYA_SCRIPT_PATH"
@@ -48,8 +55,3 @@ export XBMLANGPATH="/opt/autodesk/arnold/maya2023/icons:/opt/software/ChaosGroup
 export MAYA_CUSTOM_TEMPLATE_PATH="/opt/software/ChaosGroup/V-Ray/Maya2023-x64/maya_vray/scripts"
 export MAYA_TOOLCLIPS_PATH="/opt/software/ChaosGroup/V-Ray/Maya2023-x64/maya_vray/toolclips"
 export PXR_PLUGINPATH_NAME="/opt/software/ChaosGroup/V-Ray/Maya2023-x64/maya_vray/usdplugins:$PXR_PLUGINPATH_NAME"
-
-export SESI_LMHOST="lepe.bournemouth.ac.uk"
-export PIXAR_LICENSE_FILE="9010@talavera.bournemouth.ac.uk"
-
-echo "ENVIRONENT SETUP"
