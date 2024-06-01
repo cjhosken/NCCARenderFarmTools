@@ -18,10 +18,10 @@ export MAYA_SCRIPT_PATH="$RFMTREE/scripts:$MAYA_SCRIPT_PATH"
 export MAYA_MODULE_PATH="$RFMTREE/etc:$MAYA_MODULE_PATH"
 
 # VRAY
-#https://docs.chaos.com/display/VMAYA/Installation+from+zip#Installationfromzip-Environmentsetup
+# https://docs.chaos.com/display/VMAYA/Installation+from+zip#Installationfromzip-Environmentsetup
 
 vray_maya_path="/opt/software/ChaosGroup/V-Ray/Maya2023-x64/maya_vray"
-vray_path="/opt/software/ChaosGroup/V-Ray/Maya2023-x64/vray"
+vray_path="/opt/software/ChaosGroup/V-Ray/Maya2023-x64/vray" 
 
 export VRAY_FOR_MAYA2023_MAIN=$vray_maya_path
 
