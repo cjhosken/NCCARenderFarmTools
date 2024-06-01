@@ -147,8 +147,113 @@ if OPERATING_SYSTEM == "windows":
     LOCAL_HYTHON_PATH = "C:/Program Files/Side Effects Software/Houdini 20.0.506/bin/hython.exe"
     LOCAL_MAYAPY_PATH = "C:/Program Files/Autodesk/Maya2023/bin/mayapy.exe"
 
-
 HOUDINI_PATH="/opt/software/hfs20.0.506/"
+
+
+# Maya
+
+#ARNOLD
+# https://help.autodesk.com/view/ARNOL/ENU/?guid=arnold_for_maya_install_am_Troubleshooting_html
+
+ARNOLD_LICENSE_ORDER = ""
+ARNOLD_LICENSE_ORDER_MANAGER = ""
+solidangle_LICENSE = ""
+RLM_LICENSE = ""
+ADSKFLEX_LICENSE_FILE = ""
+LM_LICENSE_FILE = ""
+
+
+PATH = "/opt/autodesk/maya2023/bin:"
+MAYA_MODULE_PATH = "/opt/autodesk/maya2023/modules:"
+MAYA_PLUG_IN_PATH = "/opt/autodesk/maya2023/plug-ins:/opt/autodesk/arnold/maya2023/plug-ins:"
+MAYA_SCRIPT_PATH = "/opt/autodesk/maya2023/scripts:/opt/autodesk/arnold/maya2023/scripts:"
+MAYA_RENDER_DESC_PATH = "/opt/autodesk/arnold/maya2023:"
+MAYA_PRESET_PATH = ""
+PYTHONPATH = "/opt/autodesk/arnold/maya2023/scripts:"
+MAYA_CUSTOM_TEMPLATE_PATH = ""
+PXR_PLUGINPATH_NAME = ""
+XBMLANGPATH = "/opt/autodesk/arnold/maya2023/icons:"
+LD_LIBRARY_PATH=""
+
+# RENDERMAN
+# https://rmanwiki.pixar.com/display/RFM24/Installation+of+RenderMan+for+Maya
+RMAN_VERSION = "24.1"
+RFMTREE = f"/opt/software/pixar/RenderManForMaya-{RMAN_VERSION}"
+RMANTREE = f"/opt/software/pixar/RenderManProServer-{RMAN_VERSION}"
+
+MAYA_RENDER_DESC_PATH += f"{RFMTREE}/etc:"
+MAYA_SCRIPT_PATH += f"{RFMTREE}/scripts:"
+MAYA_MODULE_PATH += f"{RFMTREE}/etc:"
+
+# VRAY
+# https://docs.chaos.com/display/VMAYA/Installation+from+zip#Installationfromzip-Environmentsetup
+vray_maya_path = "/opt/software/ChaosGroup/V-Ray/Maya2023-x64/maya_vray"
+vray_path = "/opt/software/ChaosGroup/V-Ray/Maya2023-x64/vray"
+
+VRAY_FOR_MAYA2023_MAIN = vray_maya_path
+
+VRAY_APPSDK_PLUGINS = vray_maya_path + "/vrayplugins"
+
+VRAY_FOR_MAYA2023_PLUGINS = vray_maya_path + "/vrayplugins"
+VRAY_PLUGINS = vray_maya_path + "/vrayplugins"
+VRAY_OSL_PATH_MAYA2023 = vray_path + "/opensl"
+
+PATH += f"{vray_maya_path}/bin:{vray_path}/lib:"
+
+MAYA_PLUG_IN_PATH += f"{vray_maya_path}/plug-ins:"
+MAYA_RENDER_DESC_PATH += f"{vray_maya_path}/rendererDesc:"
+MAYA_SCRIPT_PATH += f"{vray_maya_path}/scripts:"
+MAYA_PRESET_PATH += f"{vray_maya_path}/presets:"
+PYTHONPATH += f"{vray_maya_path}/scripts:"
+XBMLANGPATH += f"{vray_maya_path}/icons:"
+MAYA_CUSTOM_TEMPLATE_PATH += f"{vray_maya_path}/scripts:"
+MAYA_TOOLCLIPS_PATH = f"{vray_maya_path}/toolclips"
+PXR_PLUGINPATH_NAME += f"{vray_maya_path}/usdplugins:"
+VRAY_APPSDK_PLUGINS = f"{vray_maya_path}/vrayplugins"
+
+VRAY_AUTH_CLIENT_FILE_PATH=""
+
+
+
+ENVIRONMENT_SCRIPT = f"""
+export PATH={PATH}$PATH;
+export RMANTREE={RMANTREE};
+export RFMTREE={RFMTREE};
+export MAYA_MODULE_PATH={MAYA_MODULE_PATH}$MAYA_MODULE_PATH;
+export MAYA_PLUG_IN_PATH={MAYA_PLUG_IN_PATH}$MAYA_PLUG_IN_PATH;
+export MAYA_SCRIPT_PATH={MAYA_SCRIPT_PATH}$MAYA_SCRIPT_PATH;
+export MAYA_RENDER_DESC_PATH={MAYA_RENDER_DESC_PATH}$MAYA_RENDER_DESC_PATH;
+export MAYA_PRESET_PATH={MAYA_PRESET_PATH}$MAYA_PRESET_PATH;
+export PYTHONPATH={PYTHONPATH}$PYTHONPATH;
+export XBMLANGPATH={XBMLANGPATH}$XBMLANGPATH;
+export MAYA_CUSTOM_TEMPLATE_PATH={MAYA_CUSTOM_TEMPLATE_PATH}$MAYA_CUSTOM_TEMPLATE_PATH;
+export MAYA_TOOLCLIPS_PATH={MAYA_TOOLCLIPS_PATH};
+export PXR_PLUGINPATH_NAME={PXR_PLUGINPATH_NAME}$PXR_PLUGINPATH_NAME;
+
+export VRAY_FOR_MAYA2023_MAIN={VRAY_FOR_MAYA2023_MAIN};
+export VRAY_FOR_MAYA2023_PLUGINS={VRAY_FOR_MAYA2023_PLUGINS};
+export VRAY_OLS_PATH_MAYA2023={VRAY_OSL_PATH_MAYA2023};
+export VRAY_APPSDK_PLUGINS={VRAY_APPSDK_PLUGINS};
+export VRAY_AUTH_CLIENT_FILE_PATH={VRAY_AUTH_CLIENT_FILE_PATH};
+
+export VRAY_PLUGINS={VRAY_PLUGINS};
+export VRAY_OSL_PATH={VRAY_OSL_PATH_MAYA2023};
+
+export LD_LIBRARY_PATH={LD_LIBRARY_PATH}$LD_LIBRARY_PATH;s
+"""
+
+print(ENVIRONMENT_SCRIPT)
+
+
+#environment variables:
+#Warning: 00:00:11   691MB         |         ARNOLD_LICENSE_ORDER   = (not set)
+#Warning: 00:00:11   691MB         |         ARNOLD_LICENSE_MANAGER = (not set)
+#Warning: 00:00:11   691MB         |  [rlm]  solidangle_LICENSE     = (not set)
+#Warning: 00:00:11   691MB         |  [rlm]  RLM_LICENSE            = (not set)
+#Warning: 00:00:11   691MB         |  [clm]  ADSKFLEX_LICENSE_FILE  = (not set)
+#Warning: 00:00:11   691MB         |  [clm]  LM_LICENSE_FILE        = (not set)
+
+
 
 MAYA_RENDER_ENGINES = {
     "Set by file": "file",
