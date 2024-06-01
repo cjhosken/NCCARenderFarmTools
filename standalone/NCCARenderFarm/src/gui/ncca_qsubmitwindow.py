@@ -144,7 +144,7 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
 
             self.render_path = os.path.join(remote_render_path, render_file_path).replace("\\", "/")
         else:
-            self.render_path = self.file_path
+            self.render_path = self.file_path.replace(f"/home/{self.username}", f"/render/{self.username}")
         
 
     def submit_job(self, job):
