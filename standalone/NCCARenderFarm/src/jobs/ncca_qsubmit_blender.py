@@ -10,6 +10,9 @@ class NCCA_QSubmit_Blender(NCCA_QSubmitWindow):
     def __init__(self, renderfarm=None,file_path="", folder_path="", username="", file_data=None, parent=None):
         super().__init__(renderfarm, file_path, folder_path, name="Submit Blender Job", username=username, parent=parent)
 
+        if (self.job_path.text() == "/"):
+            self.job_path.setText(os.path.dirname(file_path).replace(f"/home/{username}/farm/", "/")) 
+
         if file_data is not None:
             file_data = file_data[0]
             self.frame_start.setText(str(file_data[0]))
@@ -55,8 +58,8 @@ class NCCA_QSubmit_Blender(NCCA_QSubmitWindow):
         external_commands = self.command.text()
         
 
-        if (not output_path.startswith(f"/render/{self.username}")):
-            output_path = os.path.join(f"/render/{self.username}", output_path).replace("\\", "/")
+        if (not output_path.startswith(f"/render/{self.username}/farm")):
+            output_path = os.path.join(f"/render/{self.username}/farm", output_path).replace("\\", "/")
 
 
         output_file = os.path.basename(output_path)
@@ -86,7 +89,7 @@ class NCCA_QSubmit_Blender(NCCA_QSubmitWindow):
 
         # https://docs.blender.org/manual/en/latest/advanced/command_line/render.html
 
-        render_command=f"{BLENDER_PATH} -b {self.file_path} -f QB_FRAME_NUMBER"
+        render_command=f"{BLENDER_PATH} -b {self.render_path} -f QB_FRAME_NUMBER"
 
         render_output_path = os.path.join(os.path.dirname(output_path), output_file_name_without_extension).replace("\\", "/")
 

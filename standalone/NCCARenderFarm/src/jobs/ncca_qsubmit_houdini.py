@@ -8,6 +8,9 @@ class NCCA_QSubmit_Houdini(NCCA_QSubmitWindow):
     def __init__(self, renderfarm=None, file_path="", folder_path="", username="", file_data=None, parent=None):
         super().__init__(renderfarm, file_path, folder_path, name="Submit Houdini Job", username=username, parent=parent)
 
+        if (self.job_path.text() == "/"):
+            self.job_path.setText(os.path.dirname(file_path).replace(f"/home/{username}/farm/", "/")) 
+
         if file_data is not None:
             farm = file_data["NCCA_RENDERFARM"]
 

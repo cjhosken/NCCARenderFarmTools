@@ -7,8 +7,9 @@ from gui.ncca_qinput import NCCA_QInput
 class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
     def __init__(self, renderfarm=None, file_path="", folder_path="", username="", file_data=None, parent=None):
         super().__init__(renderfarm, file_path, folder_path=folder_path, name="Submit Maya Job", username=username, parent=parent)
-
-        self.project_location.setText(os.path.dirname(self.file_path).replace(f"/render/{self.username}", ""))
+        
+        if (self.job_path.text() == "/"):
+            self.job_path.setText(os.path.dirname(file_path).replace(f"/home/{username}/farm/", "/")) 
 
         if file_data is not None:
             farm = file_data["NCCA_RENDERFARM"]
@@ -47,25 +48,13 @@ class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
         self.render_cam_row_widget.setLayout(self.render_cam_row_layout)
         self.main_layout.addWidget(self.render_cam_row_widget)
 
-        self.project_location_row_layout = QHBoxLayout()
-        self.project_location_row_widget = QWidget()
-
-        self.project_location_label = QLabel("Project Location")
-        self.project_location_row_layout.addWidget(self.project_location_label)
-
-        self.project_location = NCCA_QInput(placeholder="Project Path")
-        self.project_location_row_layout.addWidget(self.project_location)
-
-        self.project_location_row_widget.setLayout(self.project_location_row_layout)
-        self.main_layout.addWidget(self.project_location_row_widget)
-
         self.output_path_row_layout = QHBoxLayout()
         self.output_path_row_widget = QWidget()
 
         self.output_path_label = QLabel("Output Path")
         self.output_path_row_layout.addWidget(self.output_path_label)
         self.output_path = NCCA_QInput(placeholder="Output Path")
-        self.output_path.setText("output/frame_####.exr")
+        self.output_path.setText("/output/frame_####.exr")
         self.output_path_row_layout.addWidget(self.output_path)
 
         self.output_path_row_widget.setLayout(self.output_path_row_layout)
@@ -127,25 +116,23 @@ class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
         # Get values of all UI elements
         renderer = MAYA_RENDER_ENGINES.get(self.active_renderer.currentText())
         camera = self.render_cam.currentText()
-        project_path = self.project_location.text()
+        project_path = self.job_path.text()
         extra_commands = self.command.text()
         output_path = self.output_path.text()
 
         import os
 
         # Ensure the output_path starts with the desired prefix
-        if not output_path.startswith(f"/render/{self.username}"):
-            output_path = os.path.join(f"/render/{self.username}", output_path.lstrip("/")).replace("\\", "/")
+        if not output_path.startswith(f"/render/{self.username}/farm"):
+            output_path = os.path.join(f"/render/{self.username}/farm", output_path.lstrip("/")).replace("\\", "/")
 
         # Ensure the project_path starts with the desired prefix
-        if not project_path.startswith(f"/render/{self.username}"):
-            project_path = os.path.join(f"/render/{self.username}", project_path.lstrip("/")).replace("\\", "/")
+        if not project_path.startswith(f"/render/{self.username}/farm"):
+            project_path = os.path.join(f"/render/{self.username}/farm", project_path.lstrip("/")).replace("\\", "/")
 
         # Normalize the paths to handle any path formatting issues
         output_path = os.path.normpath(output_path).replace("\\", "/")
         project_path = os.path.normpath(project_path).replace("\\", "/") + "/"
-
-        print(project_path)
 
 
         frame_range = f"{frame_start}-{frame_start}x{frame_step}"
@@ -186,7 +173,7 @@ class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
         pre_render += f"export MAYA_MODULE_PATH={MAYA_MODULE_PATH}:$MAYA_MODULE_PATH;"
         pre_render += """mayapy -c 'import maya.standalone; import maya.cmds as cmds; maya.standalone.initialize(); cmds.loadPlugin(allPlugins=True); print("Maya standalone initialized and all plugins loaded successfully.");'"""
 
-        render_command = f"Render {render_options} {extra_commands} {self.file_path}"
+        render_command = f"Render {render_options} {extra_commands} {self.render_path}"
 
         print(render_command)
 

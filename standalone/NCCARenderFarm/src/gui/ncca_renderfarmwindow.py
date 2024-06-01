@@ -94,7 +94,7 @@ class NCCA_RenderFarmWindow(NCCA_QMainWindow):
 
         data = None
 
-        self.setCursor(QCursor(Qt.WaitCursor))
+        
 
         if "blend" in project_ext:
             data = read_blend_rend_chunk(file_path)
@@ -103,7 +103,7 @@ class NCCA_RenderFarmWindow(NCCA_QMainWindow):
             self.job_dialog.show()
         
         elif "hip" in project_ext:
-            self.setCursor(QCursor(Qt.WaitCursor))
+            QApplication.setOverrideCursor(Qt.WaitCursor)
             command = [LOCAL_HYTHON_PATH, os.path.join(SCRIPT_DIR, "libs", "houdini_render_info.py"), file_path]
 
             # Execute the command
@@ -116,12 +116,12 @@ class NCCA_RenderFarmWindow(NCCA_QMainWindow):
                 # Load JSON data
                 data = json.loads(json_data)
 
-            self.setCursor(QCursor(Qt.ArrowCursor))
+            QApplication.restoreOverrideCursor()
             self.job_dialog = NCCA_QSubmit_Houdini(renderfarm=renderfarm, username=self.username, file_path=file_path, folder_path=project_folder, file_data=data)
             self.job_dialog.show()
 
         elif project_ext in [".mb", ".ma"]:
-            self.setCursor(QCursor(Qt.WaitCursor))
+            QApplication.setOverrideCursor(Qt.WaitCursor)
             command = [LOCAL_MAYAPY_PATH, os.path.join(SCRIPT_DIR, "libs", "maya_render_info.py").replace("\\", "/"), file_path]
             # Execute the command
             output = subprocess.check_output(command, stderr=subprocess.STDOUT, universal_newlines=True).strip()
@@ -132,7 +132,7 @@ class NCCA_RenderFarmWindow(NCCA_QMainWindow):
                 # Load JSON data
                 data = json.loads(json_data)
 
-            self.setCursor(QCursor(Qt.ArrowCursor))
+            QApplication.restoreOverrideCursor()
             self.job_dialog = NCCA_QSubmit_Maya(renderfarm=renderfarm, username=self.username, file_path=file_path, folder_path=project_folder, file_data=data)
             self.job_dialog.show()
 

@@ -118,30 +118,33 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
         super().endUI()
 
     def prepare_job(self):
-        remote_job_path = os.path.join("/home", self.username, RENDERFARM_HOME_DIR, self.job_path.text().lstrip("/")).replace("\\", "/")
-        # Upload the files to the renderfarm
+        if self.renderfarm is not None:
+            remote_job_path = os.path.join("/home", self.username, RENDERFARM_HOME_DIR, self.job_path.text().lstrip("/")).replace("\\", "/")
+            # Upload the files to the renderfarm
 
-        upload = True
-        if (self.renderfarm.exists(remote_job_path)):
-            response = NCCA_QMessageBox.override(
-                self,
-                "Override?",
-                f"{remote_job_path} already exists. What do you want to do?"
-            )
+            upload = True
+            if (self.renderfarm.exists(remote_job_path)):
+                response = NCCA_QMessageBox.override(
+                    self,
+                    "Override?",
+                    f"{remote_job_path} already exists. What do you want to do?"
+                )
 
-            if (response ==QDialogButtonBox.YesRole):
-                pass
-            else:
-                upload = False
-        
-        if (upload):
-            self.renderfarm.upload_folder(self.folder_path, remote_job_path, None)
+                if (response ==QDialogButtonBox.YesRole):
+                    pass
+                else:
+                    upload = False
+            
+            if (upload):
+                self.renderfarm.upload_folder(self.folder_path, remote_job_path, None)
 
-        remote_render_path = os.path.join("/render", self.username, RENDERFARM_HOME_DIR, self.job_path.text().lstrip("/")).replace("\\", "/")
-        common_prefix = os.path.commonprefix([self.folder_path, self.file_path])
-        render_file_path = self.file_path[len(common_prefix)+1:]
+            remote_render_path = os.path.join("/render", self.username, RENDERFARM_HOME_DIR, self.job_path.text().lstrip("/")).replace("\\", "/")
+            common_prefix = os.path.commonprefix([self.folder_path, self.file_path])
+            render_file_path = self.file_path[len(common_prefix)+1:]
 
-        self.render_path = os.path.join(remote_render_path, render_file_path).replace("\\", "/")
+            self.render_path = os.path.join(remote_render_path, render_file_path).replace("\\", "/")
+        else:
+            self.render_path = self.file_path
         
 
     def submit_job(self, job):

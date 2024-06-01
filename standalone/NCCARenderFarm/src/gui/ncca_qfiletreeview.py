@@ -296,6 +296,10 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         else:
             _, file_ext = os.path.splitext(os.path.basename(file_path))
 
+            if "blend" in file_ext or "hip" in file_ext or file_ext in [".mb", ".ma"]:
+                self.action_submit = self.context_menu.addAction("Submit Render Job")
+                self.action_submit.triggered.connect(self.submitSelectedIndex)
+
             if file_ext in OPENABLE_FILES:
                 self.action_open = self.context_menu.addAction("Open")
                 self.action_open.triggered.connect(self.openSelectedIndex)
@@ -748,3 +752,79 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         else:
             # Handle non-image files here (optional)
             pass
+
+    def submitSelectedIndex(self):
+        """Opens a window for users to submit their project to the renderfarm"""
+        index = self.currentIndex()
+        if not index.isValid():
+            return
+
+        file_path = self.model().get_file_path(index)
+        _, file_ext = os.path.splitext(os.path.basename(file_path))
+
+
+        # Get the file name from the remote path
+        file_name = os.path.basename(file_path)
+
+        # Create a temporary directory
+        temp_dir = tempfile.TemporaryDirectory(dir=os.path.join(get_user_home(), "tmp"))
+
+        # Construct the local path for the downloaded file
+        local_path = os.path.join(temp_dir.name, file_name).replace("\\", "/")
+
+        # Download the file to the temporary directory
+        self.model().renderfarm.download(file_path, local_path, None)
+
+        data = None
+        self.setCursor(QCursor(Qt.WaitCursor))
+        if "blend" in file_ext:
+            data = read_blend_rend_chunk(local_path)
+
+            temp_dir.cleanup()
+
+            self.job_dialog = NCCA_QSubmit_Blender(username=self.username, file_path=file_path, file_data=data)
+            self.job_dialog.setGeometry(self.geometry())
+            self.job_dialog.show()
+        
+        elif "hip" in file_ext:
+            QApplication.setOverrideCursor(Qt.WaitCursor)
+            command = [LOCAL_HYTHON_PATH, os.path.join(SCRIPT_DIR, "libs", "houdini_render_info.py").replace("\\", "/"), local_path]
+            
+            # Execute the command
+            output = subprocess.check_output(command, stderr=subprocess.STDOUT, universal_newlines=True).strip()
+                
+            match = re.search(r'{\s*"NCCA_RENDERFARM":\s*{.*?}\s*}', output, re.DOTALL)
+                
+            if match:
+                json_data = match.group()
+                # Load JSON data
+                data = json.loads(json_data)
+            
+            QApplication.restoreOverrideCursor()
+            self.job_dialog = NCCA_QSubmit_Houdini(username=self.username, file_path=file_path, file_data=data)
+            self.job_dialog.setGeometry(self.geometry())
+            self.job_dialog.show()
+
+        
+        elif file_ext in [".mb", ".ma"]:
+            QApplication.setOverrideCursor(Qt.WaitCursor)
+            command = [LOCAL_MAYAPY_PATH, os.path.join(SCRIPT_DIR, "libs", "maya_render_info.py").replace("\\", "/"), local_path]
+            # Execute the command
+            output = subprocess.check_output(command, stderr=subprocess.STDOUT, universal_newlines=True).strip()
+            match = re.search(r'{\s*"NCCA_RENDERFARM":\s*{.*?}\s*}', output, re.DOTALL)
+
+            if match:
+                json_data = match.group()
+                # Load JSON data
+                data = json.loads(json_data)
+
+            QApplication.restoreOverrideCursor()
+            self.job_dialog = NCCA_QSubmit_Maya(username=self.username, file_path=file_path, file_data=data)
+            self.job_dialog.setGeometry(self.geometry())
+            self.job_dialog.show()
+        else:
+            self.job_dialog = NCCA_QSubmitWindow(username=self.username, file_path=file_path)
+            self.job_dialog.setGeometry(self.geometry())
+            self.job_dialog.show()
+        
+        self.setCursor(QCursor(Qt.ArrowCursor))
