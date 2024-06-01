@@ -15,6 +15,11 @@ def enable_vray_plugin():
         if not cmds.pluginInfo(plug, query=True, loaded=True):
             cmds.loadPlugin(plug)
 
+def enable_vw_plugin():
+    if not cmds.pluginInfo("VectorRender", query=True, loaded=True):
+        cmds.loadPlugin("VectorRender")
+
 if __name__ == "__main__":
     enable_mtoa_plugin()
     enable_vray_plugin()
+    enable_vw_plugin()

@@ -135,7 +135,7 @@ class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
         project_path = os.path.normpath(project_path).replace("\\", "/") + "/"
 
 
-        frame_range = f"{frame_start}-{frame_start}x{frame_step}"
+        frame_range = f"{frame_start}-{frame_end}x{frame_step}"
         output_file = os.path.basename(output_path)
 
         frame_padding = max(output_file.count("#"), len(str(int(frame_end)*int(frame_step))) + 1)

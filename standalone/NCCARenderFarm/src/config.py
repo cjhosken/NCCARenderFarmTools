@@ -239,31 +239,19 @@ export VRAY_AUTH_CLIENT_FILE_PATH={VRAY_AUTH_CLIENT_FILE_PATH};
 export VRAY_PLUGINS={VRAY_PLUGINS};
 export VRAY_OSL_PATH={VRAY_OSL_PATH_MAYA2023};
 
-export LD_LIBRARY_PATH={LD_LIBRARY_PATH}$LD_LIBRARY_PATH;s
+export LD_LIBRARY_PATH={LD_LIBRARY_PATH}$LD_LIBRARY_PATH;
 """
 
-print(ENVIRONMENT_SCRIPT)
-
-
-#environment variables:
-#Warning: 00:00:11   691MB         |         ARNOLD_LICENSE_ORDER   = (not set)
-#Warning: 00:00:11   691MB         |         ARNOLD_LICENSE_MANAGER = (not set)
-#Warning: 00:00:11   691MB         |  [rlm]  solidangle_LICENSE     = (not set)
-#Warning: 00:00:11   691MB         |  [rlm]  RLM_LICENSE            = (not set)
-#Warning: 00:00:11   691MB         |  [clm]  ADSKFLEX_LICENSE_FILE  = (not set)
-#Warning: 00:00:11   691MB         |  [clm]  LM_LICENSE_FILE        = (not set)
-
-
-
+# I dont see a need to enable maya hardware or vector renderer as nobody uses them
 MAYA_RENDER_ENGINES = {
     "Set by file": "file",
-    "Maya Software": "sw",
-    "Maya Hardware": "hw",
-    "Maya Hardware 2.0": "hw2",
     "Arnold": "arnold",
     "RenderMan": "renderman",
     "VRay": "vray",
-    "Vector Renderer": "vr"
+    "Maya Software": "sw"
+    #"Maya Hardware": "hw", It seems Maya Hardware is unsupported
+    #"Maya Hardware 2.0": "hw2",
+    #"Vector Renderer": "vr"
 }
 
 MAYA_FILE_EXTENSIONS= {
