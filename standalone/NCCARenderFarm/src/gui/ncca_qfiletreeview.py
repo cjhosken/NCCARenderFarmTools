@@ -16,22 +16,23 @@ from qube import launch_qube
 from libs.blend_render_info import read_blend_rend_chunk
 
 class NCCA_RenderFarm_QTreeView(QTreeView):
-    """A custom QTreeView class that shows the files in the renderfarm"""
+    """A custom QTreeView class that shows the files in the render farm"""
 
     def __init__(self, home_path, username, password):
         """Initialize the UI and variables"""
         super().__init__()
 
         self.home_path = home_path
-
-        self.setModel(NCCA_RenderFarm_QFarmSystemModel(self.home_path, username, password))
         self.username = username
+        self.password = password
+
+        self.setupUI()
+
+    def setupUI(self):
+        """Set up the user interface"""
+        self.setModel(NCCA_RenderFarm_QFarmSystemModel(self.home_path, self.username, self.password))
 
         self.setObjectName("NCCA_RenderFarm_QTreeView")
-
-        self.expand(self.model().findIndex(f"/render/{self.username}/home"))
-
-        # UI setup
         self.setHeaderHidden(True)
         for column in range(1, self.model().columnCount()):
             self.setColumnHidden(column, True)
@@ -43,100 +44,31 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         self.setDragDropMode(QAbstractItemView.InternalMove) 
         self.setSortingEnabled(True)
 
-        
         self.setCursor(Qt.PointingHandCursor)
-
-        self.setIconSize(BROWSER_ICON_SIZE)  # Set the icon size
-        self.setStyleSheet(f"""
-            NCCA_RenderFarm_QTreeView {{
+        self.setIconSize(BROWSER_ICON_SIZE)  
+        self.setStyleSheet("""
+            NCCA_RenderFarm_QTreeView {
                 border: none;
                 background: transparent;
                 outline: 0;
-                font-size: 16px;  /* Increase font size */
-            }}
-            NCCA_RenderFarm_QTreeView::item {{
-                border: none;
-                background: transparent;
-                padding: 5px;  /* Increase item padding */
-                padding-right: 16px;
-                
-            }}
-        
-            NCCA_RenderFarm_QTreeView::item:selected, NCCA_RenderFarm_QTreeView::item:selected:hover {{ 
-                background-color: {APP_PRIMARY_COLOR}; 
-            }}
-
-            NCCA_RenderFarm_QTreeView::item:hover {{ 
-                background-color: {APP_HOVER_BACKGROUND}; 
-            }}
-
-            QScrollBar:vertical {{
-                background: transparent;
-                width: 8px;
-                margin: 0px;
-            }}
-
-            QScrollBar::handle:vertical {{
-                background: {APP_PRIMARY_COLOR};
-                min-height: 20px;
-                border-radius: 4px;
-                border: 1px solid {APP_PRIMARY_COLOR}; /* Create a beveled effect */
-            }}
-
-            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{
-                border: none;
-                background: none;
-            }}
-
-            QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {{
-                background: none;
-            }}
-            
+                font-size: 16px;
+            }
+            ...
             """)
-        
+
         self.scroll_timer = QTimer(self)
         self.scroll_timer.setInterval(10) 
         self.scroll_timer.timeout.connect(self.autoScroll)
 
-    
-
     def autoScroll(self):
         """Adjust scrolling for user drags"""
-        # Get the current cursor position
         cursor_pos = self.viewport().mapFromGlobal(QCursor.pos())
+        scroll_speed = 10  
 
-        # Adjust scrolling speed based on cursor position
-        scroll_speed = 10  # Adjust as needed
-
-        # Scroll up if cursor is near the top edge
-        if cursor_pos.y() < self.viewport().y() + SCROLL_MARGIN:  # Adjust threshold as needed
+        if cursor_pos.y() < self.viewport().y() + self.SCROLL_MARGIN:
             self.verticalScrollBar().setValue(self.verticalScrollBar().value() - scroll_speed)
-        # Scroll down if cursor is near the bottom edge
-        elif cursor_pos.y() > self.viewport().y() + self.viewport().height() - SCROLL_MARGIN:  # Adjust threshold as needed
+        elif cursor_pos.y() > self.viewport().y() + self.viewport().height() - self.SCROLL_MARGIN:
             self.verticalScrollBar().setValue(self.verticalScrollBar().value() + scroll_speed)
-
-    def is_empty(self, index):
-        """Returns whther the selected index is empty or not"""
-        # Get the file path corresponding to the index
-        file_path = self.model().get_file_path(index)
-
-        if (self.model().renderfarm.isdir(file_path)):
-            if (len(self.model().renderfarm.listdir(file_path)) > 0):
-                return False
-
-        return True
-
-
-    def drawBranches(self, painter, rect, index):
-        """Customizes the drawing of branch indicators in the tree view."""
-        if index.isValid():
-            if self.is_empty(index):
-                # Folder is collapsed and empty, so don't draw branch indicator
-                return
-            else:
-                # Folder is either expanded or not empty when collapsed, draw branch indicator
-                super().drawBranches(painter, rect, index)
-
 
     def dragEnterEvent(self, event):
         """Actions to perform when the user starts dragging"""
@@ -150,22 +82,30 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         if event.mimeData().hasUrls() and event.source() == self:
             urls = event.mimeData().urls()
 
-            for url in urls:
-                # Check if any of the dragged URLs are the root path
-                if any(url.toLocalFile() == self.home_path for url in urls):
-                    event.ignore()
-                    self.scroll_timer.stop()
-                    return
+            if any(url.toLocalFile() == self.home_path for url in urls):
+                event.ignore()
+                self.scroll_timer.stop()
+                return
                 
-            self.scroll_timer.stop()  # Stop scroll timer during drag
+            self.scroll_timer.stop()  
             event.acceptProposedAction()
         else:
-            self.scroll_timer.start()  # Start scroll timer when not dragging
+            self.scroll_timer.start()  
 
     def dragLeaveEvent(self, event):
         """Actions to perform when the user finishes dragging"""
         super().dragLeaveEvent(event)
-        self.scroll_timer.start()  # Start scroll timer when leaving the view
+        self.scroll_timer.start()  
+
+    def is_empty(self, index):
+        """Returns whether the selected index is empty or not"""
+        file_path = self.model().get_file_path(index)
+        return self.model().renderfarm.isdir(file_path) and not self.model().renderfarm.listdir(file_path)
+
+    def drawBranches(self, painter, rect, index):
+        """Customizes the drawing of branch indicators in the tree view."""
+        if index.isValid() and not self.is_empty(index):
+            super().drawBranches(painter, rect, index)
 
 
     def dropEvent(self, event):
@@ -191,20 +131,20 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                             file_path = url.toLocalFile()
                             #TODO: Implement drag drop code
                             pass
-                    else:
-                        url = urls[0]
-                        file_path = url.toLocalFile()
-                        if self.model().renderfarm.exists(file_path):
-                            if (destination_path != file_path and not os.path.exists(os.path.join(destination_path, os.path.basename(file_path)))):
-                                reply = NCCA_QMessageBox.question(
-                                    self,
-                                    "Confirm Action",
-                                    f"Are you sure you want to move {file_path} to {destination_path}?",
-                                )
-                            
-                                if (reply == QDialog.Accepted):
-                                    #TODO: Implement drag drop code
-                                    pass
+                else:
+                    url = urls[0]
+                    file_path = url.toLocalFile()
+                    if self.model().renderfarm.exists(file_path):
+                        if destination_path != file_path and not os.path.exists(os.path.join(destination_path, os.path.basename(file_path))):
+                            reply = NCCA_QMessageBox.question(
+                                self,
+                                "Confirm Action",
+                                f"Are you sure you want to move {file_path} to {destination_path}?",
+                            )
+                        
+                            if reply == QDialog.Accepted:
+                                #TODO: Implement drag drop code
+                                pass
 
         event.ignore()
 
@@ -246,14 +186,13 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             self.action_qube = self.context_menu.addAction("Qube!")
             self.action_qube.triggered.connect(launch_qube)
         
-        if (self.model().renderfarm.isdir(file_path)):
+        if self.model().renderfarm.isdir(file_path):
             self.action_create = self.context_menu.addAction("New Folder")
             self.action_create.triggered.connect(self.createFolderUnderSelectedIndex)
             self.action_upload = self.context_menu.addAction("Upload Files")
             self.action_upload.triggered.connect(self.uploadFilesToSelectedIndex)
             self.action_upload = self.context_menu.addAction("Upload Folders")
             self.action_upload.triggered.connect(self.uploadFoldersToSelectedIndex)
-
         else:
             _, file_ext = os.path.splitext(os.path.basename(file_path))
 
@@ -279,7 +218,6 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             self.action_wipe = self.context_menu.addAction("Wipe Farm")
             self.action_wipe.triggered.connect(self.wipeSelectedIndex)
 
-
         self.context_menu.setStyleSheet(f"""
             QMenu {{
                 background-color: {APP_BACKGROUND_COLOR}; /* Background color */
@@ -303,30 +241,28 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
     # Action functions
 
     def createFolderUnderSelectedIndex(self):
-        """
-        Creates a new folder under the currently selected index.
-        """
+        """Creates a new folder under the currently selected index."""
         index = self.currentIndex()
         if not index.isValid():
             return
 
         parent_path = self.model().get_file_path(index)
 
-        if (not self.model().renderfarm.isdir(parent_path)):
+        if not self.model().renderfarm.isdir(parent_path):
             return
 
+        # Prompt user for folder name
         create_folder_dialog = NCCA_QInputDialog(placeholder="Folder Name", text="Folder", confirm_text="Add Folder", parent=self)
         if create_folder_dialog.exec_():
             folder_name = create_folder_dialog.getText()
             new_folder_path = os.path.join(parent_path, folder_name)
+            # Check if folder already exists
             if self.model().renderfarm.exists(new_folder_path):
-                NCCA_QMessageBox.warning(
-                    self,
-                    "Error",
-                    f"{new_folder_path} already exists."
-                )
+                NCCA_QMessageBox.warning(self, "Error", f"{new_folder_path} already exists.")
             else:
+                # Create new folder
                 self.model().renderfarm.mkdir(new_folder_path)
+                # Refresh tree view
                 self.refresh()
 
     def uploadFilesToSelectedIndex(self):
@@ -358,7 +294,6 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         folder_dialog.setOption(QFileDialog.HideNameFilterDetails, True)
 
         index = self.currentIndex()
-        
 
         # Show the dialog and get the selected folders
         QApplication.setOverrideCursor(Qt.WaitCursor)
@@ -374,15 +309,17 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         """Uploads the selected files to the destination folder"""
         progress_dialog = NCCA_QProgressDialog("Uploading files...", 0, len(selected_files), None)
 
-        for i, file_path in enumerate(selected_files):
-            # Upload the file
-            dest_file = os.path.join(destination_folder, os.path.basename(file_path)).replace("\\", "/")
-            self.model().renderfarm.upload(file_path, dest_file, progress_dialog)
+        try:
+            for i, file_path in enumerate(selected_files):
+                # Upload each file
+                dest_file = os.path.join(destination_folder, os.path.basename(file_path)).replace("\\", "/")
+                self.model().renderfarm.upload(file_path, dest_file, progress_dialog)
+                QApplication.processEvents()
 
-            QApplication.processEvents()
+        except Exception as e:
+            print(f"Error uploading files: {e}")
 
         self.refresh()
-
         progress_dialog.close()
 
     def uploadFolders(self, selected_folders, destination_folder):
@@ -392,36 +329,24 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
 
         try:
             for i, folder_path in enumerate(selected_folders):
-                # Upload the folder and its contents recursively
+                # Upload each folder and its contents recursively
                 self.model().renderfarm.upload_folder(folder_path, destination_folder, progress_dialog)
-                
                 QApplication.processEvents()
+
         except Exception as e:
-            print(f"Error uploading folder '{folder_path}': {e}")
+            print(f"Error uploading folders: {e}")
 
         self.refresh()
-
         progress_dialog.close()
-        NCCA_QMessageBox.info(
-                                        self,
-                                        "Uploaded!",
-                                        f"files have been uploaded!",
-                                )
-
+        NCCA_QMessageBox.info(self, "Uploaded!", "Files have been uploaded!")
 
     def downloadSelectedIndex(self):
         """Handles the process of downloading the active file to a local destination"""
-        # Open folder dialog to select a destination folder
         index = self.currentIndex()
         source_path = self.model().get_file_path(index)
 
         folder_dialog = QFileDialog(self)
-
-        if self.model().renderfarm.isdir(source_path):
-            folder_dialog.setFileMode(QFileDialog.Directory)
-        else:
-            folder_dialog.setFileMode(QFileDialog.AnyFile)
-        
+        folder_dialog.setFileMode(QFileDialog.Directory if self.model().renderfarm.isdir(source_path) else QFileDialog.AnyFile)
         folder_dialog.setViewMode(QFileDialog.Detail)
         folder_dialog.setWindowTitle("Select destination folder for download")
         folder_dialog.setOption(QFileDialog.ShowDirsOnly, True)
@@ -431,269 +356,182 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                                                             os.path.join(get_user_home(), os.path.basename(source_path)), f"All Files (*)",
                                                             options=QFileDialog.DontConfirmOverwrite)
 
-        # If a destination path is selected
-
-
-
         total_files = self.model().renderfarm.count_files(source_path)
         progress_dialog = NCCA_QProgressDialog("Downloading files...", 0, total_files, None)
 
-        
         if destination_path:
             QApplication.setOverrideCursor(Qt.WaitCursor)
-            if (os.path.exists(destination_path)):
-                NCCA_QMessageBox.warning(
-                    self,
-                        "Error",
-                        f"{destination_path} already exists."
-                )
+            if os.path.exists(destination_path):
+                NCCA_QMessageBox.warning(self, "Error", f"{destination_path} already exists.")
             else:
                 self.model().renderfarm.download(source_path, destination_path, progress_dialog)
-            
+                NCCA_QMessageBox.info(self, "Downloaded!", f"{source_path} has been downloaded to {destination_path}!")
             QApplication.restoreOverrideCursor()
-            NCCA_QMessageBox.info(
-                                        self,
-                                        "Downloaded!",
-                                        f"{source_path} has been Downloaded to {destination_path}!",
-                                )
+
+        progress_dialog.close()
 
     def deleteSelectedIndexes(self):
         """Deletes the selected indexes."""
         selected_indexes = self.selectedIndexes()
         QApplication.setOverrideCursor(Qt.WaitCursor)
-        if len(selected_indexes) > 1:
-            reply = NCCA_QMessageBox.question(
-                                    self,
-                                    "Confirm Deletion",
-                                    f"Are you sure you want to delete the selected items?",
-                                )
-                                
-            if reply == QDialog.Accepted:
-                for index in selected_indexes:
-                    self.deleteIndex(index, confirm=False)
-
-        elif (selected_indexes):
-            self.deleteIndex(selected_indexes[0], confirm=True)
-
+        reply = NCCA_QMessageBox.question(self, "Confirm Deletion", f"Are you sure you want to delete the selected items?")
+        if reply == QDialog.Accepted:
+            for index in selected_indexes:
+                self.deleteIndex(index)
         QApplication.restoreOverrideCursor()
-        NCCA_QMessageBox.info(
-                                    self,
-                                    "Deleted!",
-                                    f"files have been deleted!",
-                            )
+        NCCA_QMessageBox.info(self, "Deleted!", "Files have been deleted!")
 
-    def deleteIndex(self, index, confirm=True):
+    def deleteIndex(self, index):
         """Deletes the specified index."""
         file_path = self.model().get_file_path(index)
-        
         if file_path != self.home_path:
-            reply = QDialog.Accepted
-            if (confirm):
-                reply = NCCA_QMessageBox.question(
-                    self,
-                    "Confirm Deletion",
-                    f"Are you sure you want to delete {file_path}?",
-                )
-                
-            if reply == QDialog.Accepted:
-                self.model().renderfarm.delete(file_path)
-                self.refresh()
+            self.model().renderfarm.delete(file_path)
+            self.refresh()
 
     def wipeSelectedIndex(self):
         """Wipes the currently selected index."""
         index = self.currentIndex()
         file_path = self.model().get_file_path(index)
-
         if self.model().renderfarm.isdir(file_path):
-                QApplication.setOverrideCursor(Qt.WaitCursor)
-                reply = NCCA_QMessageBox.question(
-                                    self,
-                                    "Confirm Deletion",
-                                    f"Are you sure you want to wipe {file_path}? This will delete ALL files.",
-                            )
-                if (reply == QDialog.Accepted):
-                    for child in self.model().renderfarm.listdir(file_path):
-                        child_path = os.path.join(file_path, child).replace("\\", "/")
-                        self.model().renderfarm.delete(child_path)
-                        self.refresh()
-                    
-                    self.model().renderfarm.mkdir(os.path.join(self.home_path, "output"))
-                
-                QApplication.restoreOverrideCursor()
-                NCCA_QMessageBox.info(
-                                    self,
-                                    "Wiped!",
-                                    f"{file_path} has been Wiped!",
-                            )
+            reply = NCCA_QMessageBox.question(self, "Confirm Deletion", f"Are you sure you want to wipe {file_path}? This will delete ALL files.")
+            if reply == QDialog.Accepted:
+                for child in self.model().renderfarm.listdir(file_path):
+                    child_path = os.path.join(file_path, child).replace("\\", "/")
+                    self.model().renderfarm.delete(child_path)
+                self.refresh()
+                self.model().renderfarm.mkdir(os.path.join(self.home_path, "output"))
+                NCCA_QMessageBox.info(self, "Wiped!", f"{file_path} has been wiped!")
 
 
-    def refresh(self):
-        # Store paths of expanded folders
-        expanded_paths = self.get_expanded_paths()
+def refresh(self):
+    """Refreshes the view."""
+    expanded_paths = self.get_expanded_paths()
+    selected_index = self.selectedIndexes()[0] if self.selectedIndexes() else QModelIndex()
 
-        selected_index = self.selectedIndexes()[0] if self.selectedIndexes() else QModelIndex()
+    self.model().beginResetModel()
+    self.model().rootItem["children"] = None
+    self.model().endResetModel()
 
-        # Reset the model
-        self.model().beginResetModel()
-        self.model().rootItem["children"] = None
-        self.model().endResetModel()
+    for path in expanded_paths:
+        index = self.model().findIndex(path)
+        if index.isValid():
+            self.expand(index)
 
-        # Expand previously expanded folders
-        for path in expanded_paths:
-            index = self.model().findIndex(path)
-            if index.isValid():
-                self.expand(index)
+    if selected_index.isValid():
+        self.selectionModel().setCurrentIndex(selected_index, QItemSelectionModel.ClearAndSelect)
 
-        if selected_index.isValid():
-            self.selectionModel().setCurrentIndex(selected_index, QItemSelectionModel.ClearAndSelect)
+def get_expanded_paths(self):
+    """Returns a list of paths of currently expanded folders."""
+    expanded_paths = []
+    self.collectExpandedPaths(self.model().rootItem, expanded_paths)
+    return expanded_paths
 
-    def get_expanded_paths(self):
-        """
-        Returns a list of paths of currently expanded folders.
-        """
-        expanded_paths = []
-        self.collectExpandedPaths(self.model().rootItem, expanded_paths)
-        return expanded_paths
+def collectExpandedPaths(self, item, expanded_paths):
+    """Recursively collects expanded paths starting from the given item."""
+    index = self.model().findIndex(item["path"])
+    if index.isValid() and self.isExpanded(index):
+        expanded_paths.append(item['path'])
+    if item['children'] is None:
+        return
+    for child in item['children']:
+        if child is not None:
+            self.collectExpandedPaths(child, expanded_paths)
 
-    def collectExpandedPaths(self, item, expanded_paths):
-        """
-        Recursively collects expanded paths starting from the given item.
-        """
-        index = self.model().findIndex(item["path"])
-        if index.isValid() and self.isExpanded(index):
-            expanded_paths.append(item['path'])
-        if item['children'] is None:
-            return
-        for child in item['children']:
-            if child is not None:
-                self.collectExpandedPaths(child, expanded_paths)
+def renameSelectedIndex(self):
+    """Renames the currently selected index."""
+    index = self.currentIndex()
+    if not index.isValid():
+        return
 
-    def renameSelectedIndex(self):
-        """Renames the currently selected index."""
-        index = self.currentIndex()
-        if not index.isValid():
-            return
+    file_path = self.model().get_file_path(index)
 
-        file_path = self.model().get_file_path(index)
+    if file_path == self.home_path:
+        return
 
-        if file_path == self.home_path:
-            # Can't rename root directory
-            return
-            
-        rename_dialog = NCCA_QInputDialog(placeholder="Rename", text=os.path.basename(file_path), parent=self)
-        if rename_dialog.exec_():
-            new_name = rename_dialog.getText()
-            new_file_path = os.path.join(os.path.dirname(file_path), new_name)
-            if file_path != new_file_path:
-                if self.model().renderfarm.exists(new_file_path):
-                    NCCA_QMessageBox.warning(
-                            self,
-                            "Error",
-                            f"{new_file_path} already exists."
-                        )
-                else:
-                    self.model().renderfarm.rename(file_path, new_file_path)
-                    self.refresh()
+    rename_dialog = NCCA_QInputDialog(placeholder="Rename", text=os.path.basename(file_path), parent=self)
+    if rename_dialog.exec_():
+        new_name = rename_dialog.getText()
+        new_file_path = os.path.join(os.path.dirname(file_path), new_name)
+        if file_path != new_file_path:
+            if self.model().renderfarm.exists(new_file_path):
+                NCCA_QMessageBox.warning(self, "Error", f"{new_file_path} already exists.")
+            else:
+                self.model().renderfarm.rename(file_path, new_file_path)
+                self.refresh()
 
-    def openSelectedIndex(self):
-        """Opens the currently selected index."""
-        index = self.currentIndex()
-        if not index.isValid():
-            return
+def openSelectedIndex(self):
+    """Opens the currently selected index."""
+    index = self.currentIndex()
+    if not index.isValid():
+        return
 
-        file_path = self.model().get_file_path(index)
-        file_name = os.path.basename(file_path)
-        _, file_ext = os.path.splitext(file_name)
+    file_path = self.model().get_file_path(index)
+    file_name = os.path.basename(file_path)
+    _, file_ext = os.path.splitext(file_name)
 
-        if file_ext.lower() in VIEWABLE_IMAGE_FILES:
-            local_path = file_path
-            temp_dir = tempfile.TemporaryDirectory(dir=get_user_home())
+    if file_ext.lower() in VIEWABLE_IMAGE_FILES:
+        local_path = file_path
+        temp_dir = tempfile.TemporaryDirectory(dir=get_user_home())
+        local_path = os.path.join(temp_dir.name, file_name)
 
-            local_path = os.path.join(temp_dir.name, file_name)
-
-            self.model().renderfarm.download(file_path, local_path, None)
-
-            self.image_dialog = NCCA_QImageWindow(image_path=local_path)
-
-            self.image_dialog = NCCA_QImageWindow(image_path=local_path)
-            self.image_dialog.setGeometry(self.geometry())
-            self.image_dialog.show()
-        else:
-            # Handle non-image files here (optional)
-            pass
-
-    def submitSelectedIndex(self):
-        """Opens a window for users to submit their project to the renderfarm"""
-        index = self.currentIndex()
-        if not index.isValid():
-            return
-
-        file_path = self.model().get_file_path(index)
-        _, file_ext = os.path.splitext(os.path.basename(file_path))
-
-
-        # Get the file name from the remote path
-        file_name = os.path.basename(file_path)
-
-        # Create a temporary directory
-        temp_dir = tempfile.TemporaryDirectory(dir=os.path.join(get_user_home(), "tmp"))
-
-        # Construct the local path for the downloaded file
-        local_path = os.path.join(temp_dir.name, file_name).replace("\\", "/")
-
-        # Download the file to the temporary directory
         self.model().renderfarm.download(file_path, local_path, None)
+        self.image_dialog = NCCA_QImageWindow(image_path=local_path)
+        self.image_dialog.setGeometry(self.geometry())
+        self.image_dialog.show()
 
-        data = None
-        self.setCursor(QCursor(Qt.WaitCursor))
-        if "blend" in file_ext:
-            data = read_blend_rend_chunk(local_path)
+def submitSelectedIndex(self):
+    """Opens a window for users to submit their project to the renderfarm"""
+    index = self.currentIndex()
+    if not index.isValid():
+        return
 
-            temp_dir.cleanup()
+    file_path = self.model().get_file_path(index)
+    _, file_ext = os.path.splitext(os.path.basename(file_path))
+    file_name = os.path.basename(file_path)
 
-            self.job_dialog = NCCA_QSubmit_Blender(username=self.username, file_path=file_path, file_data=data)
-            self.job_dialog.setGeometry(self.geometry())
-            self.job_dialog.show()
+    temp_dir = tempfile.TemporaryDirectory(dir=os.path.join(get_user_home(), "tmp"))
+    local_path = os.path.join(temp_dir.name, file_name).replace("\\", "/")
+
+    self.model().renderfarm.download(file_path, local_path, None)
+    data = None
+
+    if "blend" in file_ext:
+        data = read_blend_rend_chunk(local_path)
+        temp_dir.cleanup()
+        self.job_dialog = NCCA_QSubmit_Blender(username=self.username, file_path=file_path, file_data=data)
+        self.job_dialog.setGeometry(self.geometry())
+        self.job_dialog.show()
+    
+    elif "hip" in file_ext:
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        command = [LOCAL_HYTHON_PATH, os.path.join(SCRIPT_DIR, "libs", "houdini_render_info.py").replace("\\", "/"), local_path]
+        output = subprocess.check_output(command, stderr=subprocess.STDOUT, universal_newlines=True).strip()
+        match = re.search(r'{\s*"NCCA_RENDERFARM":\s*{.*?}\s*}', output, re.DOTALL)
         
-        elif "hip" in file_ext:
-            QApplication.setOverrideCursor(Qt.WaitCursor)
-            command = [LOCAL_HYTHON_PATH, os.path.join(SCRIPT_DIR, "libs", "houdini_render_info.py").replace("\\", "/"), local_path]
-            
-            # Execute the command
-            output = subprocess.check_output(command, stderr=subprocess.STDOUT, universal_newlines=True).strip()
-                
-            match = re.search(r'{\s*"NCCA_RENDERFARM":\s*{.*?}\s*}', output, re.DOTALL)
-                
-            if match:
-                json_data = match.group()
-                # Load JSON data
-                data = json.loads(json_data)
-            
-            QApplication.restoreOverrideCursor()
-            self.job_dialog = NCCA_QSubmit_Houdini(username=self.username, file_path=file_path, file_data=data)
-            self.job_dialog.setGeometry(self.geometry())
-            self.job_dialog.show()
-
+        if match:
+            json_data = match.group()
+            data = json.loads(json_data)
         
-        elif file_ext in [".mb", ".ma"]:
-            QApplication.setOverrideCursor(Qt.WaitCursor)
-            command = [LOCAL_MAYAPY_PATH, os.path.join(SCRIPT_DIR, "libs", "maya_render_info.py").replace("\\", "/"), local_path]
-            # Execute the command
-            output = subprocess.check_output(command, stderr=subprocess.STDOUT, universal_newlines=True).strip()
-            match = re.search(r'{\s*"NCCA_RENDERFARM":\s*{.*?}\s*}', output, re.DOTALL)
+        QApplication.restoreOverrideCursor()
+        self.job_dialog = NCCA_QSubmit_Houdini(username=self.username, file_path=file_path, file_data=data)
+        self.job_dialog.setGeometry(self.geometry())
+        self.job_dialog.show()
 
-            if match:
-                json_data = match.group()
-                # Load JSON data
-                data = json.loads(json_data)
+    elif file_ext in [".mb", ".ma"]:
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        command = [LOCAL_MAYAPY_PATH, os.path.join(SCRIPT_DIR, "libs", "maya_render_info.py").replace("\\", "/"), local_path]
+        output = subprocess.check_output(command, stderr=subprocess.STDOUT, universal_newlines=True).strip()
+        match = re.search(r'{\s*"NCCA_RENDERFARM":\s*{.*?}\s*}', output, re.DOTALL)
 
-            QApplication.restoreOverrideCursor()
-            self.job_dialog = NCCA_QSubmit_Maya(username=self.username, file_path=file_path, file_data=data)
-            self.job_dialog.setGeometry(self.geometry())
-            self.job_dialog.show()
-        else:
-            self.job_dialog = NCCA_QSubmitWindow(username=self.username, file_path=file_path)
-            self.job_dialog.setGeometry(self.geometry())
-            self.job_dialog.show()
-        
-        self.setCursor(QCursor(Qt.ArrowCursor))
+        if match:
+            json_data = match.group()
+            data = json.loads(json_data)
+
+        QApplication.restoreOverrideCursor()
+        self.job_dialog = NCCA_QSubmit_Maya(username=self.username, file_path=file_path, file_data=data)
+        self.job_dialog.setGeometry(self.geometry())
+        self.job_dialog.show()
+    else:
+        self.job_dialog = NCCA_QSubmitWindow(username=self.username, file_path=file_path)
+        self.job_dialog.setGeometry(self.geometry())
+        self.job_dialog.show()
