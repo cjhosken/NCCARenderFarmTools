@@ -13,22 +13,37 @@ RMAN_VERSION="24.1"
 export RFMTREE="/opt/software/pixar/RenderManForMaya-$RMAN_VERSION"
 export RMANTREE="/opt/software/pixar/RenderManProServer-$RMAN_VERSION"
 
-export MAYA_RENDER_DESC_PATH+=":$RFMTREE/etc/"
-export MAYA_SCRIPT_PATH+=":$RFMTREE/scripts/"
-export MAYA_MODULE_PATH+=":$RFMTREE/etc/"
+export MAYA_RENDER_DESC_PATH="$RFMTREE/etc:$MAYA_RENDER_DESC_PATH"
+export MAYA_SCRIPT_PATH="$RFMTREE/scripts:$MAYA_SCRIPT_PATH"
+export MAYA_MODULE_PATH="$RFMTREE/etc:$MAYA_MODULE_PATH"
 
 # VRAY
 #https://docs.chaos.com/display/VMAYA/Installation+from+zip#Installationfromzip-Environmentsetup
-export VRAY_FOR_MAYA2023_MAIN_x64="/opt/software/ChaosGroup/V-Ray/Maya2023-x64/maya_vray"
 
-export VRAY_APPSDK_PLUGINS="$VRAY_FOR_MAYA2023_MAIN_x64/vrayplugins/"
+vray_maya_path="/opt/software/ChaosGroup/V-Ray/Maya2023-x64/maya_vray"
+vray_path="/opt/software/ChaosGroup/V-Ray/Maya2023-x64/vray"
+
+export VRAY_FOR_MAYA2023_MAIN=$vray_maya_path
+
+export VRAY_APPSDK_PLUGINS="$vray_maya_path/vrayplugins/"
 export VRAY_TOOLS_FOR_MAYA="/opt/software/ChaosGroup/V-Ray/Maya2023-x64/vray/bin/"
 
-export VRAY_FOR_MAYA2023_PLUGINS_x64="$VRAY_FOR_MAYA2023_MAIN_x64/vrayplugins"
+export VRAY_FOR_MAYA2023_PLUGINS="$vray_maya_path/vrayplugins"
+export VRAY_PLUGINS="$vray_maya_path/vrayplugins"
+export VRAY_OSL_PATH_MAYA2023="$vray_path/opensl"
 
-export MAYA_PLUG_IN_PATH+=":$VRAY_FOR_MAYA2023_MAIN_x64/plug-ins"
-export MAYA_SCRIPT_PATH+=":$VRAY_FOR_MAYA2023_MAIN_x64/scripts"
-export MAYA_RENDER_DESC_PATH+=":$VRAY_FOR_MAYA2023_MAIN_x64/rendererDesc/"
+export PATH="$vray_maya_path/bin:$PATH"
+
+export MAYA_PLUG_IN_PATH="$vray_maya_path/plug-ins:$MAYA_PLUG_IN_PATH"
+export MAYA_RENDER_DESC_PATH="$vray_maya_path/rendererDesc:$MAYA_RENDER_DESC_PATH"
+export MAYA_SCRIPT_PATH="$vray_maya_path/scripts:$MAYA_SCRIPT_PATH"
+export MAYA_PRESET_PATH="$vray_maya_path/presets:$MAYA_PRESET_PATH"
+export PYTHONPATH="$vray_maya_path/scripts:$PYTHONPATH"
+export XBMLANGPATH="$vray_maya_path/icons"
+export MAYA_CUSTOM_TEMPLATE_PATH="$vray_maya_path/scripts:$MAYA_CUSTOM_TEMPLATE_PATH"
+export MAYA_TOOLCLIPS_PATH="$vray_maya_path/toolclips"
+export PXR_PLUGINPATH_NAME="$vray_maya_path/usdplugins:$PXR_PLUGINPATH_NAME"
+export VRAY_APPSDK_PLUGINS="$vray_maya_path/vrayplugins"
 
 # ARNOLD (Assuming ARNOLD_PATH is defined elsewhere)
 # export ARNOLD_PATH="/path/to/arnold"
