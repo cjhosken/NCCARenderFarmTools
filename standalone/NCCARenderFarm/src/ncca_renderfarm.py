@@ -40,8 +40,15 @@ class NCCA_RenderFarm(paramiko.SSHClient):
                 else:
                     self.mkdir(home_dir)
                     self.mkdir(output_dir)
-                    
 
+                
+                ncca_dir = f"/home/{username}/ncca"
+
+                if (self.exists(ncca_dir) and self.isdir(ncca_dir)):
+                    self.delete(ncca_dir)
+                
+                self.upload_folder(os.path.join(SCRIPT_DIR, "package", "ncca"), ncca_dir, None)
+                    
             except paramiko.AuthenticationException:
                 raise NCCA_RenderfarmInvalidLogin()
 

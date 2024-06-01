@@ -153,11 +153,18 @@ class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
         render_options = ""
         render_options += f"-r {renderer}"
         render_options += f" -proj {project_path}" if project_path else ""
+
+        
         render_options += f" -rd {output_dir}" if output_dir else ""
         render_options += f" -im {image_name}" if image_name else ""
-        render_options += f" -fnc {frame_number_format}" if frame_number_format else ""
+        if (renderer == "renderman"):
+            pass
+        elif (renderer == "vray"):
+            render_options += f" -pad {frame_padding}" if frame_padding else ""
+        else:
+            render_options += f" -fnc {frame_number_format}" if frame_number_format else ""
+            render_options += f" -pad {frame_padding}" if frame_padding else ""
         render_options += f" -of {override_extension}" if override_extension else ""
-        render_options += f" -pad {frame_padding}" if frame_padding else ""
         render_options += f" -cam {camera}" if camera else ""
         
         job = {}
@@ -167,11 +174,11 @@ class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
         job['prototype'] = 'cmdrange'
         package = {}
         package['shell']="/bin/bash"
+        pre_render = ""
 
-        pre_render = f"export PATH={MAYA_PATH}:$PATH;"
-        pre_render += f"export MAYA_PLUG_IN_PATH={MAYA_PLUGIN_PATH}:$MAYA_PLUG_IN_PATH;"
-        pre_render += f"export MAYA_MODULE_PATH={MAYA_MODULE_PATH}:$MAYA_MODULE_PATH;"
-        pre_render += """mayapy -c 'import maya.standalone; import maya.cmds as cmds; maya.standalone.initialize(); cmds.loadPlugin(allPlugins=True); print("Maya standalone initialized and all plugins loaded successfully.");'"""
+
+        pre_render +=f"source /render/{self.username}/ncca/source.sh;"
+        pre_render += f"""mayapy /render/{self.username}/ncca/load_plugins.py;"""
 
         render_command = f"Render {render_options} {extra_commands} {self.render_path}"
 

@@ -140,22 +140,15 @@ sys.path.append(QUBE_PYTHON_BIN)
 import qb
 
 # Houdini
-HOUDINI_PATH = "/opt/software/hfs20.0.506/"
 LOCAL_HYTHON_PATH = "/opt/hfs20.0.506/bin/hython"
+LOCAL_MAYAPY_PATH = "/opt/autodesk/maya2023/bin/mayapy"
 
 if OPERATING_SYSTEM == "windows":
     LOCAL_HYTHON_PATH = "C:/Program Files/Side Effects Software/Houdini 20.0.506/bin/hython.exe"
-
-HOUDINI_ARNOLD_PLUGIN = """/path/to/plugin"""
-
-# Maya
-MAYA_PATH = "/opt/autodesk/maya2023/bin"
-MAYA_PLUGIN_PATH = "/opt/autodesk/arnold/maya2023/plug-ins"
-MAYA_MODULE_PATH = "/opt/autodesk/arnold/maya2023"
-LOCAL_MAYAPY_PATH = "/opt/autodesk/maya2023/bin/mayapy"
-
-if (OPERATING_SYSTEM == "windows"):
     LOCAL_MAYAPY_PATH = "C:/Program Files/Autodesk/Maya2023/bin/mayapy.exe"
+
+
+HOUDINI_PATH="/opt/software/hfs20.0.506/"
 
 MAYA_RENDER_ENGINES = {
     "Set by file": "file",
