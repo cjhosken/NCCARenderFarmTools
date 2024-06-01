@@ -176,8 +176,7 @@ class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
         package['shell']="/bin/bash"
         pre_render = ""
 
-        
-        pre_render += ENVIRONMENT_SCRIPT
+        pre_render += f"sed -i 's/\r//' /render/s5605094/ncca/source.sh; source /render/{self.username}/ncca/source.sh;"
         pre_render += f"""mayapy /render/{self.username}/ncca/load_plugins.py;"""
 
         render_command = f"Render {render_options} {extra_commands} {self.render_path}"
@@ -187,14 +186,7 @@ class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
         package['cmdline'] = f"{pre_render} {render_command}"
         
         job['package'] = package
-        
-        env = {
-            "HOME": f"/render/{self.username}",
-            "SESI_LMHOST": "lepe.bournemouth.ac.uk",
-            "PIXAR_LICENSE_FILE": "9010@talavera.bournemouth.ac.uk",
-        }
-        
-        job['env'] = env
+
         job["cwd"] = f"/render/{self.username}"
         
         job['agenda'] = qb.genframes(frame_range)

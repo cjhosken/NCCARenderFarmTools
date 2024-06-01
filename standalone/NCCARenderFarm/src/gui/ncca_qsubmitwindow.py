@@ -148,9 +148,12 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
         
 
     def submit_job(self, job):
+        env={"HOME" :f"/render/{self.username}"}
+    
+        job['env']=env
+
         """ Submits the job to the renderfarm"""
-        listOfJobsToSubmit = []
-        listOfJobsToSubmit.append(job)
+        listOfJobsToSubmit = [job]
         listOfSubmittedJobs = qb.submit(listOfJobsToSubmit)
         id_list=[]
         for job in listOfSubmittedJobs:
@@ -162,3 +165,12 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
             "NCCA Renderfarm",
             f"Job Submitted!\nID: {id_list}"
         )
+
+
+    def expand_env_vars(self, env_dict):
+        for key, value in env_dict.items():
+            if isinstance(value, str):
+                env_dict[key] = os.path.expandvars(value)
+            elif isinstance(value, list):
+                env_dict[key] = [os.path.expandvars(item) for item in value]
+        return env_dict
