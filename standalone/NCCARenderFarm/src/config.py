@@ -147,8 +147,6 @@ if OPERATING_SYSTEM == "windows":
     LOCAL_HYTHON_PATH = "C:/Program Files/Side Effects Software/Houdini 20.0.506/bin/hython.exe"
     LOCAL_MAYAPY_PATH = "C:/Program Files/Autodesk/Maya2023/bin/mayapy.exe"
 
-HOUDINI_PATH="/opt/software/hfs20.0.506/"
-
 
 # Maya
 
@@ -212,6 +210,34 @@ PXR_PLUGINPATH_NAME += f"{vray_maya_path}/usdplugins:"
 VRAY_APPSDK_PLUGINS = f"{vray_maya_path}/vrayplugins"
 
 VRAY_AUTH_CLIENT_FILE_PATH=""
+
+
+# HOUDINI
+
+# ARNOLD
+# https://help.autodesk.com/view/ARNOL/ENU/?guid=arnold_for_houdini_ah_getting_started_ah_Environment_Variables_html
+
+HOUDINI_VERSION="20.0.506"
+HOUDINI_PATH = ""
+HTOA=""
+HOUDINI_ROOT = "/opt/software/hfs20.0.506/"
+
+ARNOLD_LICENSE_HOST=""
+ARNOLD_LICENSE_PORT=""
+
+
+# RENDERMAN
+# https://rmanwiki.pixar.com/display/RFH26/Installation+of+RenderMan+for+Houdini
+
+RFHTREE=f"/opt/software/RenderManForHoudini-{RMAN_VERSION}"
+
+HOUDINI_DEFAULT_RIB_RENDER=""
+HOUDINI_PATH += f"{RFHTREE}/3.9/{HOUDINI_VERSION}/:"
+RMAN_PROCEDURALPATH=f"{RFHTREE}/3.9/{HOUDINI_VERSION}/openvdb:"
+
+
+# VRAY
+# https://docs.chaos.com/display/VRAYHOUDINI/Installation+from+zip
 
 
 
