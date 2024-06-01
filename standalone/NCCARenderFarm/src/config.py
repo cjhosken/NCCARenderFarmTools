@@ -28,7 +28,7 @@ OPERATING_SYSTEM = get_os()
 
 # GLOBAL
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-ASSET_DIR = os.path.join(SCRIPT_DIR, "assets")
+ASSET_DIR = os.path.normpath(os.path.join(SCRIPT_DIR, "assets"))
 NCCA_ENVIRONMENT_PATH = os.path.expanduser('~/.ncca')
 
 # APP GLOBALS
@@ -38,35 +38,35 @@ APPLICATION_AUTHORS = ["Christopher Hosken", "ChatGPT"]
 APPLICATION_DESCRIPTION = "A cross-platform tool that allows users to interact with the NCCA Renderfarm."
 
 # ICONS AND IMAGES
-ICON_DIR = os.path.join(ASSET_DIR, "icons")
-IMAGE_DIR = os.path.join(ASSET_DIR, "images")
+ICON_DIR = os.path.normpath(os.path.join(ASSET_DIR, "icons"))
+IMAGE_DIR = os.path.normpath(os.path.join(ASSET_DIR, "images"))
 
-APPLICATION_ICON_PATH = os.path.join(ICON_DIR, "farm.png")
-WARNING_ICON_PATH = os.path.join(ICON_DIR, "warning.png")
-QUESTION_ICON_PATH = os.path.join(ICON_DIR, "question.svg")
-DROPDOWN_ICON_PATH = os.path.join(ICON_DIR, "dropdown.svg")
-CHECKED_ICON_PATH = os.path.join(ICON_DIR, "checked.svg")
+APPLICATION_ICON_PATH = os.path.normpath(os.path.join(ICON_DIR, "farm.png"))
+WARNING_ICON_PATH = os.path.normpath(os.path.join(ICON_DIR, "warning.png"))
+QUESTION_ICON_PATH = os.path.normpath(os.path.join(ICON_DIR, "question.svg"))
+DROPDOWN_ICON_PATH = os.path.normpath(os.path.join(ICON_DIR, "dropdown.svg"))
+CHECKED_ICON_PATH = os.path.normpath(os.path.join(ICON_DIR, "checked.svg"))
 
-CLOSE_ICON_PATH = os.path.join(ICON_DIR, "close.svg")
-QUBE_ICON_PATH = os.path.join(ICON_DIR, "cube.svg")
-BUG_ICON_PATH = os.path.join(ICON_DIR, "bug.svg")
-INFO_ICON_PATH = os.path.join(ICON_DIR, "info.svg")
-SUBMIT_ICON_PATH = os.path.join(ICON_DIR, "add.svg")
+CLOSE_ICON_PATH = os.path.normpath(os.path.join(ICON_DIR, "close.svg"))
+QUBE_ICON_PATH = os.path.normpath(os.path.join(ICON_DIR, "cube.svg"))
+BUG_ICON_PATH = os.path.normpath(os.path.join(ICON_DIR, "bug.svg"))
+INFO_ICON_PATH = os.path.normpath(os.path.join(ICON_DIR, "info.svg"))
+SUBMIT_ICON_PATH = os.path.normpath(os.path.join(ICON_DIR, "add.svg"))
 
 ICON_SIZE = QSize(24, 24)
 ICON_BUTTON_SIZE = QSize(48, 48)
 BROWSER_ICON_SIZE = QSize(32, 32)
 
-NO_CONNECTION_IMAGE = os.path.join(IMAGE_DIR, "connection_failed.jpg")
+NO_CONNECTION_IMAGE = os.path.normpath(os.path.join(IMAGE_DIR, "connection_failed.jpg"))
 NO_CONNECTION_IMAGE_SIZE = QSize(256, 256)
 
-HOME_ICON_PATH = os.path.join(ICON_DIR, "farm.png")
-FOLDER_ICON_PATH = os.path.join(ICON_DIR, "folder.svg")
-FILE_ICON_PATH = os.path.join(ICON_DIR, "file.svg")
-IMAGE_ICON_PATH = os.path.join(ICON_DIR, "image.svg")
-ARCHIVE_ICON_PATH = os.path.join(ICON_DIR, "archive.png")
+HOME_ICON_PATH = os.path.normpath(os.path.join(ICON_DIR, "farm.png"))
+FOLDER_ICON_PATH = os.path.normpath(os.path.join(ICON_DIR, "folder.svg"))
+FILE_ICON_PATH = os.path.normpath(os.path.join(ICON_DIR, "file.svg"))
+IMAGE_ICON_PATH = os.path.normpath(os.path.join(ICON_DIR, "image.svg"))
+ARCHIVE_ICON_PATH = os.path.normpath(os.path.join(ICON_DIR, "archive.png"))
 
-FOLDERUI_ICON_PATH = os.path.join(ICON_DIR, "folderui.svg")
+FOLDERUI_ICON_PATH = os.path.normpath(os.path.join(ICON_DIR, "folderui.svg"))
 
 # RENDERFARM AND FILESYSTEMS
 RENDERFARM_ADDRESS = "tete.bournemouth.ac.uk"
