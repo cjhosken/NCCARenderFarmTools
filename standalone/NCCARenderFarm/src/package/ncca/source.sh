@@ -8,6 +8,7 @@ export MAYA_SCRIPT_PATH="/opt/autodesk/maya2023/scripts"
 export MAYA_RENDER_DESC_PATH=""
 
 # RENDERMAN
+# https://rmanwiki.pixar.com/display/RFM24/Installation+of+RenderMan+for+Maya
 RMAN_VERSION="24.1"
 export RFMTREE="/opt/software/pixar/RenderManForMaya-$RMAN_VERSION"
 export RMANTREE="/opt/software/pixar/RenderManProServer-$RMAN_VERSION"
@@ -17,6 +18,7 @@ export MAYA_SCRIPT_PATH+=":$RFMTREE/scripts/"
 export MAYA_MODULE_PATH+=":$RFMTREE/etc/"
 
 # VRAY
+#https://docs.chaos.com/display/VMAYA/Installation+from+zip#Installationfromzip-Environmentsetup
 export VRAY_FOR_MAYA2023_MAIN_x64="/opt/software/ChaosGroup/V-Ray/Maya2023-x64/maya_vray"
 
 export VRAY_APPSDK_PLUGINS="$VRAY_FOR_MAYA2023_MAIN_x64/vrayplugins/"
