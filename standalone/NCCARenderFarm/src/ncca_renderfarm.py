@@ -81,7 +81,8 @@ class NCCA_RenderFarm(paramiko.SSHClient):
         """Uploads the source files and directories from local to the SFTP server"""
         if os.path.isfile(source_local_path):
             self.sftp.put(source_local_path, remote_path)
-            progress_dialog.setValue(progress_dialog.value() + 1)
+            if progress_dialog is not None:
+                progress_dialog.setValue(progress_dialog.value() + 1)
             
 
     def upload_folder(self, local_folder_path, remote_folder_path, progress_dialog):

@@ -30,6 +30,7 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
         if self.renderfarm.isdir(parent_path):
             children = self.renderfarm.listdir(parent_path)
             parent_item['children'] = [self.create_item(os.path.join(parent_path, child), parent_item) for child in children]
+            self.sort_children(parent_item['children'], Qt.AscendingOrder)
 
     def create_item(self, path, parent):
         """Creates a custom item to be shown in the file browser"""
@@ -54,6 +55,7 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
 
             children = self.renderfarm.listdir(parent_path)
             parent_item['children'] = [self.create_item(os.path.join(parent_path, child), parent_item) for child in children]
+            self.sort_children(parent_item['children'], Qt.AscendingOrder)
 
         # Check if the row is within the bounds of the parent's children
         if row < len(parent_item['children']):
@@ -116,6 +118,7 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
                 if stat.S_ISDIR(parent_stat.st_mode):
                     children = self.renderfarm.listdir(parent_path)
                     parent_item['children'] = [self.create_item(os.path.join(parent_path, child), parent_item) for child in children]
+                    self.sort_children(parent_item['children'], Qt.AscendingOrder)
                 else:
                     # If it's not a directory, return 0 as it has no children
                     return 0
@@ -221,3 +224,27 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
                     return self.findIndex(path, child_index)
 
         return QModelIndex()
+    
+    def sort(self, column, order=Qt.AscendingOrder):
+        """
+        Sort the model data.
+        """
+        if column != 0:
+            return
+
+        # Recursively sort all children of the root item
+        def recursive_sort(item):
+            if item['children']:
+                item['children'].sort(key=lambda x: os.path.basename(x['path']).lower(), reverse=(order == Qt.DescendingOrder))
+                for child in item['children']:
+                    recursive_sort(child)
+
+        self.layoutAboutToBeChanged.emit()
+        recursive_sort(self.rootItem)
+        self.layoutChanged.emit()
+
+    def sort_children(self, children, order):
+        """
+        Sorts the children list alphabetically.
+        """
+        children.sort(key=lambda x: os.path.basename(x['path']).lower(), reverse=(order == Qt.DescendingOrder))

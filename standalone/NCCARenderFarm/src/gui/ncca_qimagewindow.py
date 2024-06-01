@@ -21,14 +21,8 @@ class NCCA_QImageWindow(NCCA_QMainWindow):
         self.image_name_label.setContentsMargins(25, 0, 0, 0)
         self.nav_and_title_layout.addWidget(self.image_name_label)
 
-        self.channel_combo = NCCA_QComboBox()
-        #TODO: Get the image channels from the active image
-        self.channel_combo.addItems(["RGB", "Alpha", "Depth"])
-        self.channel_combo.currentIndexChanged.connect(self.changeChannel)
-        self.nav_and_title_layout.addWidget(self.channel_combo)
-
-        self.image_label = QLabel()
-        self.main_layout.addWidget(self.image_label)
+        self.image_view = ZoomableImageView(self)
+        self.main_layout.addWidget(self.image_view)
 
         image_name, image_ext = os.path.splitext(os.path.basename(self.image_path))
 
@@ -63,24 +57,83 @@ class NCCA_QImageWindow(NCCA_QMainWindow):
             print("Failed to read the EXR file.")
             return None
 
-    def loadImage(self, path, channel=None):
+    def loadImage(self, path):
         """Load an image to the UI from its path"""
-        image = cv2.imread(path)
-
-        # Split the image into its channels
-        channels = cv2.split(image)
-        print(channels)
-
-        
-        pixmap = QPixmap(path)
-        pixmap = pixmap.scaled(IMAGE_WINDOW_SIZE, Qt.KeepAspectRatio)
-        self.image_label.setPixmap(pixmap)
-        self.image_label.adjustSize()
+        self.image_view.setImage(path)
 
 
-    def changeChannel(self, index):
-        """load the specified channel based on image data
-        This is primarily for Multi-layer EXR files, however alpha can be avaliable for formats such as .png 
-        """
-        channel = self.channel_combo.currentText()
-        self.loadImage(self.image_path, channel)
+class ZoomableImageView(QGraphicsView):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setRenderHint(QPainter.Antialiasing, True)
+        self.setRenderHint(QPainter.SmoothPixmapTransform, True)
+        self.setScene(QGraphicsScene(self))
+        self.setAlignment(Qt.AlignCenter)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setMinimumSize(900, 300)
+        self.setBaseSize(900, 300)
+        self._zoom = 0
+        self._pan = False
+        self._start_pos = QPoint()
+        self.pixmap_item = None
+
+    def setImage(self, image_path):
+        pixmap = QPixmap(image_path)
+        if pixmap.isNull():
+            print(f"Failed to load image: {image_path}")
+            return
+
+        self.pixmap_item = QGraphicsPixmapItem(pixmap)
+        self.scene().clear()
+        self.scene().addItem(self.pixmap_item)
+        self._zoom = 0
+        self.resetTransform()
+        #self.fitInView(self.pixmap_item, Qt.KeepAspectRatio)
+
+    def wheelEvent(self, event):
+        zoom_in_factor = 1.25
+        zoom_out_factor = 0.8
+
+        # Map the mouse position to scene coordinates
+        mouse_point = self.mapToScene(event.position().toPoint())
+
+        if event.angleDelta().y() > 0:
+            zoom_factor = zoom_in_factor
+            self._zoom += 1
+        else:
+            if self._zoom > 0:
+                zoom_factor = zoom_out_factor
+                self._zoom -= 1
+            else:
+                zoom_factor = 1.0  # No change in zoom
+
+        if self._zoom > 0:
+            # Scale around the mouse position
+            self.scale(zoom_factor, zoom_factor)
+            # Translate to keep the mouse position fixed
+            delta = self.mapToScene(event.position().toPoint()) - mouse_point
+            self.translate(delta.x(), delta.y())
+        elif self._zoom == 0:
+            self.resetTransform()
+
+    def mousePressEvent(self, event: QMouseEvent):
+        if event.button() == Qt.LeftButton:
+            self._pan = True
+            self._start_pos = event.pos()
+            self.setCursor(Qt.ClosedHandCursor)
+        super().mousePressEvent(event)
+
+    def mouseMoveEvent(self, event: QMouseEvent):
+        if self._pan:
+            delta = event.pos() - self._start_pos
+            self._start_pos = event.pos()
+            self.horizontalScrollBar().setValue(self.horizontalScrollBar().value() - delta.x())
+            self.verticalScrollBar().setValue(self.verticalScrollBar().value() - delta.y())
+        super().mouseMoveEvent(event)
+
+    def mouseReleaseEvent(self, event: QMouseEvent):
+        if event.button() == Qt.LeftButton:
+            self._pan = False
+            self.setCursor(Qt.ArrowCursor)
+        super().mouseReleaseEvent(event)

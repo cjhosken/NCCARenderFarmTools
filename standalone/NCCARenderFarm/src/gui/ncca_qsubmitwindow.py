@@ -118,8 +118,7 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
         super().endUI()
 
     def prepare_job(self):
-        remote_job_path = os.path.join(f"/home/{self.username}", RENDERFARM_HOME_DIR, self.job_path.text().lstrip("/"))
-        print(remote_job_path)
+        remote_job_path = os.path.join("/home", self.username, RENDERFARM_HOME_DIR, self.job_path.text().lstrip("/")).replace("\\", "/")
         # Upload the files to the renderfarm
 
         upload = True
@@ -136,8 +135,13 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
                 upload = False
         
         if (upload):
-            self.renderfarm.upload_folder(self.folder_path, remote_job_path)
+            self.renderfarm.upload_folder(self.folder_path, remote_job_path, None)
 
+        remote_render_path = os.path.join("/render", self.username, RENDERFARM_HOME_DIR, self.job_path.text().lstrip("/")).replace("\\", "/")
+        common_prefix = os.path.commonprefix([self.folder_path, self.file_path])
+        render_file_path = self.file_path[len(common_prefix)+1:]
+
+        self.render_path = os.path.join(remote_render_path, render_file_path).replace("\\", "/")
         
 
     def submit_job(self, job):

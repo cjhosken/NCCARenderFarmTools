@@ -56,7 +56,7 @@ class NCCA_QSubmit_Houdini(NCCA_QSubmitWindow):
         render_command=f"hython $HB/hrender.py -F QB_FRAME_NUMBER"
         render_command+=f" -e {external_commands}" if external_commands else " -e"
         render_command+=f" -d {rop_path}" if rop_path else ""
-        render_command+=f" {self.file_path}"
+        render_command+=f" {self.render_path}"
 
         print(render_command)
 

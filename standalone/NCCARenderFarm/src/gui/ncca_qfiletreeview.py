@@ -40,7 +40,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
 
         self.setObjectName("NCCA_RenderFarm_QTreeView")
 
-        self.expand(self.model().findIndex(self.home_path))
+        self.expand(self.model().findIndex(f"/render/{self.username}/home"))
 
         # UI setup
         self.setHeaderHidden(True)
@@ -52,6 +52,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         self.setDropIndicatorShown(True)
         self.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.setDragDropMode(QAbstractItemView.InternalMove) 
+        self.setSortingEnabled(True)
 
         
         self.setCursor(Qt.PointingHandCursor)

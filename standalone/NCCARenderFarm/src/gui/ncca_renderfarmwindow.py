@@ -144,4 +144,4 @@ class NCCA_RenderFarmWindow(NCCA_QMainWindow):
                         )
             return
 
-        self.browser.refreshFarm()
+        self.browser.refresh()
