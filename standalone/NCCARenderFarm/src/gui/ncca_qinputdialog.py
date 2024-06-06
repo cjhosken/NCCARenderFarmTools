@@ -10,11 +10,10 @@ class NCCA_QInputDialog(NCCA_QDialog):
 
     def __init__(self, placeholder="", text="", confirm_text="Ok", parent=None):
         """Initialize the dialog UI"""
-        super().__init__(parent, size=MESSAGE_BOX_SIZE)
         self.placeholder = placeholder
         self.text = text
         self.confirm_text = confirm_text
-        self.init_ui()
+        super().__init__(parent, size=MESSAGE_BOX_SIZE)
 
     def init_ui(self):
         """Initialize the UI"""

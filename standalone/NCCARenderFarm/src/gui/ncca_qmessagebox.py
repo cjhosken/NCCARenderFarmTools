@@ -68,17 +68,15 @@ class NCCA_QMessageBox(NCCA_QDialog):
 
         confirm_button.clicked.connect(msg_box.accept)
 
-        return msg_box.exec_()
+        return msg_box
 
     @staticmethod
     def question(parent, title, text, yes_text="Yes", no_text="No"):
         """Creates a confirmation popup dialog"""
         msg_box = NCCA_QMessageBox._create_popup(parent, title, text, QUESTION_ICON_PATH)
-        yes_button = NCCA_QFlatButton(yes_text)
-        yes_button.clicked.connect(msg_box.accept)
-        msg_box.button_box.addButton(yes_button, QDialogButtonBox.YesRole)
 
         no_button = NCCA_QFlatButton(no_text)
+        no_button.setFixedSize(QSize(125, 35))
         no_button.clicked.connect(msg_box.reject)
         msg_box.button_box.addButton(no_button, QDialogButtonBox.NoRole)
 
