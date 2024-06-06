@@ -13,8 +13,7 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
         self.password = password
         self.renderfarm = NCCA_RenderFarm(self.username, self.password)
         self.home_path = home_path
-        self.rootItem = self.create_item(f"/home/{username}", None)
-        self.expanded_paths = set()
+        self.rootItem = self.create_item(self.home_path, None)
 
     def populateChildren(self, parent_item):
         """Recursively populate children for a given parent item."""
@@ -30,11 +29,11 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
         if self.renderfarm.isdir(parent_path):
             children = self.renderfarm.listdir(parent_path)
             parent_item['children'] = [self.create_item(os.path.join(parent_path, child), parent_item) for child in children]
-            self.sort_children(parent_item['children'], Qt.AscendingOrder)
+            self.sort_children(parent_item['children'], Qt.DescendingOrder)
 
     def create_item(self, path, parent):
         """Creates a custom item to be shown in the file browser"""
-        return {'path': path.replace('\\', '/'), 'parent': parent, 'children': None}
+        return {'path': path, 'parent': parent, 'children': None}
         
     def index(self, row, column, parent=QModelIndex()):
         """

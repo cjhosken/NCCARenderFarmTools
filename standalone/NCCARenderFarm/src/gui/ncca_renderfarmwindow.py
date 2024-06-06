@@ -22,15 +22,15 @@ class NCCA_RenderFarmWindow(NCCA_QMainWindow):
         self.password = password
         self.use_local = use_local
 
-        self.home_path = os.path.join(f"/home/{self.username}", RENDERFARM_HOME_DIR).replace("\\", "/")
+        self.home_path = join_path(f"/home/{self.username}", RENDERFARM_HOME_DIR)
 
         # Replace the home path with the local home if use_local
         if (self.use_local):
             self.home_path = get_user_home()
         super().__init__(name, MAIN_WINDOW_SIZE)
 
-    def initUI(self):
-        super().initUI()
+    def init_ui(self):
+        super().init_ui()
         """Initializes the UI"""
 
         # Title

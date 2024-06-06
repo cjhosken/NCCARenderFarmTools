@@ -20,9 +20,9 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
         self.renderfarm = renderfarm
         super().__init__(self.name, size=SUBMIT_WINDOW_SIZE)
 
-    def initUI(self):
+    def init_ui(self):
         """Initializes the UI"""
-        super().initUI()
+        super().init_ui()
         self.setupJobInputs()
 
     def setupJobInputs(self):
@@ -140,11 +140,11 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
         
         """Prepare job for submission."""
         if self.renderfarm is None:
-            self.render_path = self.file_path.replace(os.path.normpath(os.path.join("/home", self.username)),
-                                                    os.path.normpath(os.path.join("/render", self.username)))
+            self.render_path = self.file_path.replace(join_path("/home", self.username),
+                                                    join_path("/render", self.username))
             return
 
-        remote_job_path = os.path.normpath(os.path.join("/home", self.username, RENDERFARM_HOME_DIR, self.job_path.text()))
+        remote_job_path = join_path("/home", self.username, RENDERFARM_HOME_DIR, self.job_path.text())
 
         if self.renderfarm.exists(remote_job_path):
             response = NCCA_QMessageBox.override(
@@ -157,13 +157,13 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
                 self.renderfarm.delete(remote_job_path)
                 self.renderfarm.upload_folder(self.folder_path, remote_job_path, None)
             elif response == QDialogButtonBox.NoRole: 
-                remote_render_path = os.path.normpath(os.path.join("/render", self.username, RENDERFARM_HOME_DIR,
-                                                self.job_path.text()))
+                remote_render_path = join_path("/render", self.username, RENDERFARM_HOME_DIR,
+                                                self.job_path.text())
 
                 common_prefix = os.path.commonprefix([self.folder_path, self.file_path])
                 render_file_path = self.file_path[len(common_prefix) + 1:]
 
-                self.render_path = os.path.normpath(os.path.join(remote_render_path, render_file_path))
+                self.render_path = join_path(remote_render_path, render_file_path)
             
             else:
                 self.render_path == None
@@ -171,7 +171,7 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
 
     def submit_job(self, job):
         """Submit the job to the renderfarm."""
-        job['env'] = {"HOME": os.path.normpath(os.path.join("/render", self.username))}
+        job['env'] = {"HOME": join_path("/render", self.username)}
 
         listOfJobsToSubmit = [job]
         listOfSubmittedJobs = qb.submit(listOfJobsToSubmit)

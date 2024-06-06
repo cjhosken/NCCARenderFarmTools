@@ -11,10 +11,10 @@ class NCCA_QMainWindow(QMainWindow):
         self.name = name
         self.size = size
 
-        self.initUI()
-        self.endUI()
+        self.init_ui()
+        self.end_ui()
 
-    def initUI(self):
+    def init_ui(self):
         """Initialize the UI"""
         self.setWindowTitle(self.name)
         self.setFixedSize(self.size)
@@ -61,7 +61,7 @@ class NCCA_QMainWindow(QMainWindow):
         self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(0)
 
-    def endUI(self):
+    def end_ui(self):
         """Complete the UI"""
         # Exit button
         self.exit_button = NCCA_QIconButton(CLOSE_ICON_PATH, ICON_SIZE)

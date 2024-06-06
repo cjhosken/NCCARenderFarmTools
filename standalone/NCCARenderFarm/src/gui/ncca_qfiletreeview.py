@@ -135,7 +135,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                     url = urls[0]
                     file_path = url.toLocalFile()
                     if self.model().renderfarm.exists(file_path):
-                        if destination_path != file_path and not os.path.exists(os.path.join(destination_path, os.path.basename(file_path))):
+                        if destination_path != file_path and not os.path.exists(join_path(destination_path, os.path.basename(file_path))):
                             reply = NCCA_QMessageBox.question(
                                 self,
                                 "Confirm Action",
@@ -255,7 +255,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         create_folder_dialog = NCCA_QInputDialog(placeholder="Folder Name", text="Folder", confirm_text="Add Folder", parent=self)
         if create_folder_dialog.exec_():
             folder_name = create_folder_dialog.getText()
-            new_folder_path = os.path.join(parent_path, folder_name)
+            new_folder_path = join_path(parent_path, folder_name)
             # Check if folder already exists
             if self.model().renderfarm.exists(new_folder_path):
                 NCCA_QMessageBox.warning(self, "Error", f"{new_folder_path} already exists.")
@@ -300,7 +300,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         if folder_dialog.exec():
             selected_folders = folder_dialog.selectedFiles()
             for folder in selected_folders:
-                destination_folder = os.path.join(self.model().get_file_path(index), os.path.basename(folder)).replace("\\", "/")
+                destination_folder = join_path(self.model().get_file_path(index), os.path.basename(folder)).replace("\\", "/")
                 self.uploadFolders(selected_folders, destination_folder)
         QApplication.restoreOverrideCursor()
         
@@ -312,7 +312,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         try:
             for i, file_path in enumerate(selected_files):
                 # Upload each file
-                dest_file = os.path.join(destination_folder, os.path.basename(file_path)).replace("\\", "/")
+                dest_file = join_path(destination_folder, os.path.basename(file_path)).replace("\\", "/")
                 self.model().renderfarm.upload(file_path, dest_file, progress_dialog)
                 QApplication.processEvents()
 
@@ -353,7 +353,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         folder_dialog.selectFile(os.path.basename(source_path))
 
         destination_path, _ = folder_dialog.getSaveFileName(self, "Select destination and rename",
-                                                            os.path.join(get_user_home(), os.path.basename(source_path)), f"All Files (*)",
+                                                            join_path(get_user_home(), os.path.basename(source_path)), f"All Files (*)",
                                                             options=QFileDialog.DontConfirmOverwrite)
 
         total_files = self.model().renderfarm.count_files(source_path)
@@ -396,142 +396,141 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             reply = NCCA_QMessageBox.question(self, "Confirm Deletion", f"Are you sure you want to wipe {file_path}? This will delete ALL files.")
             if reply == QDialog.Accepted:
                 for child in self.model().renderfarm.listdir(file_path):
-                    child_path = os.path.join(file_path, child).replace("\\", "/")
+                    child_path = join_path(file_path, child).replace("\\", "/")
                     self.model().renderfarm.delete(child_path)
                 self.refresh()
-                self.model().renderfarm.mkdir(os.path.join(self.home_path, "output"))
+                self.model().renderfarm.mkdir(join_path(self.home_path, "output"))
                 NCCA_QMessageBox.info(self, "Wiped!", f"{file_path} has been wiped!")
 
+    def refresh(self):
+        """Refreshes the view."""
+        expanded_paths = self.get_expanded_paths()
+        selected_index = self.selectedIndexes()[0] if self.selectedIndexes() else QModelIndex()
 
-def refresh(self):
-    """Refreshes the view."""
-    expanded_paths = self.get_expanded_paths()
-    selected_index = self.selectedIndexes()[0] if self.selectedIndexes() else QModelIndex()
+        self.model().beginResetModel()
+        self.model().rootItem["children"] = None
+        self.model().endResetModel()
 
-    self.model().beginResetModel()
-    self.model().rootItem["children"] = None
-    self.model().endResetModel()
+        for path in expanded_paths:
+            index = self.model().findIndex(path)
+            if index.isValid():
+                self.expand(index)
 
-    for path in expanded_paths:
-        index = self.model().findIndex(path)
-        if index.isValid():
-            self.expand(index)
+        if selected_index.isValid():
+            self.selectionModel().setCurrentIndex(selected_index, QItemSelectionModel.ClearAndSelect)
 
-    if selected_index.isValid():
-        self.selectionModel().setCurrentIndex(selected_index, QItemSelectionModel.ClearAndSelect)
+    def get_expanded_paths(self):
+        """Returns a list of paths of currently expanded folders."""
+        expanded_paths = []
+        self.collectExpandedPaths(self.model().rootItem, expanded_paths)
+        return expanded_paths
 
-def get_expanded_paths(self):
-    """Returns a list of paths of currently expanded folders."""
-    expanded_paths = []
-    self.collectExpandedPaths(self.model().rootItem, expanded_paths)
-    return expanded_paths
+    def collectExpandedPaths(self, item, expanded_paths):
+        """Recursively collects expanded paths starting from the given item."""
+        index = self.model().findIndex(item["path"])
+        if index.isValid() and self.isExpanded(index):
+            expanded_paths.append(item['path'])
+        if item['children'] is None:
+            return
+        for child in item['children']:
+            if child is not None:
+                self.collectExpandedPaths(child, expanded_paths)
 
-def collectExpandedPaths(self, item, expanded_paths):
-    """Recursively collects expanded paths starting from the given item."""
-    index = self.model().findIndex(item["path"])
-    if index.isValid() and self.isExpanded(index):
-        expanded_paths.append(item['path'])
-    if item['children'] is None:
-        return
-    for child in item['children']:
-        if child is not None:
-            self.collectExpandedPaths(child, expanded_paths)
+    def renameSelectedIndex(self):
+        """Renames the currently selected index."""
+        index = self.currentIndex()
+        if not index.isValid():
+            return
 
-def renameSelectedIndex(self):
-    """Renames the currently selected index."""
-    index = self.currentIndex()
-    if not index.isValid():
-        return
+        file_path = self.model().get_file_path(index)
 
-    file_path = self.model().get_file_path(index)
+        if file_path == self.home_path:
+            return
 
-    if file_path == self.home_path:
-        return
+        rename_dialog = NCCA_QInputDialog(placeholder="Rename", text=os.path.basename(file_path), parent=self)
+        if rename_dialog.exec_():
+            new_name = rename_dialog.getText()
+            new_file_path = join_path(os.path.dirname(file_path), new_name)
+            if file_path != new_file_path:
+                if self.model().renderfarm.exists(new_file_path):
+                    NCCA_QMessageBox.warning(self, "Error", f"{new_file_path} already exists.")
+                else:
+                    self.model().renderfarm.rename(file_path, new_file_path)
+                    self.refresh()
 
-    rename_dialog = NCCA_QInputDialog(placeholder="Rename", text=os.path.basename(file_path), parent=self)
-    if rename_dialog.exec_():
-        new_name = rename_dialog.getText()
-        new_file_path = os.path.join(os.path.dirname(file_path), new_name)
-        if file_path != new_file_path:
-            if self.model().renderfarm.exists(new_file_path):
-                NCCA_QMessageBox.warning(self, "Error", f"{new_file_path} already exists.")
-            else:
-                self.model().renderfarm.rename(file_path, new_file_path)
-                self.refresh()
+    def openSelectedIndex(self):
+        """Opens the currently selected index."""
+        index = self.currentIndex()
+        if not index.isValid():
+            return
 
-def openSelectedIndex(self):
-    """Opens the currently selected index."""
-    index = self.currentIndex()
-    if not index.isValid():
-        return
+        file_path = self.model().get_file_path(index)
+        file_name = os.path.basename(file_path)
+        _, file_ext = os.path.splitext(file_name)
 
-    file_path = self.model().get_file_path(index)
-    file_name = os.path.basename(file_path)
-    _, file_ext = os.path.splitext(file_name)
+        if file_ext.lower() in VIEWABLE_IMAGE_FILES:
+            local_path = file_path
+            temp_dir = tempfile.TemporaryDirectory(dir=get_user_home())
+            local_path = join_path(temp_dir.name, file_name)
 
-    if file_ext.lower() in VIEWABLE_IMAGE_FILES:
-        local_path = file_path
-        temp_dir = tempfile.TemporaryDirectory(dir=get_user_home())
-        local_path = os.path.join(temp_dir.name, file_name)
+            self.model().renderfarm.download(file_path, local_path, None)
+            self.image_dialog = NCCA_QImageWindow(image_path=local_path)
+            self.image_dialog.setGeometry(self.geometry())
+            self.image_dialog.show()
+
+    def submitSelectedIndex(self):
+        """Opens a window for users to submit their project to the renderfarm"""
+        index = self.currentIndex()
+        if not index.isValid():
+            return
+
+        file_path = self.model().get_file_path(index)
+        _, file_ext = os.path.splitext(os.path.basename(file_path))
+        file_name = os.path.basename(file_path)
+
+        temp_dir = tempfile.TemporaryDirectory(dir=join_path(get_user_home(), "tmp"))
+        local_path = join_path(temp_dir.name, file_name).replace("\\", "/")
 
         self.model().renderfarm.download(file_path, local_path, None)
-        self.image_dialog = NCCA_QImageWindow(image_path=local_path)
-        self.image_dialog.setGeometry(self.geometry())
-        self.image_dialog.show()
+        data = None
 
-def submitSelectedIndex(self):
-    """Opens a window for users to submit their project to the renderfarm"""
-    index = self.currentIndex()
-    if not index.isValid():
-        return
-
-    file_path = self.model().get_file_path(index)
-    _, file_ext = os.path.splitext(os.path.basename(file_path))
-    file_name = os.path.basename(file_path)
-
-    temp_dir = tempfile.TemporaryDirectory(dir=os.path.join(get_user_home(), "tmp"))
-    local_path = os.path.join(temp_dir.name, file_name).replace("\\", "/")
-
-    self.model().renderfarm.download(file_path, local_path, None)
-    data = None
-
-    if "blend" in file_ext:
-        data = read_blend_rend_chunk(local_path)
-        temp_dir.cleanup()
-        self.job_dialog = NCCA_QSubmit_Blender(username=self.username, file_path=file_path, file_data=data)
-        self.job_dialog.setGeometry(self.geometry())
-        self.job_dialog.show()
-    
-    elif "hip" in file_ext:
-        QApplication.setOverrideCursor(Qt.WaitCursor)
-        command = [LOCAL_HYTHON_PATH, os.path.join(SCRIPT_DIR, "libs", "houdini_render_info.py").replace("\\", "/"), local_path]
-        output = subprocess.check_output(command, stderr=subprocess.STDOUT, universal_newlines=True).strip()
-        match = re.search(r'{\s*"NCCA_RENDERFARM":\s*{.*?}\s*}', output, re.DOTALL)
+        if "blend" in file_ext:
+            data = read_blend_rend_chunk(local_path)
+            temp_dir.cleanup()
+            self.job_dialog = NCCA_QSubmit_Blender(username=self.username, file_path=file_path, file_data=data)
+            self.job_dialog.setGeometry(self.geometry())
+            self.job_dialog.show()
         
-        if match:
-            json_data = match.group()
-            data = json.loads(json_data)
-        
-        QApplication.restoreOverrideCursor()
-        self.job_dialog = NCCA_QSubmit_Houdini(username=self.username, file_path=file_path, file_data=data)
-        self.job_dialog.setGeometry(self.geometry())
-        self.job_dialog.show()
+        elif "hip" in file_ext:
+            QApplication.setOverrideCursor(Qt.WaitCursor)
+            command = [LOCAL_HYTHON_PATH, join_path(SCRIPT_DIR, "libs", "houdini_render_info.py").replace("\\", "/"), local_path]
+            output = subprocess.check_output(command, stderr=subprocess.STDOUT, universal_newlines=True).strip()
+            match = re.search(r'{\s*"NCCA_RENDERFARM":\s*{.*?}\s*}', output, re.DOTALL)
+            
+            if match:
+                json_data = match.group()
+                data = json.loads(json_data)
+            
+            QApplication.restoreOverrideCursor()
+            self.job_dialog = NCCA_QSubmit_Houdini(username=self.username, file_path=file_path, file_data=data)
+            self.job_dialog.setGeometry(self.geometry())
+            self.job_dialog.show()
 
-    elif file_ext in [".mb", ".ma"]:
-        QApplication.setOverrideCursor(Qt.WaitCursor)
-        command = [LOCAL_MAYAPY_PATH, os.path.join(SCRIPT_DIR, "libs", "maya_render_info.py").replace("\\", "/"), local_path]
-        output = subprocess.check_output(command, stderr=subprocess.STDOUT, universal_newlines=True).strip()
-        match = re.search(r'{\s*"NCCA_RENDERFARM":\s*{.*?}\s*}', output, re.DOTALL)
+        elif file_ext in [".mb", ".ma"]:
+            QApplication.setOverrideCursor(Qt.WaitCursor)
+            command = [LOCAL_MAYAPY_PATH, join_path(SCRIPT_DIR, "libs", "maya_render_info.py").replace("\\", "/"), local_path]
+            output = subprocess.check_output(command, stderr=subprocess.STDOUT, universal_newlines=True).strip()
+            match = re.search(r'{\s*"NCCA_RENDERFARM":\s*{.*?}\s*}', output, re.DOTALL)
 
-        if match:
-            json_data = match.group()
-            data = json.loads(json_data)
+            if match:
+                json_data = match.group()
+                data = json.loads(json_data)
 
-        QApplication.restoreOverrideCursor()
-        self.job_dialog = NCCA_QSubmit_Maya(username=self.username, file_path=file_path, file_data=data)
-        self.job_dialog.setGeometry(self.geometry())
-        self.job_dialog.show()
-    else:
-        self.job_dialog = NCCA_QSubmitWindow(username=self.username, file_path=file_path)
-        self.job_dialog.setGeometry(self.geometry())
-        self.job_dialog.show()
+            QApplication.restoreOverrideCursor()
+            self.job_dialog = NCCA_QSubmit_Maya(username=self.username, file_path=file_path, file_data=data)
+            self.job_dialog.setGeometry(self.geometry())
+            self.job_dialog.show()
+        else:
+            self.job_dialog = NCCA_QSubmitWindow(username=self.username, file_path=file_path)
+            self.job_dialog.setGeometry(self.geometry())
+            self.job_dialog.show()

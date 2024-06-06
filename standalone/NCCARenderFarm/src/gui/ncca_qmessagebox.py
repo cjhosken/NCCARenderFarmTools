@@ -8,11 +8,11 @@ class NCCA_QMessageBox(NCCA_QDialog):
 
     def __init__(self, parent=None, icon=None, title=""):
         """Initialize the messagebox"""
-        super().__init__(parent, size=MESSAGE_BOX_SIZE, title=title)
         self.icon = icon
-        self.initUI()
+        super().__init__(parent, size=MESSAGE_BOX_SIZE, title=title)
 
-    def initUI(self):
+    def init_ui(self):
+        super().init_ui()
         """Initialize the UI"""
         # Icon (optional)
         self.icon_label = QLabel()

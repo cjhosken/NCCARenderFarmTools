@@ -14,11 +14,11 @@ class NCCA_QInputDialog(NCCA_QDialog):
         self.placeholder = placeholder
         self.text = text
         self.confirm_text = confirm_text
-        self.initUI()
+        self.init_ui()
 
-    def initUI(self):
+    def init_ui(self):
         """Initialize the UI"""
-        super().initUI()
+        super().init_ui()
 
         # Text input
         self.line_edit = NCCA_QInput(placeholder=self.placeholder, text=self.text)

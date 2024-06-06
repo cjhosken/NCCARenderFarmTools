@@ -24,49 +24,52 @@ def get_os():
     else:
         return 'unknown'
 
+def join_path(*paths):
+    return os.path.join(*paths).replace("\\", "/")
+
 OPERATING_SYSTEM = get_os()
 
 # GLOBAL
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-ASSET_DIR = os.path.normpath(os.path.join(SCRIPT_DIR, "assets"))
+ASSET_DIR = join_path(SCRIPT_DIR, "assets")
 NCCA_ENVIRONMENT_PATH = os.path.expanduser('~/.ncca')
 
 # APP GLOBALS
 APPLICATION_NAME = "NCCA Renderfarm 2024"
-APPLICATION_VERSION = "2024.05.24"
+APPLICATION_VERSION = "2024.06.06"
 APPLICATION_AUTHORS = ["Christopher Hosken", "ChatGPT"]
 APPLICATION_DESCRIPTION = "A cross-platform tool that allows users to interact with the NCCA Renderfarm."
 
 # ICONS AND IMAGES
-ICON_DIR = os.path.normpath(os.path.join(ASSET_DIR, "icons"))
-IMAGE_DIR = os.path.normpath(os.path.join(ASSET_DIR, "images"))
+ICON_DIR = join_path(ASSET_DIR, "icons")
+IMAGE_DIR = join_path(ASSET_DIR, "images")
 
-APPLICATION_ICON_PATH = os.path.normpath(os.path.join(ICON_DIR, "farm.png"))
-WARNING_ICON_PATH = os.path.normpath(os.path.join(ICON_DIR, "warning.png"))
-QUESTION_ICON_PATH = os.path.normpath(os.path.join(ICON_DIR, "question.svg"))
-DROPDOWN_ICON_PATH = os.path.normpath(os.path.join(ICON_DIR, "dropdown.svg"))
-CHECKED_ICON_PATH = os.path.normpath(os.path.join(ICON_DIR, "checked.svg"))
+APPLICATION_ICON_PATH = join_path(ICON_DIR, "farm.png")
+WARNING_ICON_PATH = join_path(ICON_DIR, "warning.png")
+QUESTION_ICON_PATH = join_path(ICON_DIR, "question.svg")
+DROPDOWN_ICON_PATH = join_path(ICON_DIR, "dropdown.svg")
+CHECKED_ICON_PATH = join_path(ICON_DIR, "checked.svg")
 
-CLOSE_ICON_PATH = os.path.normpath(os.path.join(ICON_DIR, "close.svg"))
-QUBE_ICON_PATH = os.path.normpath(os.path.join(ICON_DIR, "cube.svg"))
-BUG_ICON_PATH = os.path.normpath(os.path.join(ICON_DIR, "bug.svg"))
-INFO_ICON_PATH = os.path.normpath(os.path.join(ICON_DIR, "info.svg"))
-SUBMIT_ICON_PATH = os.path.normpath(os.path.join(ICON_DIR, "add.svg"))
+CLOSE_ICON_PATH = join_path(ICON_DIR, "close.svg")
+QUBE_ICON_PATH = join_path(ICON_DIR, "cube.svg")
+BUG_ICON_PATH = join_path(ICON_DIR, "bug.svg")
+INFO_ICON_PATH = join_path(ICON_DIR, "info.svg")
+SUBMIT_ICON_PATH = join_path(ICON_DIR, "add.svg")
 
 ICON_SIZE = QSize(24, 24)
 ICON_BUTTON_SIZE = QSize(48, 48)
 BROWSER_ICON_SIZE = QSize(32, 32)
 
-NO_CONNECTION_IMAGE = os.path.normpath(os.path.join(IMAGE_DIR, "connection_failed.jpg"))
+NO_CONNECTION_IMAGE = join_path(IMAGE_DIR, "connection_failed.jpg")
 NO_CONNECTION_IMAGE_SIZE = QSize(256, 256)
 
-HOME_ICON_PATH = os.path.normpath(os.path.join(ICON_DIR, "farm.png"))
-FOLDER_ICON_PATH = os.path.normpath(os.path.join(ICON_DIR, "folder.svg"))
-FILE_ICON_PATH = os.path.normpath(os.path.join(ICON_DIR, "file.svg"))
-IMAGE_ICON_PATH = os.path.normpath(os.path.join(ICON_DIR, "image.svg"))
-ARCHIVE_ICON_PATH = os.path.normpath(os.path.join(ICON_DIR, "archive.png"))
+HOME_ICON_PATH = join_path(ICON_DIR, "farm.png")
+FOLDER_ICON_PATH = join_path(ICON_DIR, "folder.svg")
+FILE_ICON_PATH = join_path(ICON_DIR, "file.svg")
+IMAGE_ICON_PATH = join_path(ICON_DIR, "image.svg")
+ARCHIVE_ICON_PATH = join_path(ICON_DIR, "archive.png")
 
-FOLDERUI_ICON_PATH = os.path.normpath(os.path.join(ICON_DIR, "folderui.svg"))
+FOLDERUI_ICON_PATH = join_path(ICON_DIR, "folderui.svg")
 
 # RENDERFARM AND FILESYSTEMS
 RENDERFARM_ADDRESS = "tete.bournemouth.ac.uk"
@@ -128,8 +131,8 @@ QUBE_LAUNCHER_PATH = "/public/bin/2023/goQube"
 QUBE_PYTHON_BIN = "/public/devel/2022/pfx/qube/api/python/"
 
 if OPERATING_SYSTEM == "windows":
-    QUBE_LAUNCHER_PATH = "c:/Program Files (x86)/pfx/qube/bin/qube.exe"
-    QUBE_PYTHON_BIN = "c:/Program Files/pfx/qube/api/python"
+    QUBE_LAUNCHER_PATH = "C:/Program Files (x86)/pfx/qube/bin/qube.exe"
+    QUBE_PYTHON_BIN = "C:/Program Files/pfx/qube/api/python"
 
 LOCAL_HYTHON_PATH = "/opt/hfs20.0.506/bin/hython"
 LOCAL_MAYAPY_PATH = "/opt/autodesk/maya2023/bin/mayapy"

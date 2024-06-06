@@ -17,12 +17,12 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
         super().__init__(name, LOGIN_WINDOW_SIZE)
         self.load_environment()
 
-    def initUI(self):
+    def init_ui(self):
         """Initializes the UI"""
-        super().initUI()
-        self.setupUI()
+        super().init_ui()
+        self.setup_ui()
 
-    def setupUI(self):
+    def setup_ui(self):
         """Sets up the user interface elements"""
         self.main_layout.setAlignment(Qt.AlignCenter)
 

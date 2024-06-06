@@ -10,12 +10,12 @@ class NCCA_QImageWindow(NCCA_QMainWindow):
         self.image_path = image_path
         super().__init__(os.path.basename(self.image_path), size=IMAGE_WINDOW_SIZE)
 
-    def initUI(self):
+    def init_ui(self):
         """Initialize the UI."""
-        super().initUI()
-        self.setupUI()
+        super().init_ui()
+        self.setup_ui()
 
-    def setupUI(self):
+    def setup_ui(self):
         """Set up the user interface."""
         self.image_name_label = QLabel(text=os.path.basename(self.image_path))
         self.image_name_label.setContentsMargins(25, 0, 0, 0)
@@ -46,7 +46,7 @@ class NCCA_QImageWindow(NCCA_QMainWindow):
             normalized_array = cv2.normalize(exr_array, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8U)
             png_image = Image.fromarray(normalized_array)
 
-            image_path = os.path.join(os.path.dirname(path), image_name + ".png").replace("\\", "/")
+            image_path = join_path(os.path.dirname(path), image_name + ".png")
             png_image.save(image_path)
             return image_path
         else:

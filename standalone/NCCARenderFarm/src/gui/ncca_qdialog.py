@@ -29,16 +29,16 @@ class NCCA_QDialog(QDialog):
         """)
 
         # Root widget
-        root = QWidget(self)
-        root.resize(size)
-        root.setObjectName("NCCA_QDialogRootWidget")
+        self.root = QWidget(self)
+        self.root.resize(size)
+        self.root.setObjectName("NCCA_QDialogRootWidget")
 
         # Root layout
-        root_layout = QVBoxLayout(root)
-        root.setLayout(root_layout)
+        self.root_layout = QVBoxLayout(self.root)
+        self.root.setLayout(self.root_layout)
 
         # Header layout
-        header_layout = QHBoxLayout()
+        self.header_layout = QHBoxLayout()
 
         # Title label
         self.title_label = QLabel(title)
@@ -48,23 +48,23 @@ class NCCA_QDialog(QDialog):
         self.close_button.clicked.connect(self.close)
 
         # Add widgets to layouts
-        header_layout.addWidget(self.title_label)
-        header_layout.addStretch()
-        header_layout.addWidget(self.close_button)
+        self.header_layout.addWidget(self.title_label)
+        self.header_layout.addStretch()
+        self.header_layout.addWidget(self.close_button)
 
         # Main layout
-        main_layout = QVBoxLayout()
-        main_layout.addStretch(1)
+        self.main_layout = QVBoxLayout()
+        self.main_layout.addStretch(1)
 
         # Set up main layout
-        self.init_ui(main_layout)
+        self.init_ui()
         self.end_ui()
 
         # Add layouts to root layout
-        root_layout.addLayout(header_layout)
-        root_layout.addLayout(main_layout)
+        self.root_layout.addLayout(self.header_layout)
+        self.root_layout.addLayout(self.main_layout)
 
-    def init_ui(self, main_layout):
+    def init_ui(self):
         """Allows customization in classes that inherit from NCCA_QDialog."""
         pass
 
