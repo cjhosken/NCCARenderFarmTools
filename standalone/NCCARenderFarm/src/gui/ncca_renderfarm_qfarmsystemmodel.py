@@ -11,8 +11,8 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
         super().__init__(parent)
         self.username = username
         self.password = password
-        self.renderfarm = NCCA_RenderFarm(self.username, self.password)
         self.home_path = home_path
+        self.renderfarm = NCCA_RenderFarm(self.home_path, self.username, self.password)
         self.rootItem = self.create_item(self.home_path, None)
 
     def populateChildren(self, parent_item):

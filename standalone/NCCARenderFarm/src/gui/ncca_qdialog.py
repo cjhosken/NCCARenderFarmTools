@@ -60,10 +60,6 @@ class NCCA_QDialog(QDialog):
         self.init_ui()
         self.end_ui()
 
-        # Add layouts to root layout
-        self.root_layout.addLayout(self.header_layout)
-        self.root_layout.addLayout(self.main_layout)
-
     def init_ui(self):
         """Allows customization in classes that inherit from NCCA_QDialog."""
         pass

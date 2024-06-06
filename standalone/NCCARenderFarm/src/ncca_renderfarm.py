@@ -29,10 +29,11 @@ class NCCA_RenderFarm(paramiko.SSHClient):
         sftp (paramiko.SFTPClient): The SFTP client used for file operations.
     """
 
-    def __init__(self, username, password):
+    def __init__(self, home_path, username, password):
         """Initialize the connection to the remote SFTP server."""
         super().__init__()
 
+        self.home_path = home_path
         self.username = username
         self.password = password
 
@@ -42,14 +43,13 @@ class NCCA_RenderFarm(paramiko.SSHClient):
                 self.connect(RENDERFARM_ADDRESS, port=RENDERFARM_PORT, username=self.username, password=self.password)
                 self.sftp = self.open_sftp()
 
-                home_dir = join_path("/home", username, RENDERFARM_HOME_DIR)
-                output_dir = join_path(home_dir, "output")
+                output_dir = join_path(self.home_path, "output")
 
-                if self.exists(home_dir) and self.isdir(home_dir):
+                if self.exists(self.home_path) and self.isdir(self.home_path):
                     if not self.exists(output_dir) or not self.isdir(output_dir):
                         self.mkdir(output_dir)
                 else:
-                    self.mkdir(home_dir)
+                    self.mkdir(self.home_path)
                     self.mkdir(output_dir)
 
                 ncca_dir = join_path("/home", username, NCCA_PACKAGE_DIR)
