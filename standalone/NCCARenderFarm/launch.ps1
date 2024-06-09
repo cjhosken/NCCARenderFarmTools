@@ -3,6 +3,7 @@ $SCRIPT_DIR = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
 
 Write-Output "The script is running from: $SCRIPT_DIR"
 
+
 # Function to check if a command exists
 function Command-Exists {
     param (
@@ -43,6 +44,8 @@ if (-not (Command-Exists pyenv)) {
     exit
 }
 
+Set-Location -Path $SCRIPT_DIR
+
 # Read the Python version from the .python-version file
 $PYTHON_VERSION = Get-Content "$SCRIPT_DIR\.python-version"
 
@@ -75,6 +78,8 @@ if (Test-Path $requirementsPath) {
     Write-Output "Requirements file not found: $requirementsPath"
     exit 1
 }
+
+Set-Location -Path $SCRIPT_DIR
 
 $mainScriptPath = Join-Path -Path $SCRIPT_DIR -ChildPath "src\main.py"
 if (Test-Path $mainScriptPath) {

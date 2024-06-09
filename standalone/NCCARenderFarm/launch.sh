@@ -3,6 +3,8 @@
 # Define the script directory
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+cd $SCRIPT_DIR
+
 echo "The script is running from: $SCRIPT_DIR"
 
 # Read the Python version from the .python-version file
