@@ -6,19 +6,23 @@ For Linux, run `./standalone/NCCARenderFarm/launch.sh` to run the standalone app
 For Windows run `. "./standalone/NCCARenderFarm/launch.ps1"` to run the standalone application.
 
 ## Current TODOs
-1. Katana and Nuke job submit
+1. Drag and drop from local files
+2. Fix the renderfarm server
 
 ## TODOs
-1. Fix the renderfarm server
-2. Polish the code and check for bugs
-3. First release
-4. Implement into the machines
-5. Public Announcements
-
+3. Polish the code and check for bugs
+4. First release
+5. Implement into the machines
+6. Public Announcements
 
 ## Bugs
 
-When deleting large folders, the application takes a while to count the number of files. If a user spam clicks during this process, the application crashes.
+- When deleting large folders, the application takes a while to count the number of files. If a user spam clicks during this process, the application crashes. This is true for any time the program is loading something (or running a process)
+
+- NukeX hangs on job submission, has something to do with "-t < script.py".
+
+- Katana not fully implemented due to it not being supported on the NCCA machines.
+
 
 ## Known Limitations
 At the current moment, Qt (and c++) is not behaving correctly on the RedHat machines in the NCCA lab. 
