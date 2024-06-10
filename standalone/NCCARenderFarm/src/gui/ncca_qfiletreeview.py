@@ -131,39 +131,27 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                     )
                     
                     if reply == QDialog.Accepted:
-                        total_files = sum(len(files) for folder in urls for _, _, files in os.walk(folder))
-                        progress_dialog = NCCA_QProgressDialog("Uploading files...", 0, total_files, None)
                         for url in urls:
+                            file_path = url.toLocalFile()
+                            if (os.path.exists(file_path)):
+                                progress_dialog = None
+                                if (os.path.isdir(file_path)):
+                                    total_files = sum(len(files) for _, _, files in os.walk(file_path))
+                                    progress_dialog = NCCA_QProgressDialog("Uploading files...", 0, total_files, None)
 
-                            file_path = url.toString()
-                            if self.model().renderfarm.exists(file_path):
-                                if destination_path != file_path and not self.model().renderfarm.exists(join_path(destination_path, os.path.basename(file_path))):
-                                    self.model().renderfarm.move(file_path=file_path, destination_folder=destination_path)
+                                if not self.model().renderfarm.exists(join_path(destination_path, os.path.basename(file_path))):
+                                    self.model().renderfarm.upload(file_path, join_path(destination_path, os.path.basename(file_path)), progress_dialog)
                             else:
-                                file_path = url.toLocalFile()
-                                if (os.path.exists(file_path)):
-                                    if not self.model().renderfarm.exists(join_path(destination_path, os.path.basename(file_path))):
-                                        self.model().renderfarm.upload(file_path, join_path(destination_path, os.path.basename(file_path)), progress_dialog)
+                                file_path = url.toString()
+                                if self.model().renderfarm.exists(file_path):
+                                    if destination_path != file_path and not self.model().renderfarm.exists(join_path(destination_path, os.path.basename(file_path))):
+                                        self.model().renderfarm.move(file_path=file_path, destination_folder=destination_path)
 
                         
                         self.refresh()
                 else:
-                    file_path = urls[0].toString()
-                    if self.model().renderfarm.exists(file_path):
-                        if destination_path != file_path and not self.model().renderfarm.exists(join_path(destination_path, os.path.basename(file_path))):
-                            reply = NCCA_QMessageBox.question(
-                                self,
-                                "Confirm Action",
-                                f"Are you sure you want to move {file_path} to {destination_path}?",
-                            )
-                        
-                            if reply == QDialog.Accepted:
-                                self.model().renderfarm.move(file_path=file_path, destination_folder=destination_path)
-                                self.refresh()
-
-                    else:
-                        file_path = urls[0].toLocalFile()
-                        if (os.path.exists(file_path)):
+                    file_path = urls[0].toLocalFile()
+                    if (os.path.exists(file_path)):
                             if not self.model().renderfarm.exists(join_path(destination_path, os.path.basename(file_path))):
                                 reply = NCCA_QMessageBox.question(
                                     self,
@@ -178,6 +166,22 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
 
                                     self.model().renderfarm.upload(file_path, join_path(destination_path, os.path.basename(file_path)), progress_dialog)
                                     self.refresh()
+                                    
+                    else:
+                        file_path = urls[0].toString()
+                        if self.model().renderfarm.exists(file_path):
+                            if destination_path != file_path and not self.model().renderfarm.exists(join_path(destination_path, os.path.basename(file_path))):
+                                reply = NCCA_QMessageBox.question(
+                                    self,
+                                    "Confirm Action",
+                                    f"Are you sure you want to move {file_path} to {destination_path}?",
+                                )
+                            
+                                if reply == QDialog.Accepted:
+                                    self.model().renderfarm.move(file_path=file_path, destination_folder=destination_path)
+                                    self.refresh()
+
+                        
 
         event.ignore()
 
