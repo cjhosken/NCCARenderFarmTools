@@ -7,7 +7,6 @@ For Windows run `. "./standalone/NCCARenderFarm/launch.ps1"` to run the standalo
 
 ## Current TODOs
 1. Fix the Renderfarm server
-3. QB Error messages
 5. Fix crash when hanging
 6. Documentation
 
