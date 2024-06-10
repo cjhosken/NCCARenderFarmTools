@@ -246,3 +246,16 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
         Sorts the children list alphabetically.
         """
         children.sort(key=lambda x: os.path.basename(x['path']).lower(), reverse=(order == Qt.DescendingOrder))
+
+    def mimeData(self, indexes):
+        """Create a QMimeData object with the URLs of the selected items"""
+        mime_data = QMimeData()
+        urls = []
+
+        for index in indexes:
+            if index.isValid():
+                file_path = self.get_file_path(index)
+                urls.append(file_path)
+
+        mime_data.setUrls(urls)
+        return mime_data

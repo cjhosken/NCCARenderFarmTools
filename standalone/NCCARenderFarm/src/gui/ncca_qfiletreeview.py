@@ -41,7 +41,6 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         self.setAcceptDrops(True)
         self.setDropIndicatorShown(True)
         self.setSelectionMode(QAbstractItemView.ExtendedSelection)
-        self.setDragDropMode(QAbstractItemView.InternalMove) 
         self.setSortingEnabled(True)
 
         self.setCursor(Qt.PointingHandCursor)
@@ -65,37 +64,43 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         cursor_pos = self.viewport().mapFromGlobal(QCursor.pos())
         scroll_speed = 10  
 
-        if cursor_pos.y() < self.viewport().y() + self.SCROLL_MARGIN:
+        if cursor_pos.y() < self.viewport().y() + SCROLL_MARGIN:
             self.verticalScrollBar().setValue(self.verticalScrollBar().value() - scroll_speed)
-        elif cursor_pos.y() > self.viewport().y() + self.viewport().height() - self.SCROLL_MARGIN:
+        elif cursor_pos.y() > self.viewport().y() + self.viewport().height() - SCROLL_MARGIN:
             self.verticalScrollBar().setValue(self.verticalScrollBar().value() + scroll_speed)
 
     def dragEnterEvent(self, event):
         """Actions to perform when the user starts dragging"""
         super().dragEnterEvent(event)
+
         if event.mimeData().hasUrls():
             event.acceptProposedAction()
+        else:
+            event.ignore()
 
     def dragMoveEvent(self, event):
         """Actions to perform when the user is dragging"""
         super().dragMoveEvent(event)
+
         if event.mimeData().hasUrls() and event.source() == self:
             urls = event.mimeData().urls()
+            for url in urls:
+                if url == self.home_path:
+                    event.ignore()
+                    if self.scroll_timer:
+                        self.scroll_timer.stop()
+                    return
 
-            if any(url.toLocalFile() == self.home_path for url in urls):
-                event.ignore()
+            if self.scroll_timer:
                 self.scroll_timer.stop()
-                return
-                
-            self.scroll_timer.stop()  
             event.acceptProposedAction()
         else:
-            self.scroll_timer.start()  
+            event.ignore()
 
     def dragLeaveEvent(self, event):
         """Actions to perform when the user finishes dragging"""
-        super().dragLeaveEvent(event)
-        self.scroll_timer.start()  
+        if self.scroll_timer:
+            self.scroll_timer.start()
 
     def is_empty(self, index):
         """Returns whether the selected index is empty or not"""
@@ -107,10 +112,9 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         if index.isValid() and not self.is_empty(index):
             super().drawBranches(painter, rect, index)
 
-
     def dropEvent(self, event):
-        """ Handles the drop event in the tree view."""
         super().dropEvent(event)
+        """ Handles the drop event in the tree view."""
         if event.mimeData().hasUrls():
             event.setDropAction(Qt.MoveAction)
             event.accept()
@@ -128,12 +132,11 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                     
                     if reply == QDialog.Accepted:
                         for url in urls:
-                            file_path = url.toLocalFile()
+                            file_path = url.toString()
                             #TODO: Implement drag drop code
                             pass
                 else:
-                    url = urls[0]
-                    file_path = url.toLocalFile()
+                    file_path = urls[0].toString()
                     if self.model().renderfarm.exists(file_path):
                         if destination_path != file_path and not os.path.exists(join_path(destination_path, os.path.basename(file_path))):
                             reply = NCCA_QMessageBox.question(
@@ -300,7 +303,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         if folder_dialog.exec():
             selected_folders = folder_dialog.selectedFiles()
             for folder in selected_folders:
-                destination_folder = join_path(self.model().get_file_path(index), os.path.basename(folder)).replace("\\", "/")
+                destination_folder = join_path(self.model().get_file_path(index), os.path.basename(folder))
                 self.uploadFolders(selected_folders, destination_folder)
         QApplication.restoreOverrideCursor()
         
@@ -312,7 +315,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         try:
             for i, file_path in enumerate(selected_files):
                 # Upload each file
-                dest_file = join_path(destination_folder, os.path.basename(file_path)).replace("\\", "/")
+                dest_file = join_path(destination_folder, os.path.basename(file_path))
                 self.model().renderfarm.upload(file_path, dest_file, progress_dialog)
                 QApplication.processEvents()
 
@@ -396,7 +399,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             reply = NCCA_QMessageBox.question(self, "Confirm Deletion", f"Are you sure you want to wipe {file_path}? This will delete ALL files.")
             if reply == QDialog.Accepted:
                 for child in self.model().renderfarm.listdir(file_path):
-                    child_path = join_path(file_path, child).replace("\\", "/")
+                    child_path = join_path(file_path, child)
                     self.model().renderfarm.delete(child_path)
                 self.refresh()
                 self.model().renderfarm.mkdir(join_path(self.home_path, "output"))
@@ -489,7 +492,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         file_name = os.path.basename(file_path)
 
         temp_dir = tempfile.TemporaryDirectory(dir=join_path(get_user_home(), "tmp"))
-        local_path = join_path(temp_dir.name, file_name).replace("\\", "/")
+        local_path = join_path(temp_dir.name, file_name)
 
         self.model().renderfarm.download(file_path, local_path, None)
         data = None
@@ -503,7 +506,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         
         elif "hip" in file_ext:
             QApplication.setOverrideCursor(Qt.WaitCursor)
-            command = [LOCAL_HYTHON_PATH, join_path(SCRIPT_DIR, "libs", "houdini_render_info.py").replace("\\", "/"), local_path]
+            command = [LOCAL_HYTHON_PATH, join_path(SCRIPT_DIR, "libs", "houdini_render_info.py"), local_path]
             output = subprocess.check_output(command, stderr=subprocess.STDOUT, universal_newlines=True).strip()
             match = re.search(r'{\s*"NCCA_RENDERFARM":\s*{.*?}\s*}', output, re.DOTALL)
             
@@ -518,7 +521,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
 
         elif file_ext in [".mb", ".ma"]:
             QApplication.setOverrideCursor(Qt.WaitCursor)
-            command = [LOCAL_MAYAPY_PATH, join_path(SCRIPT_DIR, "libs", "maya_render_info.py").replace("\\", "/"), local_path]
+            command = [LOCAL_MAYAPY_PATH, join_path(SCRIPT_DIR, "libs", "maya_render_info.py"), local_path]
             output = subprocess.check_output(command, stderr=subprocess.STDOUT, universal_newlines=True).strip()
             match = re.search(r'{\s*"NCCA_RENDERFARM":\s*{.*?}\s*}', output, re.DOTALL)
 
