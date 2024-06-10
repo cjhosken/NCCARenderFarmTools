@@ -32,7 +32,6 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
             self.sort_children(parent_item['children'], Qt.DescendingOrder)
 
     def create_item(self, path, parent):
-        print(path)
         """Creates a custom item to be shown in the file browser"""
         return {'path': path, 'parent': parent, 'children': None}
         

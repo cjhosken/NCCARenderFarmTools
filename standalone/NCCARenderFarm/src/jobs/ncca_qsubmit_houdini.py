@@ -15,7 +15,10 @@ class NCCA_QSubmit_Houdini(NCCA_QSubmitWindow):
             farm = file_data["NCCA_RENDERFARM"]
 
             if "rop_nodes" in farm:
-                self.rop.addItems(farm["rop_nodes"])
+                rop_nodes_names = []
+                for rop_node in json_data["NCCA_RENDERFARM"]["rop_nodes"]:
+                    rop_nodes_names.append(rop_node["path"])
+                self.rop.addItems(rop_nodes_names)
 
     def init_ui(self):
         super().init_ui()
@@ -26,11 +29,23 @@ class NCCA_QSubmit_Houdini(NCCA_QSubmitWindow):
         self.rop_row_layout.addWidget(self.rop_label)
 
         self.rop = NCCA_QComboBox()
+        self.rop.currentIndexChanged.connect(self.update_frame_labels)
         self.rop_row_layout.addWidget(self.rop)
 
         self.rop_row_widget.setLayout(self.rop_row_layout)
         self.main_layout.addWidget(self.rop_row_widget)
-        
+    
+    def update_frame_labels(self, index):
+        # Get the selected ROP node name from the combo box
+        rop_node_path = self.rop_combo.currentText()
+
+        for rop_node_info in json_data["NCCA_RENDERFARM"]["write_nodes"]:
+            # Check if the path of the current write node matches the desired path
+            if rop_node_info["path"] == rop_node_path:
+                # Update the labels
+                self.frame_start.setText(rop_node_info["frame_start"])
+                self.frame_end.setText(rop_node_info["frame_end"])
+                self.frame_step.setText(rop_node_info["frame_step"])
 
     def prepare_job(self):
         super().prepare_job()

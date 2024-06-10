@@ -16,6 +16,7 @@ class NCCA_QSubmit_NukeX(NCCA_QSubmitWindow):
 
     def init_ui(self):
         super().init_ui()
+        self.frame_step = None
 
     def prepare_job(self):
         super().prepare_job()

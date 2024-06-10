@@ -15,27 +15,32 @@ if __name__ == "__main__":
         hou.hipFile.load(local_path)
     except Exception as e:
         # Print the traceback of the exception
+        print(e)
         pass
     try:
-        rop_nodes = []
+        rop_nodes_info = []
 
         # Iterate through all nodes in the scene
         for node in hou.node("/").allSubChildren():
-            print(f"{node}: {node.type().category()}")
             if isinstance(node, hou.RopNode):
-                # Add the name of the ROP node to the list
-                rop_nodes.append(node.path())
+                # Get ROP node information
+                rop_info = {
+                    "path": node.path(),
+                    "frame_start": node.parm("trange1"),
+                    "frame_end": node.parm("trange2"),
+                    "frame_step": node.parm("f2")
+                }
+                # Add ROP node information to the list
+                rop_nodes_info.append(rop_info)
 
         # Generate JSON data
         json_data = {
             "NCCA_RENDERFARM": {
-                "rop_nodes": rop_nodes,
+                "rop_nodes": rop_nodes_info,
             }
         }
 
         # Print JSON data
         print(json.dumps(json_data, indent=4))
-
     except Exception as e:
-        # Print the traceback of the exception
         print(e)
