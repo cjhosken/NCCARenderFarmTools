@@ -5,22 +5,20 @@ from .submit import *
 from .widgets import *
 from .tree import *
 
+from resources import *
+
 from .ncca_qmainwindow import NCCA_QMainWindow
 
 class NCCA_RenderFarmWindow(NCCA_QMainWindow):
     """Interface for the user to interact with the renderfarm"""
 
-    def __init__(self, name, username, password, use_local=False):
+    def __init__(self, name, username, password):
         """Initialize the main application window"""
         self.username = username
         self.password = password
-        self.use_local = use_local
 
-        self.home_path = join_path(f"/home/{self.username}", RENDERFARM_HOME_DIR)
+        self.home_path = join_path("/home", self.username, RENDERFARM_HOME_DIR)
 
-        # Replace the home path with the local home if use_local
-        if (self.use_local):
-            self.home_path = get_user_home()
         super().__init__(name, MAIN_WINDOW_SIZE)
 
     def init_ui(self):
