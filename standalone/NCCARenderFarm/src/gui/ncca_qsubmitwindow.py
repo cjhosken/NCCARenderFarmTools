@@ -17,7 +17,7 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
         self.folder_path = "/"
         if folder_path is not None:
             self.folder_path = folder_path
-            
+
         self.job_id = 0
         self.name = name
         self.username = username
@@ -102,11 +102,11 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
         self.frame_row_widget.setLayout(self.frame_row_layout)
         self.main_layout.addWidget(self.frame_row_widget)
 
-    def endUI(self):
+    def end_ui(self):
         """Finalize UI elements."""
         self.setupCommandInput()
         self.setupButtons()
-        super().endUI()
+        super().end_ui()
 
     def setupCommandInput(self):
         """Set up extra command input."""
