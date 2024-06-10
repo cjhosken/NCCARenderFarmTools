@@ -27,6 +27,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         self.password = password
 
         self.setupUI()
+        self.refresh()
 
     def setupUI(self):
         """Set up the user interface"""
@@ -133,12 +134,14 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                     if reply == QDialog.Accepted:
                         for url in urls:
                             file_path = url.toString()
-                            #TODO: Implement drag drop code
-                            pass
+                            if self.model().renderfarm.exists(file_path):
+                                if destination_path != file_path and not self.model().renderfarm.exists(join_path(destination_path, os.path.basename(file_path))):
+                                    self.model().renderfarm.move(file_path=file_path, destination_folder=destination_path)
+                        self.refresh()
                 else:
                     file_path = urls[0].toString()
                     if self.model().renderfarm.exists(file_path):
-                        if destination_path != file_path and not os.path.exists(join_path(destination_path, os.path.basename(file_path))):
+                        if destination_path != file_path and not self.model().renderfarm.exists(join_path(destination_path, os.path.basename(file_path))):
                             reply = NCCA_QMessageBox.question(
                                 self,
                                 "Confirm Action",
@@ -146,8 +149,8 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                             )
                         
                             if reply == QDialog.Accepted:
-                                #TODO: Implement drag drop code
-                                pass
+                                self.model().renderfarm.move(file_path=file_path, destination_folder=destination_path)
+                                self.refresh()
 
         event.ignore()
 

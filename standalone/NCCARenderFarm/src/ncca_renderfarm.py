@@ -170,3 +170,20 @@ class NCCA_RenderFarm(paramiko.SSHClient):
     def rename(self, old_remote_path, new_remote_path):
         """Renames a file or directory on the remote SFTP server."""
         self.sftp.rename(old_remote_path, new_remote_path)
+
+    def move(self, file_path, destination_folder):
+        """
+        Moves a file to a new location on the remote SFTP server.
+
+        Args:
+            file_path (str): The path of the file to be moved.
+            destination_folder (str): The destination folder where the file will be moved.
+        """
+        # Extract the file name from the file path
+        file_name = os.path.basename(file_path)
+        
+        # Construct the new file path in the destination folder
+        new_file_path = join_path(destination_folder, file_name)
+        
+        # Rename the file to move it to the new location
+        self.rename(file_path, new_file_path)
