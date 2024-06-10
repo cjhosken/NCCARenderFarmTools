@@ -1,1 +1,0 @@
-cat nukex_render_info.py

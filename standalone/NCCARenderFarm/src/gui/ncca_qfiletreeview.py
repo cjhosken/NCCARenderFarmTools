@@ -200,7 +200,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         else:
             _, file_ext = os.path.splitext(os.path.basename(file_path))
 
-            if "blend" in file_ext or "hip" in file_ext or file_ext in [".mb", ".ma"]:
+            if file_ext in [".mb", ".ma", ".nk", ".katana", ".blend", ".hip", ".hipnc"]:
                 self.action_submit = self.context_menu.addAction("Submit Render Job")
                 self.action_submit.triggered.connect(self.submitSelectedIndex)
 

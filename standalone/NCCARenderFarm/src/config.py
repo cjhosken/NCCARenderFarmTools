@@ -146,7 +146,7 @@ LOCAL_KATANA_PATH=""
 BLENDER_PATH = ""
 
 if OPERATING_SYSTEM == "windows":
-    LOCAL_NUKEX_PATH=""
+    LOCAL_NUKEX_PATH="C:/Program Files/Nuke14.0v4/Nuke14.0.exe"
     LOCAL_KATANA_PATH=""
     LOCAL_HYTHON_PATH = "C:/Program Files/Side Effects Software/Houdini 20.0.506/bin/hython.exe"
     LOCAL_MAYAPY_PATH = "C:/Program Files/Autodesk/Maya2023/bin/mayapy.exe"
