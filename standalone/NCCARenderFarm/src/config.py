@@ -143,6 +143,8 @@ LOCAL_NUKEX_PATH = ""
 KATANA_PATH=""
 LOCAL_KATANA_PATH=""
 
+BLENDER_PATH = ""
+
 if OPERATING_SYSTEM == "windows":
     LOCAL_NUKEX_PATH=""
     LOCAL_KATANA_PATH=""
@@ -173,8 +175,6 @@ MAYA_FILE_EXTENSIONS= {
     ".deepexr": "deepexr",
     ".maya": "maya"
 }
-
-BLENDER_PATH = "/render/s5605094/blender/blender"
 
 BLENDER_RENDER_ENGINES = {
     "Set by file": "",
