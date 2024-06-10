@@ -6,11 +6,11 @@ For Linux, run `./standalone/NCCARenderFarm/launch.sh` to run the standalone app
 For Windows run `. "./standalone/NCCARenderFarm/launch.ps1"` to run the standalone application.
 
 ## Current TODOs
-1. Drag and drop from local files
-2. Fix the renderfarm server
+1. Fix the renderfarm server
+2. update Qb for Python 3.11
 
 ## TODOs
-3. Polish the code and check for bugs
+3. Polish the code and check for bugs (reduce hanging)
 4. First release
 5. Implement into the machines
 6. Public Announcements
@@ -18,8 +18,6 @@ For Windows run `. "./standalone/NCCARenderFarm/launch.ps1"` to run the standalo
 ## Bugs
 
 - When deleting large folders, the application takes a while to count the number of files. If a user spam clicks during this process, the application crashes. This is true for any time the program is loading something (or running a process)
-
-- NukeX hangs on job submission, has something to do with "-t < script.py".
 
 - Katana not fully implemented due to it not being supported on the NCCA machines.
 
@@ -87,3 +85,8 @@ Warning: file: /opt/autodesk/maya2023/scripts/others/supportRenderers.mel line 1
 Error: file: /opt/autodesk/maya2023/scripts/others/supportRenderers.mel line 169: Renderer "renderman" is not valid
 Error: file: /tmp/ASTMPVlbWhf.mel line 34: Scene /render/s5605094/farm/maya/maya_test.ma failed to render.
 ```
+
+
+While not required, It would be nice to have the tool be in line with the [VFX Reference Platform](https://vfxplatform.com/).
+
+To do so, this would involve updating Qube so that its compatible with Python 3.11 (At the moment, we're stuck on 3.8)
