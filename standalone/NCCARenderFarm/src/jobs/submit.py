@@ -84,9 +84,15 @@ def submit(self, file_path, folder_path, renderfarm, username, local_path=None):
         self.job_dialog.show()
 
     elif project_ext in [".katana"]:
+        NCCA_QMessageBox.warning(
+                None,
+                "NCCA Renderfarm Error",
+                f"Katana has not been implemented yet!"
+            )
+        return
+
         QApplication.setOverrideCursor(Qt.WaitCursor)
-        command = [LOCAL_KATANA_PATH, "--script", join_path(SCRIPT_DIR, "libs", "katana_render_info.py"), local_path]
-        # Execute the command
+        #command = [LOCAL_KATANA_PATH, "--script", join_path(SCRIPT_DIR, "libs", "katana_render_info.py"), local_path]
         output = subprocess.check_output(command, stderr=subprocess.STDOUT, universal_newlines=True).strip()
         match = re.search(r'{\s*"NCCA_RENDERFARM":\s*{.*?}\s*}', output, re.DOTALL)
 
@@ -100,7 +106,7 @@ def submit(self, file_path, folder_path, renderfarm, username, local_path=None):
         self.job_dialog.show()
     else:
         NCCA_QMessageBox.warning(
-            self,
+            None,
             "Error",
             f"{project_ext} not supported. Please choose a supported software file."
         )

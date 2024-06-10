@@ -1,6 +1,11 @@
 from config import *
 from gui.ncca_qmessagebox import NCCA_QMessageBox
 
+def launch_qube():
+    """Run the qube_thread function in a separate thread."""
+    qube_thread = threading.Thread(target=qube_thread)
+    qube_thread.start()
+
 def qube_thread():
     """Open Qube! in a subprocess and handle any errors."""
     try:
@@ -18,23 +23,6 @@ def qube_thread():
             None,
             "Qube Error",
             str(e),
-            "Ok"
-        )
-
-def launch_qube():
-    """Run the qube_thread function in a separate thread."""
-    qube_thread = threading.Thread(target=qube_thread)
-    qube_thread.start()
-
-def import_qb():
-    try:
-        sys.path.append(QUBE_PYTHON_BIN)
-        import qb
-    except ModuleNotFoundError:
-        NCCA_QMessageBox.warning(
-            None,
-            "Qube Error",
-            "Qube is not installed on this machine. Make sure that you install it from Apps Anywhere.",
             "Ok"
         )
     

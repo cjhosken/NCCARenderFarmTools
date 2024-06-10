@@ -33,11 +33,6 @@ export VRAY_OSL_PATH_MAYA2023="/opt/software/ChaosGroup/V-Ray/Maya2023-x64/vray/
 export VRAY_APPSDK_PLUGINS="/opt/software/ChaosGroup/V-Ray/Maya2023-x64/maya_vray/vrayplugins"
 export VRAY_AUTH_CLIENT_FILE_PATH=""
 
-export HOUDINI_VERSION="20.0.506"
-export HOUDINI_PATH=""
-export HTOA=""
-export HOUDINI_ROOT="/opt/software/hfs$HOUDINI_VERSION/"
-
 export RFHTREE="/opt/software/RenderManForHoudini-$RMAN_VERSION"
 export HOUDINI_DEFAULT_RIB_RENDER=""
 export RMAN_PROCEDURALPATH="/opt/software/RenderManForHoudini-$RMAN_VERSION/3.9/$HOUDINI_VERSION/openvdb"

@@ -3,7 +3,7 @@ from gui.ncca_loginwindow import NCCA_LoginWindow
 
 def main():
     """Start the NCCA Renderfarm application."""
-    
+
     # Create the application instance
     app = QApplication(sys.argv)
     

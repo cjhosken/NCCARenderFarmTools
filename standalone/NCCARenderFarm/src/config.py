@@ -134,8 +134,16 @@ if OPERATING_SYSTEM == "windows":
     QUBE_LAUNCHER_PATH = "C:/Program Files (x86)/pfx/qube/bin/qube.exe"
     QUBE_PYTHON_BIN = "C:/Program Files/pfx/qube/api/python"
 
+
+sys.path.append(QUBE_PYTHON_BIN)
+import qb
+
+
+
 LOCAL_HYTHON_PATH = "/opt/hfs20.0.506/bin/hython"
 LOCAL_MAYAPY_PATH = "/opt/autodesk/maya2023/bin/mayapy"
+
+HOUDINI_PATH=""
 
 NUKEX_PATH=""
 LOCAL_NUKEX_PATH = ""

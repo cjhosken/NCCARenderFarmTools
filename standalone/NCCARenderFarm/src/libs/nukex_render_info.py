@@ -16,18 +16,17 @@ if __name__ == "__main__":
         # Access and manipulate the nodes using Nuke's Python API
         write_nodes = [node for node in nuke.allNodes() if node.Class() == 'Write']
 
-        global_start=first
-        global_end=last
+        global_start=nuke.root().firstFrame()
+        global_end=nuke.root().lastFrame()
         
-
         # Extract information from write nodes
         write_nodes_info = []
         for node in write_nodes:
 
             write_node_info = {
                 "path": node.name(),
-                "frame_start": node.first if node.use_limit else global_start,
-                "frame_end": node.last if node.use_limit else global_end,
+                "frame_start": node['first'] if node['use_limit'].value() else global_start,
+                "frame_end": node['last'] if node['use_limit'].value() else global_end,
             }
             write_nodes_info.append(write_node_info)
 

@@ -26,9 +26,9 @@ if __name__ == "__main__":
                 # Get ROP node information
                 rop_info = {
                     "path": node.path(),
-                    "frame_start": node.parm("trange1"),
-                    "frame_end": node.parm("trange2"),
-                    "frame_step": node.parm("f2")
+                    "frame_start": node.parm("f1").eval(),
+                    "frame_end": node.parm("f2").eval(),
+                    "frame_step": node.parm("f3").eval()
                 }
                 # Add ROP node information to the list
                 rop_nodes_info.append(rop_info)

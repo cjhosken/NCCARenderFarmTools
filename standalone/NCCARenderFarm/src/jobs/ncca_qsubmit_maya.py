@@ -4,10 +4,13 @@ from gui.ncca_qsubmitwindow import NCCA_QSubmitWindow
 from gui.ncca_qcombobox import NCCA_QComboBox
 from gui.ncca_qinput import NCCA_QInput
 
+import qb
+
 class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
     def __init__(self, renderfarm=None, file_path="", folder_path="", username="", file_data=None, parent=None):
         super().__init__(renderfarm, file_path, folder_path=folder_path, name="Submit Maya Job", username=username, parent=parent)
-        
+        self.file_data = file_data
+
         if (self.job_path.text() == "/"):
             self.job_path.setText(os.path.dirname(file_path).replace(f"/home/{username}/farm/", "/")) 
 
@@ -120,8 +123,6 @@ class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
         extra_commands = self.command.text()
         output_path = self.output_path.text()
 
-        import os
-
         # Ensure the output_path starts with the desired prefix
         if not output_path.startswith(f"/render/{self.username}/farm"):
             output_path = join_path(f"/render/{self.username}/farm", output_path.lstrip("/"))
@@ -131,8 +132,7 @@ class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
             project_path = join_path(f"/render/{self.username}/farm", project_path.lstrip("/"))
 
         # Normalize the paths to handle any path formatting issues
-        output_path = os.path.normpath(output_path)
-        project_path = os.path.normpath(project_path) + "/"
+        project_path += "/"
 
 
         frame_range = f"{frame_start}-{frame_end}x{frame_step}"
@@ -181,7 +181,7 @@ class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
 
         render_command = f"Render {render_options} {extra_commands} {self.render_path}"
 
-        print(render_command)
+        
 
         package['cmdline'] = f"{pre_render} {render_command}"
         

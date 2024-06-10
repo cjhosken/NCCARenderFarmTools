@@ -2,21 +2,20 @@ from config import *
 
 from gui.ncca_qsubmitwindow import NCCA_QSubmitWindow
 from gui.ncca_qcombobox import NCCA_QComboBox
-
+import qb
 
 class NCCA_QSubmit_Houdini(NCCA_QSubmitWindow):
     def __init__(self, renderfarm=None, file_path="", folder_path="", username="", file_data=None, parent=None):
         super().__init__(renderfarm, file_path, folder_path, name="Submit Houdini Job", username=username, parent=parent)
+        self.file_data = file_data
 
         if (self.job_path.text() == "/"):
             self.job_path.setText(os.path.dirname(file_path).replace(f"/home/{username}/farm/", "/")) 
 
         if file_data is not None:
-            farm = file_data["NCCA_RENDERFARM"]
-
-            if "rop_nodes" in farm:
+            if "rop_nodes" in file_data["NCCA_RENDERFARM"]:
                 rop_nodes_names = []
-                for rop_node in json_data["NCCA_RENDERFARM"]["rop_nodes"]:
+                for rop_node in file_data["NCCA_RENDERFARM"]["rop_nodes"]:
                     rop_nodes_names.append(rop_node["path"])
                 self.rop.addItems(rop_nodes_names)
 
@@ -37,15 +36,15 @@ class NCCA_QSubmit_Houdini(NCCA_QSubmitWindow):
     
     def update_frame_labels(self, index):
         # Get the selected ROP node name from the combo box
-        rop_node_path = self.rop_combo.currentText()
+        rop_node_path = self.rop.currentText()
 
-        for rop_node_info in json_data["NCCA_RENDERFARM"]["write_nodes"]:
+        for rop_node_info in self.file_data["NCCA_RENDERFARM"]["rop_nodes"]:
             # Check if the path of the current write node matches the desired path
             if rop_node_info["path"] == rop_node_path:
                 # Update the labels
-                self.frame_start.setText(rop_node_info["frame_start"])
-                self.frame_end.setText(rop_node_info["frame_end"])
-                self.frame_step.setText(rop_node_info["frame_step"])
+                self.frame_start.setText(str(rop_node_info["frame_start"]))
+                self.frame_end.setText(str(rop_node_info["frame_end"]))
+                self.frame_step.setText(str(rop_node_info["frame_step"]))
 
     def prepare_job(self):
         super().prepare_job()

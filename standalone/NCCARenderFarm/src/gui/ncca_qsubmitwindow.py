@@ -5,8 +5,6 @@ from gui.ncca_qmessagebox import NCCA_QMessageBox
 from gui.ncca_qinput import NCCA_QInput
 from gui.ncca_qcombobox import NCCA_QComboBox
 
-from qube import import_qb
-
 class NCCA_QSubmitWindow(NCCA_QMainWindow):
     """Interface for the user to submit renderfarm jobs"""
 
@@ -140,13 +138,10 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
         self.main_layout.addWidget(self.button_box, alignment=Qt.AlignCenter)
 
     def prepare_job(self):
-        import_qb()
         
         """Prepare job for submission."""
-        if self.renderfarm is None:
-            self.render_path = self.file_path.replace(join_path("/home", self.username),
+        self.render_path = self.file_path.replace(join_path("/home", self.username),
                                                     join_path("/render", self.username))
-            return
 
         remote_job_path = join_path("/home", self.username, RENDERFARM_HOME_DIR, self.job_path.text())
 
@@ -170,22 +165,32 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
                 self.render_path = join_path(remote_render_path, render_file_path)
             
             else:
-                self.render_path == None
+                self.render_path = None
 
 
     def submit_job(self, job):
         """Submit the job to the renderfarm."""
+
         job['env'] = {"HOME": join_path("/render", self.username)}
 
         listOfJobsToSubmit = [job]
-        listOfSubmittedJobs = qb.submit(listOfJobsToSubmit)
-        id_list = []
-        for job in listOfSubmittedJobs:
-            id_list.append(job['id'])
+        try:
+            listOfSubmittedJobs = qb.submit(listOfJobsToSubmit)
+            id_list = []
+            for job in listOfSubmittedJobs:
+                id_list.append(job['id'])
 
-        self.close()
-        NCCA_QMessageBox.info(
-            self,
-            "NCCA Renderfarm",
-            f"Job Submitted!\nID: {id_list}"
-        )
+            self.close()
+            NCCA_QMessageBox.info(
+                self,
+                "NCCA Renderfarm",
+                f"Job Submitted!\nID: {id_list}"
+            )
+        except Exception as e:
+            self.close()
+            NCCA_QMessageBox.warning(
+                self,
+                "NCCA Renderfarm Error",
+                f"Unable to submit job.\n {e}. If this issue persists, please contant the NCCA team."
+            )
+            
