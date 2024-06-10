@@ -89,7 +89,7 @@ LOGIN_WINDOW_SIZE = QSize(400, 500)
 SETTINGS_WINDOW_SIZE = QSize(500, 500)
 SUBMIT_WINDOW_SIZE = QSize(500, 600)
 IMAGE_WINDOW_SIZE = QSize(1280, 720 + APP_NAVBAR_HEIGHT)
-MESSAGE_BOX_SIZE = QSize(300, 175)
+MESSAGE_BOX_SIZE = QSize(300, 400)
 
 APP_BORDER_RADIUS="10px"
 NCCA_CONNECTION_ERROR_MESSAGE= "Unable to connect to the NCCA Renderfarm. Try again later."
@@ -110,7 +110,8 @@ try:
     sys.path.append(QUBE_PYTHON_BIN)
     import qb
 except Exception as e:
-    QUBE_ERROR = str(e)
+    traceback_info = traceback.format_exc()
+    QB_IMPORT_ERROR = f"{str(e)}\n\nTraceback:\n{traceback_info}"
 
 
 LOCAL_HYTHON_PATH = "/opt/hfs20.0.506/bin/hython"

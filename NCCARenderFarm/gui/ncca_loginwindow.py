@@ -15,11 +15,11 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
         super().__init__(name, LOGIN_WINDOW_SIZE)
         self.load_environment()
 
-        if (QUBE_ERROR):
+        if (QB_IMPORT_ERROR):
             NCCA_QMessageBox.fatal(
                     self,
                     MESSAGE_FATAL_HEADER + MESSAGE_QUBE_LABEL,
-                    QUBE_ERROR,
+                    QB_IMPORT_ERROR_MESSAGE + "\n\n" + QB_IMPORT_ERROR,
                     MESSAGE_FATAL_CONFIRM_TEXT
             )
 
