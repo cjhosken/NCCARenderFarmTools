@@ -58,13 +58,15 @@ def submit(self, file_path, folder_path, renderfarm, username, local_path=None):
 
     elif project_ext in [".nk", ".nknc"]:
         QApplication.setOverrideCursor(Qt.WaitCursor)
-        # Need to get the nuke script data
-        command = [LOCAL_NUKEX_PATH, "--nukex", local_path]
+        command = [LOCAL_NUKEX_PATH, "--nukex", "-t", "<", join_path(SCRIPT_DIR, "libs", "nukex_render_info.py"), local_path]
 
         print(command)
 
         # Execute the command
         output = subprocess.check_output(command, stderr=subprocess.STDOUT, universal_newlines=True).strip()
+
+        print(output)
+
         match = re.search(r'{\s*"NCCA_RENDERFARM":\s*{.*?}\s*}', output, re.DOTALL)
 
         if match:
