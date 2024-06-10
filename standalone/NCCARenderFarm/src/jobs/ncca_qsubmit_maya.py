@@ -4,8 +4,6 @@ from gui.ncca_qsubmitwindow import NCCA_QSubmitWindow
 from gui.ncca_qcombobox import NCCA_QComboBox
 from gui.ncca_qinput import NCCA_QInput
 
-import qb
-
 class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
     def __init__(self, renderfarm=None, file_path="", folder_path="", username="", file_data=None, parent=None):
         super().__init__(renderfarm, file_path, folder_path=folder_path, name="Submit Maya Job", username=username, parent=parent)

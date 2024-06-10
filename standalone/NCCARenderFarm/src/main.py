@@ -6,7 +6,7 @@ def main():
 
     # Create the application instance
     app = QApplication(sys.argv)
-    
+
     # Set application metadata
     app.setWindowIcon(QIcon(APPLICATION_ICON_PATH))
     app.setApplicationName(APPLICATION_NAME)

@@ -47,10 +47,10 @@ class NCCA_QDialog(QDialog):
         self.close_button = NCCA_QIconButton(CLOSE_ICON_PATH, icon_size=ICON_SIZE)
         self.close_button.clicked.connect(self.close)
 
-        # Add widgets to layouts
         self.header_layout.addWidget(self.title_label)
-        self.header_layout.addStretch()
-        self.header_layout.addWidget(self.close_button)
+        # Add widgets to layouts
+
+        
 
         # Main layout
         self.main_layout = QVBoxLayout()
@@ -66,5 +66,7 @@ class NCCA_QDialog(QDialog):
 
     def end_ui(self):
         """Runs after the customization in classes that inherit from NCCA_QDialog."""
+        self.header_layout.addStretch()
+        self.header_layout.addWidget(self.close_button)
         self.root_layout.addLayout(self.header_layout)
         self.root_layout.addLayout(self.main_layout)

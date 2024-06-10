@@ -7,11 +7,15 @@ from gui.ncca_qsubmitwindow import NCCA_QSubmitWindow
 from gui.ncca_qprogressdialog import NCCA_QProgressDialog
 from gui.ncca_renderfarm_qfarmsystemmodel import NCCA_RenderFarm_QFarmSystemModel
 
-from jobs.submit import submit
-
 from utils import get_user_home
 from qube import launch_qube
 from libs.blend_render_info import read_blend_rend_chunk
+
+from jobs.ncca_qsubmit_blender import NCCA_QSubmit_Blender
+from jobs.ncca_qsubmit_houdini import NCCA_QSubmit_Houdini
+from jobs.ncca_qsubmit_katana import NCCA_QSubmit_Katana
+from jobs.ncca_qsubmit_maya import NCCA_QSubmit_Maya
+from jobs.ncca_qsubmit_nukex import NCCA_QSubmit_NukeX
 
 class NCCA_RenderFarm_QTreeView(QTreeView):
     """A custom QTreeView class that shows the files in the render farm"""
@@ -548,7 +552,131 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         self.model().renderfarm.upload(folder_path, join_path(dest_folder, os.path.basename(folder_path)), progress_dialog)
         self.refresh()
 
-        submit(self=self, file_path=file_path, folder_path=folder_path, renderfarm=self.model().renderfarm, username=self.username)
+        self.submit_job(file_path=file_path, folder_path=folder_path)
+
+    def submit_job(self, file_path, folder_path, local_path=None):
+        project_folder = folder_path
+        _, project_ext = os.path.splitext(os.path.basename(file_path))
+
+        renderfarm = self.model().renderfarm
+        username = self.username
+
+        data = None
+
+        if local_path is None:
+            local_path=file_path
+
+        if "blend" in project_ext:
+            data = read_blend_rend_chunk(local_path)
+
+            self.job_dialog = NCCA_QSubmit_Blender(renderfarm=renderfarm, username=username, file_path=file_path, folder_path=project_folder, file_data=data)
+            self.job_dialog.show()
+            
+        elif "hip" in project_ext:
+            if (os.path.exists(LOCAL_HYTHON_PATH)):
+                QApplication.setOverrideCursor(Qt.WaitCursor)
+                command = [LOCAL_HYTHON_PATH, join_path(SCRIPT_DIR, "libs", "houdini_render_info.py"), local_path]
+
+                # Execute the command
+                output = subprocess.check_output(command, stderr=subprocess.STDOUT, universal_newlines=True).strip()
+                    
+                match = re.search(r'{\s*"NCCA_RENDERFARM":\s*{.*?}\s*}', output, re.DOTALL)
+                    
+                if match:
+                    json_data = match.group()
+                    # Load JSON data
+                    data = json.loads(json_data)
+                
+                QApplication.restoreOverrideCursor()
+            else:
+                NCCA_QMessageBox.warning(
+                    self,
+                    "NCCA Renderfarm",
+                    f"Hython could not be found on this machine. Proceeding without Houdini scene info."
+                )
+
+            self.job_dialog = NCCA_QSubmit_Houdini(renderfarm=renderfarm, username=username, file_path=file_path, folder_path=project_folder, file_data=data)
+            self.job_dialog.show()
+
+        elif project_ext in [".mb", ".ma"]:
+            if (os.path.exists(LOCAL_MAYAPY_PATH)):
+                QApplication.setOverrideCursor(Qt.WaitCursor)
+                command = [LOCAL_MAYAPY_PATH, join_path(SCRIPT_DIR, "libs", "maya_render_info.py"), local_path]
+                # Execute the command
+                output = subprocess.check_output(command, stderr=subprocess.STDOUT, universal_newlines=True).strip()
+                match = re.search(r'{\s*"NCCA_RENDERFARM":\s*{.*?}\s*}', output, re.DOTALL)
+
+                if match:
+                    json_data = match.group()
+                    # Load JSON data
+                    data = json.loads(json_data)
+
+                QApplication.restoreOverrideCursor()
+            else:
+                NCCA_QMessageBox.warning(
+                    self,
+                    "NCCA Renderfarm",
+                    f"Mayapy could not be found on this machine. Proceeding without Maya scene info."
+                )
+
+            self.job_dialog = NCCA_QSubmit_Maya(renderfarm=renderfarm, username=username, file_path=file_path, folder_path=project_folder, file_data=data)
+            self.job_dialog.show()
+
+        elif project_ext in [".nk", ".nknc"]:
+            if (os.path.exists(LOCAL_NUKEX_PATH)):
+                QApplication.setOverrideCursor(Qt.WaitCursor)
+                command = [LOCAL_NUKEX_PATH, "--nukex", "-t", join_path(SCRIPT_DIR, "libs", "nukex_render_info.py"), local_path]
+
+                # Execute the command
+                output = subprocess.check_output(command, stderr=subprocess.STDOUT, universal_newlines=True).strip()
+
+                match = re.search(r'{\s*"NCCA_RENDERFARM":\s*{.*?}\s*}', output, re.DOTALL)
+
+                if match:
+                    json_data = match.group()
+                    # Load JSON data
+                    data = json.loads(json_data)
+
+                QApplication.restoreOverrideCursor()
+            else:
+                NCCA_QMessageBox.warning(
+                    self,
+                    "NCCA Renderfarm",
+                    f"NukeX could not be found on this machine. Proceeding without NukeX scene info."
+                )
+
+            self.job_dialog = NCCA_QSubmit_NukeX(renderfarm=renderfarm, username=username, file_path=file_path, folder_path=project_folder, file_data=data)
+            self.job_dialog.show()
+
+        elif project_ext in [".katana"]:
+            if (os.path.exists(LOCAL_KATANA_PATH)):
+                QApplication.setOverrideCursor(Qt.WaitCursor)
+                command = [LOCAL_KATANA_PATH, "--script", join_path(SCRIPT_DIR, "libs", "katana_render_info.py"), local_path]
+                output = subprocess.check_output(command, stderr=subprocess.STDOUT, universal_newlines=True).strip()
+                match = re.search(r'{\s*"NCCA_RENDERFARM":\s*{.*?}\s*}', output, re.DOTALL)
+
+                if match:
+                    json_data = match.group()
+                    # Load JSON data
+                    data = json.loads(json_data)
+
+                QApplication.restoreOverrideCursor()
+            else:
+                NCCA_QMessageBox.warning(
+                    self,
+                    "NCCA Renderfarm",
+                    f"Katana could not be found on this machine. Proceeding without Katana scene info."
+                )
+
+            self.job_dialog = NCCA_QSubmit_Katana(renderfarm=renderfarm, username=username, file_path=file_path, folder_path=project_folder, file_data=data)
+            self.job_dialog.show()
+        else:
+            NCCA_QMessageBox.warning(
+                None,
+                "Error",
+                f"{project_ext} not supported. Please choose a supported software file."
+            )
+            return
 
     def submitSelectedIndex(self):
         """Opens a window for users to submit their project to the renderfarm"""
@@ -565,4 +693,4 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
 
         self.model().renderfarm.download(file_path, local_path, None)
 
-        submit(self=self, file_path=file_path, folder_path=None, renderfarm=self.model().renderfarm, local_path=local_path, username=self.username)
+        self.submit_job(file_path=file_path, folder_path=None, local_path=local_path)

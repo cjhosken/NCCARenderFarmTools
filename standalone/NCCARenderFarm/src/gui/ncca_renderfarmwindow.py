@@ -9,7 +9,6 @@ from jobs.ncca_qsubmit_houdini import NCCA_QSubmit_Houdini
 from jobs.ncca_qsubmit_maya import NCCA_QSubmit_Maya
 from jobs.ncca_qsubmit_nukex import NCCA_QSubmit_NukeX
 from jobs.ncca_qsubmit_katana import NCCA_QSubmit_Katana
-from jobs.submit import submit
 
 from libs.blend_render_info import read_blend_rend_chunk
 
@@ -45,9 +44,9 @@ class NCCA_RenderFarmWindow(NCCA_QMainWindow):
         self.nav_and_title_layout.addStretch()
 
         # Submit button
-        self.submit_job_button = NCCA_QIconButton(SUBMIT_ICON_PATH, ICON_SIZE)
-        self.submit_job_button.clicked.connect(self.submit_job)
-        self.nav_and_title_layout.addWidget(self.submit_job_button, alignment=Qt.AlignRight)
+        self.submit_project_button = NCCA_QIconButton(SUBMIT_ICON_PATH, ICON_SIZE)
+        self.submit_project_button.clicked.connect(self.submit_project)
+        self.nav_and_title_layout.addWidget(self.submit_project_button, alignment=Qt.AlignRight)
 
         # Qube button
         self.launch_qube_button = NCCA_QIconButton(QUBE_ICON_PATH, ICON_SIZE)
@@ -76,7 +75,7 @@ class NCCA_RenderFarmWindow(NCCA_QMainWindow):
         """Sends the user to an info webpage"""
         QDesktopServices.openUrl(QUrl(INFO_LINK))
 
-    def submit_job(self, dest_folder):
+    def submit_project(self, dest_folder):
         self.browser.submit_project()
 
         

@@ -5,6 +5,7 @@ from gui.ncca_qcheckbox import NCCA_QCheckBox
 from gui.ncca_qinput import NCCA_QInput
 from gui.ncca_qmainwindow import NCCA_QMainWindow
 from gui.ncca_renderfarmwindow import NCCA_RenderFarmWindow
+from gui.ncca_qmessagebox import NCCA_QMessageBox
 
 from ncca_renderfarm import *
 from utils import *
@@ -16,6 +17,17 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
         """Initializes the login window and loads any existing environment variables."""
         super().__init__(name, LOGIN_WINDOW_SIZE)
         self.load_environment()
+
+        if (QUBE_ERROR):
+            result = NCCA_QMessageBox.fatal(
+                    self,
+                    "Fatal: Qube Error",
+                    QUBE_ERROR,
+                    "Ok"
+            )
+
+            if (result):
+                sys.exit(1)
 
     def init_ui(self):
         """Initializes the UI"""

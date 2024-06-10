@@ -3,7 +3,6 @@ from config import *
 from gui.ncca_qsubmitwindow import NCCA_QSubmitWindow
 from gui.ncca_qcombobox import NCCA_QComboBox
 from gui.ncca_qinput import NCCA_QInput
-import qb
 
 class NCCA_QSubmit_Katana(NCCA_QSubmitWindow):
     def __init__(self, renderfarm=None,file_path="", folder_path="", username="", file_data=None, parent=None):

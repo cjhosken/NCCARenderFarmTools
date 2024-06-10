@@ -10,6 +10,7 @@ class NCCA_QMessageBox(NCCA_QDialog):
         """Initialize the messagebox"""
         self.icon = icon
         super().__init__(parent, size=MESSAGE_BOX_SIZE, title=title)
+        self.show()
 
     def init_ui(self):
         super().init_ui()
@@ -68,7 +69,7 @@ class NCCA_QMessageBox(NCCA_QDialog):
 
         confirm_button.clicked.connect(msg_box.accept)
 
-        return msg_box
+        return msg_box.exec_()
 
     @staticmethod
     def question(parent, title, text, yes_text="Yes", no_text="No"):
@@ -91,6 +92,21 @@ class NCCA_QMessageBox(NCCA_QDialog):
     def warning(parent, title, text, confirm_text="Ok"):
         """Creates a warning popup dialog"""
         return NCCA_QMessageBox._create_popup(parent, title, text, WARNING_ICON_PATH, confirm_text)
+
+    @staticmethod
+    def fatal(parent, title, text, confirm_text="Ok"):
+        """Creates a popup dialog"""
+        msg_box = NCCA_QMessageBox(parent, icon=WARNING_ICON_PATH, title=title)
+        msg_box.label.setText(text)
+
+        confirm_button = NCCA_QFlatButton(confirm_text)
+        confirm_button.setFixedSize(QSize(125, 35))
+
+        msg_box.button_box.addButton(confirm_button, QDialogButtonBox.YesRole)
+        
+        confirm_button.clicked.connect(msg_box.accept)
+
+        return msg_box.exec_()
 
     @staticmethod
     def override(parent, title, text, override_text="Override Project", use_text="Use Project", cancel_text="Cancel"):

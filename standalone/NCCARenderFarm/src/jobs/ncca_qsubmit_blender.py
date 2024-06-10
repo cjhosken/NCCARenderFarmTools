@@ -5,7 +5,6 @@ from gui.ncca_qcombobox import NCCA_QComboBox
 from gui.ncca_qinput import NCCA_QInput
 
 from libs.blend_render_info import read_blend_rend_chunk
-import qb
 
 class NCCA_QSubmit_Blender(NCCA_QSubmitWindow):
     def __init__(self, renderfarm=None,file_path="", folder_path="", username="", file_data=None, parent=None):

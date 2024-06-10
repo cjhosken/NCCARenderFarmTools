@@ -134,10 +134,13 @@ if OPERATING_SYSTEM == "windows":
     QUBE_LAUNCHER_PATH = "C:/Program Files (x86)/pfx/qube/bin/qube.exe"
     QUBE_PYTHON_BIN = "C:/Program Files/pfx/qube/api/python"
 
+QUBE_ERROR = ""
 
-sys.path.append(QUBE_PYTHON_BIN)
-import qb
-
+try:
+    sys.path.append(QUBE_PYTHON_BIN)
+    import qb
+except Exception as e:
+    QUBE_ERROR = str(e)
 
 
 LOCAL_HYTHON_PATH = "/opt/hfs20.0.506/bin/hython"
@@ -155,7 +158,7 @@ BLENDER_PATH = ""
 
 if OPERATING_SYSTEM == "windows":
     LOCAL_NUKEX_PATH="C:/Program Files/Nuke14.0v4/Nuke14.0.exe"
-    LOCAL_KATANA_PATH=""
+    LOCAL_KATANA_PATH = "C:/Program Files/Katana"
     LOCAL_HYTHON_PATH = "C:/Program Files/Side Effects Software/Houdini 20.0.506/bin/hython.exe"
     LOCAL_MAYAPY_PATH = "C:/Program Files/Autodesk/Maya2023/bin/mayapy.exe"
 
@@ -207,3 +210,7 @@ BLENDER_FILE_EXTENSIONS = {
     ".tif": "TIFF",
     ".tiff": "TIFF"
     }
+
+
+
+# STRINGS
