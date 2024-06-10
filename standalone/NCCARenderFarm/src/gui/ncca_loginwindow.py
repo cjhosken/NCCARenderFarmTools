@@ -56,6 +56,7 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
         # Password input
         self.password = NCCA_QInput("Password")
         self.password.setEchoMode(QLineEdit.Password)
+        self.password.returnPressed.connect(self.handle_login)
         self.setupInputField(self.password)
         self.main_layout.addWidget(self.password)
         self.main_layout.addStretch()

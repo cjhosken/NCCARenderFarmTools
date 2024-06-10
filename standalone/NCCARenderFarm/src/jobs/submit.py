@@ -6,6 +6,7 @@ from jobs.ncca_qsubmit_nukex import NCCA_QSubmit_NukeX
 from jobs.ncca_qsubmit_katana import NCCA_QSubmit_Katana
 
 from libs.blend_render_info import read_blend_rend_chunk
+from gui.ncca_qmessagebox import NCCA_QMessageBox
 
 def submit(self, file_path, folder_path, renderfarm, username, local_path=None):
     project_folder = folder_path

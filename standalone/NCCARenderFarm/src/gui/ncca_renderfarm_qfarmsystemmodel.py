@@ -12,7 +12,7 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
         self.username = username
         self.password = password
         self.home_path = home_path
-        self.renderfarm = NCCA_RenderFarm(os.path.dirname(self.home_path), self.username, self.password)
+        self.renderfarm = NCCA_RenderFarm(self.home_path, self.username, self.password)
         self.rootItem = self.create_item(os.path.dirname(self.home_path), None)
 
     def populateChildren(self, parent_item):
@@ -32,6 +32,7 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
             self.sort_children(parent_item['children'], Qt.DescendingOrder)
 
     def create_item(self, path, parent):
+        print(path)
         """Creates a custom item to be shown in the file browser"""
         return {'path': path, 'parent': parent, 'children': None}
         
