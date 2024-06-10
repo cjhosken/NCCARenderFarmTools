@@ -19,10 +19,10 @@ For Windows run `. "./standalone/NCCARenderFarm/launch.ps1"` to run the standalo
 
 - When deleting large folders, the application takes a while to count the number of files. If a user spam clicks during this process, the application crashes. This is true for any time the program is loading something (or running a process)
 
+- Blender, Nuke, Katana projects don't render on the farm as the software isnt installed on there.
+
 - Katana not fully implemented due to it not being supported on the NCCA machines.
 
-
-## Known Limitations
 At the current moment, Qt (and c++) is not behaving correctly on the RedHat machines in the NCCA lab. 
 There seems to be a problem with cstdio and stdio in the gcc-toolset. 
 I'll include the error messages below when I have time.
