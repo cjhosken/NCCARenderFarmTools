@@ -11,7 +11,6 @@ class NCCA_QIconButton(QPushButton):
         
         # Set button attributes
         self.setFlat(True)
-        self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.setCursor(Qt.PointingHandCursor)
         self.setObjectName("NCCA_QIconButton")
         self.installEventFilter(self)
@@ -25,12 +24,26 @@ class NCCA_QIconButton(QPushButton):
     def eventFilter(self, obj, event):
         """Check for mouse events over the button and style accordingly."""
         if obj == self:
-            if event.type() == QEvent.Enter:
+            color_style = None
+            if event.type() == QEvent.Enter or event.type() == QEvent.FocusIn:
                 self.loadIcon(is_hover=True)
-                self.setStyleSheet(f"color: {APP_PRIMARY_COLOR}; background: {APP_BACKGROUND_COLOR}; border: none;")
-            elif event.type() == QEvent.Leave:
+                color_style = f"color: {APP_PRIMARY_COLOR};"
+
+            elif event.type() == QEvent.Leave or event.type() == QEvent.FocusOut:
                 self.loadIcon(is_hover=False)
-                self.setStyleSheet(f"background: {APP_BACKGROUND_COLOR}; border: none;") 
+                color_style = ""
+            
+            if (color_style is not None):
+                self.setStyleSheet(f"""
+                    NCCA_QIconButton {{
+                        background: {APP_BACKGROUND_COLOR}; border: none; {color_style}
+                    }}
+
+                    NCCA_QIconButton:hover, NCCA_QIconButton:focus {{
+                        background-color: {APP_BACKGROUND_COLOR}; color: {APP_PRIMARY_COLOR}; outline: none;
+                    }}
+                                """)
+            
         return super().eventFilter(obj, event)
     
     def loadIcon(self, is_hover=False):

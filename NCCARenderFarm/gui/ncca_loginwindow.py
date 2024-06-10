@@ -57,6 +57,7 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
 
         # Username input
         self.username = NCCA_QInput("Username")
+        self.username.setToolTip(USERNAME_INPUT_TOOLTIP)
         self.setupInputField(self.username)
         self.main_layout.addWidget(self.username)
         self.main_layout.addStretch()
@@ -64,14 +65,16 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
         # Password input
         self.password = NCCA_QInput("Password")
         self.password.setEchoMode(QLineEdit.Password)
-        self.password.returnPressed.connect(self.handle_login)
+        self.password.setToolTip(PASSWORD_INPUT_TOOLTIP)
         self.setupInputField(self.password)
+        self.password.returnPressed.connect(self.handle_login)
         self.main_layout.addWidget(self.password)
         self.main_layout.addStretch()
 
         # Keep details checkbox
         self.keep_details = NCCA_QCheckBox('Remember me')
         self.keep_details.setFont(TEXT_FONT)
+        self.keep_details.setToolTip(KEEP_DETAILS_TOOLTIP)
         self.main_layout.addWidget(self.keep_details)
         self.main_layout.addStretch()
 

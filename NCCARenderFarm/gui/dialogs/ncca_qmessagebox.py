@@ -11,6 +11,7 @@ class NCCA_QMessageBox(NCCA_QDialog):
         """Initialize the messagebox"""
         self.icon = icon
         super().__init__(parent, size=MESSAGE_BOX_SIZE, title=title)
+        self.setFocus()
         self.show()
 
     def init_ui(self):
