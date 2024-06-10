@@ -89,16 +89,22 @@ class NCCA_RenderFarm(paramiko.SSHClient):
         except IOError:
             return False
 
-    def upload(self, local_path, remote_path, progress_dialog):
+    def upload(self, local_path, remote_path, total_files=1):
         """Uploads a file from local to the remote SFTP server."""
+        
+        progress_dialog = NCCA_QProgressDialog("Uploading files...", 0, total_files, None)
+        
         if os.path.isdir(local_path):
             self.upload_folder(local_path, remote_path, progress_dialog)
         else:
-            self.sftp.put(local_path, remote_path)
-            if progress_dialog is not None:
-                progress_dialog.setValue(progress_dialog.value() + 1)
+            self.upload_file(local_path, remote_path, progress_dialog)
 
-    def upload_folder(self, local_folder_path, remote_folder_path, progress_dialog):
+    def upload_file(self, local_file_path, remote_file_path, progress_dialog=None):
+        self.sftp.put(local_file_path, remote_file_path)
+        if progress_dialog is not None:
+            progress_dialog.setValue(progress_dialog.value() + 1)
+
+    def upload_folder(self, local_folder_path, remote_folder_path, progress_dialog=None):
         """Recursively uploads a local folder and its contents to a remote folder."""
         if not self.exists(remote_folder_path):
             self.mkdir(remote_folder_path)
@@ -109,61 +115,69 @@ class NCCA_RenderFarm(paramiko.SSHClient):
             if os.path.isdir(local_item_path):
                 self.upload_folder(local_item_path, remote_item_path, progress_dialog)
             else:
-                self.upload(local_item_path, remote_item_path, progress_dialog)
+                self.upload_file(local_item_path, remote_item_path, progress_dialog)
 
-    def download(self, remote_path, local_path, progress_dialog):
+    def download(self, remote_path, local_path):
         """Downloads a file or directory from the remote SFTP server to local."""
+        total_files = self.count_files(remote_path)
+        progress_dialog = NCCA_QProgressDialog("Uploading files...", 0, total_files, None)
+
         if self.isdir(remote_path):
-            os.makedirs(local_path, exist_ok=True)
-            for item in self.sftp.listdir_attr(remote_path):
-                remote_item_path = join_path(remote_path, item.filename)
-                local_item_path = join_path(local_path, item.filename)
-                if stat.S_ISDIR(item.st_mode):
-                    self.download(remote_item_path, local_item_path, progress_dialog)
-                else:
-                    self.sftp.get(remote_item_path, local_item_path)
-                    if progress_dialog is not None:
-                        progress_dialog.setValue(progress_dialog.value() + 1)
+            self.download_folder(remote_path, local_path, progress_dialog)
         else:
-            self.sftp.get(remote_path, local_path)
+            self.download_file(remote_path, local_path, progress_dialog)
+
+    def download_folder(self, remote_folder_path, local_folder_path, progress_dialog=None):
+        os.makedirs(local_folder_path, exist_ok=True)
+        for remote_item_path in self.listdir(remote_folder_path):
+            item_name = os.path.basename(remote_item_path)
+            local_item_path = join_path(local_folder_path, item_name)
+            if self.isdir(remote_folder_path):
+                self.download_folder(remote_item_path, local_item_path, progress_dialog)
+            else:
+                self.download_file(remote_item_path, local_item_path, progress_dialog)
+
+    def download_file(self, remote_file_path, local_file_path, progress_dialog=None):
+        self.sftp.get(remote_file_path, local_file_path)
+        if progress_dialog is not None:
+            progress_dialog.setValue(progress_dialog.value() + 1)
 
     def delete(self, remote_path):
         """Deletes a file or directory from the remote SFTP server."""
         num_files = self.count_files(remote_path)  # Count files before deletion
         progress_dialog = NCCA_QProgressDialog("Deleting files...", 0, num_files, None)
 
-        if self.exists(remote_path):
-            if self.isdir(remote_path):
-                self.delete_dir_contents(remote_path, progress_dialog)
-                self.sftp.rmdir(remote_path)
-            else:
-                self.sftp.remove(remote_path)
-                progress_dialog.setValue(progress_dialog.value() + 1)
+        if self.isdir(remote_path):
+            self.delete_dir(remote_path, progress_dialog)
+            self.sftp.rmdir(remote_path)
+        else:
+            self.delete_file(remote_path, progress_dialog)
 
     def count_files(self, remote_path):
         """Recursively count all files in a directory."""
         file_count = 0
-        if self.isdir(remote_path):
-            for item in self.sftp.listdir_attr(remote_path):
-                item_path = join_path(remote_path, item.filename)
-                if stat.S_ISDIR(item.st_mode):
-                    file_count += self.count_files(item_path)
-                else:
-                    file_count += 1
-        else:
-            file_count = 1  # If remote_path is a file, count it as one file
-        return file_count
 
-    def delete_dir_contents(self, remote_path, progress_dialog):
+        if self.isdir(remote_path):
+            for remote_item_path in self.listdir(remote_path):
+                file_count += self.count_files(remote_item_path)
+        else:
+            file_count = 1
+
+        return file_count
+    
+    def delete_dir(self, remote_folder_path, progress_dialog=None):
         """Recursively delete all contents of a directory."""
-        for item in self.sftp.listdir_attr(remote_path):
-            item_path = join_path(remote_path, item.filename)
-            if stat.S_ISDIR(item.st_mode):
-                self.delete_dir_contents(item_path, progress_dialog)
-                self.sftp.rmdir(item_path)
+        for remote_item_path in self.listdir(remote_folder_path):
+            if self.isdir(remote_item_path):
+                self.delete_dir(remote_item_path, progress_dialog)
+                self.sftp.rmdir(remote_item_path)
             else:
-                self.sftp.remove(item_path)
-                progress_dialog.setValue(progress_dialog.value() + 1)
+                self.delete_file()
+
+    def delete_file(self, remote_file_path, progress_dialog=None):
+        self.sftp.remove(remote_file_path)
+        if progress_dialog is not None:
+            progress_dialog.setValue(progress_dialog.value() + 1)
 
     def mkdir(self, remote_path):
         """Creates a directory on the remote SFTP server."""
@@ -174,18 +188,7 @@ class NCCA_RenderFarm(paramiko.SSHClient):
         self.sftp.rename(old_remote_path, new_remote_path)
 
     def move(self, file_path, destination_folder):
-        """
-        Moves a file to a new location on the remote SFTP server.
-
-        Args:
-            file_path (str): The path of the file to be moved.
-            destination_folder (str): The destination folder where the file will be moved.
-        """
-        # Extract the file name from the file path
+        """Moves a file to a new location on the remote SFTP server."""
         file_name = os.path.basename(file_path)
-        
-        # Construct the new file path in the destination folder
         new_file_path = join_path(destination_folder, file_name)
-        
-        # Rename the file to move it to the new location
         self.rename(file_path, new_file_path)

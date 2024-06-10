@@ -1,5 +1,6 @@
 from config import *
 from renderfarm import *
+from resources import *
 
 class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
     """A custom QFileSystemModel class used for accessing the remote SFTP server"""
