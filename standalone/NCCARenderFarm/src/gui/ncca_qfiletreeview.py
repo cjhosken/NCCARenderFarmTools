@@ -7,11 +7,7 @@ from gui.ncca_qsubmitwindow import NCCA_QSubmitWindow
 from gui.ncca_qprogressdialog import NCCA_QProgressDialog
 from gui.ncca_renderfarm_qfarmsystemmodel import NCCA_RenderFarm_QFarmSystemModel
 
-from jobs.ncca_qsubmit_blender import NCCA_QSubmit_Blender
-from jobs.ncca_qsubmit_houdini import NCCA_QSubmit_Houdini
-from jobs.ncca_qsubmit_maya import NCCA_QSubmit_Maya
-from jobs.ncca_qsubmit_nukex import NCCA_QSubmit_NukeX
-from jobs.ncca_qsubmit_katana import NCCA_QSubmit_Katana
+from jobs.submit import submit
 
 from utils import get_user_home
 from qube import launch_qube
@@ -496,9 +492,9 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         _, file_ext = os.path.splitext(os.path.basename(file_path))
         file_name = os.path.basename(file_path)
 
-        temp_dir = tempfile.TemporaryDirectory(dir=join_path(get_user_home(), "tmp"))
+        temp_dir = tempfile.TemporaryDirectory(dir=get_user_home())
         local_path = join_path(temp_dir.name, file_name)
 
         self.model().renderfarm.download(file_path, local_path, None)
-        
-        submit(file_path, folder_path, renderfarm, local_path)
+
+        submit(self=self, file_path=file_path, folder_path=None, renderfarm=self.model().renderfarm, local_path=local_path, username=self.username)

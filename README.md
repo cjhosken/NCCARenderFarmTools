@@ -16,6 +16,10 @@ For Windows run `. "./standalone/NCCARenderFarm/launch.ps1"` to run the standalo
 5. Public Announcements
 
 
+## Bugs
+
+When deleting large folders, the application takes a while to count the number of files. If a user spam clicks during this process, the application crashes.
+
 ## Known Limitations
 At the current moment, Qt (and c++) is not behaving correctly on the RedHat machines in the NCCA lab. 
 There seems to be a problem with cstdio and stdio in the gcc-toolset. 

@@ -14,9 +14,8 @@ class NCCA_QSubmit_NukeX(NCCA_QSubmitWindow):
         if file_data is not None:
             pass
 
-    
-    def initUI(self):
-        super().initUI()
+    def init_ui(self):
+        super().init_ui()
 
     def prepare_job(self):
         super().prepare_job()

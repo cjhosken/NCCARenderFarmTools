@@ -10,10 +10,14 @@ from qube import import_qb
 class NCCA_QSubmitWindow(NCCA_QMainWindow):
     """Interface for the user to submit renderfarm jobs"""
 
-    def __init__(self, renderfarm=None, file_path="", folder_path="", name="Submit Job", username="", parent=None):
+    def __init__(self, renderfarm=None, file_path="", folder_path=None, name="Submit Job", username="", parent=None):
         """Initializes the window UI"""
         self.file_path = file_path
-        self.folder_path = folder_path
+        
+        self.folder_path = "/"
+        if folder_path is not None:
+            self.folder_path = folder_path
+            
         self.job_id = 0
         self.name = name
         self.username = username

@@ -17,8 +17,8 @@ class NCCA_QSubmit_Houdini(NCCA_QSubmitWindow):
             if "rop_nodes" in farm:
                 self.rop.addItems(farm["rop_nodes"])
 
-    def initUI(self):
-        super().initUI()
+    def init_ui(self):
+        super().init_ui()
         self.rop_row_layout = QHBoxLayout()
         self.rop_row_widget = QWidget()
 

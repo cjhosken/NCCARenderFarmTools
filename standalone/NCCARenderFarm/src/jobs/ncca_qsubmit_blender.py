@@ -19,8 +19,8 @@ class NCCA_QSubmit_Blender(NCCA_QSubmitWindow):
             self.frame_end.setText(str(file_data[1]))
 
     
-    def initUI(self):
-        super().initUI()
+    def init_ui(self):
+        super().init_ui()
         self.active_renderer_row_layout = QHBoxLayout()
         self.active_renderer_row_widget = QWidget()
 

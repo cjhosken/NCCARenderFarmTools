@@ -88,6 +88,5 @@ class NCCA_RenderFarmWindow(NCCA_QMainWindow):
         if not file_path:
             return
 
-        renderfarm = self.browser.model().renderfarm
 
-        submit(file_path, folder_path, renderfarm)
+        submit(self=self, file_path=file_path, folder_path=folder_path, renderfarm=self.browser.model().renderfarm, username=self.username)

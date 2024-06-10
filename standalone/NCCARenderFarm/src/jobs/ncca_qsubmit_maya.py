@@ -23,8 +23,8 @@ class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
             if "step_frame" in farm:
                 self.frame_step.setText(str(farm["step_frame"]))
 
-    def initUI(self):
-        super().initUI()
+    def init_ui(self):
+        super().init_ui()
 
         self.active_renderer_row_layout = QHBoxLayout()
         self.active_renderer_row_widget = QWidget()

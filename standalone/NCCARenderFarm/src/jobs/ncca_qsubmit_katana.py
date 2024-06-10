@@ -15,8 +15,8 @@ class NCCA_QSubmit_Katana(NCCA_QSubmitWindow):
             pass
 
     
-    def initUI(self):
-        super().initUI()
+    def init_ui(self):
+        super().init_ui()
 
     def prepare_job(self):
         super().prepare_job()
@@ -44,7 +44,7 @@ class NCCA_QSubmit_Katana(NCCA_QSubmitWindow):
 
         # https://learn.foundry.com/katana/content/tg/launch_modes/batch_mode.html
 
-        render_command=f"{KATANA_PATH} --batch -katana-file {self.render_path}"
+        render_command=f"{KATANA_PATH} --batch -katana-file {self.render_path} -t QB_FRAME_NUMBER"
 
         package['cmdline']=f"{pre_render} {render_command}"
 
