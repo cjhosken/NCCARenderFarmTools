@@ -12,8 +12,8 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
         self.username = username
         self.password = password
         self.home_path = home_path
-        self.renderfarm = NCCA_RenderFarm(self.home_path, self.username, self.password)
-        self.rootItem = self.create_item(self.home_path, None)
+        self.renderfarm = NCCA_RenderFarm(os.path.dirname(self.home_path), self.username, self.password)
+        self.rootItem = self.create_item(os.path.dirname(self.home_path), None)
 
     def populateChildren(self, parent_item):
         """Recursively populate children for a given parent item."""
@@ -28,7 +28,7 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
         # If the parent item represents a directory, populate its children
         if self.renderfarm.isdir(parent_path):
             children = self.renderfarm.listdir(parent_path)
-            parent_item['children'] = [self.create_item(os.path.join(parent_path, child), parent_item) for child in children]
+            parent_item['children'] = [self.create_item(join_path(parent_path, child), parent_item) for child in children]
             self.sort_children(parent_item['children'], Qt.DescendingOrder)
 
     def create_item(self, path, parent):
@@ -53,7 +53,7 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
             parent_path = parent_item['path']
 
             children = self.renderfarm.listdir(parent_path)
-            parent_item['children'] = [self.create_item(os.path.join(parent_path, child), parent_item) for child in children]
+            parent_item['children'] = [self.create_item(join_path(parent_path, child), parent_item) for child in children]
             self.sort_children(parent_item['children'], Qt.AscendingOrder)
 
         # Check if the row is within the bounds of the parent's children
@@ -61,7 +61,7 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
             child_item = parent_item['children'][row]
             if child_item is None:
                 return QModelIndex()
-            
+
             # Only show files that exist within /home/username
             if child_item['path'].startswith(self.home_path):
                 return self.createIndex(row, column, child_item)
@@ -116,7 +116,7 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
                 parent_stat = self.renderfarm.stat(parent_path)
                 if stat.S_ISDIR(parent_stat.st_mode):
                     children = self.renderfarm.listdir(parent_path)
-                    parent_item['children'] = [self.create_item(os.path.join(parent_path, child), parent_item) for child in children]
+                    parent_item['children'] = [self.create_item(join_path(parent_path, child), parent_item) for child in children]
                     self.sort_children(parent_item['children'], Qt.AscendingOrder)
                 else:
                     # If it's not a directory, return 0 as it has no children
@@ -167,13 +167,13 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
 
                 if "blend" in file_ext:
                     # Provide custom icon for .blend files
-                    return QIcon(os.path.join(SCRIPT_DIR, "assets/icons/blender.svg"))  
+                    return QIcon(join_path(SCRIPT_DIR, "assets/icons/blender.svg"))  
                 
                 if "hip" in file_ext:
-                    return QIcon(os.path.join(SCRIPT_DIR, "assets/icons/houdini.png"))  
+                    return QIcon(join_path(SCRIPT_DIR, "assets/icons/houdini.png"))  
                 
                 if file_ext in [".ma", ".mb"]:
-                    return QIcon(os.path.join(SCRIPT_DIR, "assets/icons/maya.png"))  
+                    return QIcon(join_path(SCRIPT_DIR, "assets/icons/maya.png"))  
 
                 if file_ext.lower() in VIEWABLE_IMAGE_FILES:
                     return QIcon(IMAGE_ICON_PATH)
