@@ -54,8 +54,8 @@ class NCCA_QSubmit_Houdini(NCCA_QSubmitWindow):
         package['shell']="/bin/bash"
 
         #https://www.sidefx.com/docs/houdini/ref/utils/hrender.html
-
         pre_render=f"cd {HOUDINI_PATH}; source houdini_setup_bash; "
+        pre_render += f"sed -i 's/\r//' /render/{self.username}/ncca/source.sh; source /render/{self.username}/ncca/source.sh;"
         render_command=f"hython $HB/hrender.py -F QB_FRAME_NUMBER"
         render_command+=f" -e {external_commands}" if external_commands else " -e"
         render_command+=f" -d {rop_path}" if rop_path else ""
@@ -66,12 +66,7 @@ class NCCA_QSubmit_Houdini(NCCA_QSubmitWindow):
         package['cmdline']=f"{pre_render} {render_command}"
 
         job['package'] = package
-        
-        env={"HOME" :f"/render/{self.username}",  
-                    "SESI_LMHOST" : "lepe.bournemouth.ac.uk",
-                    "PIXAR_LICENSE_FILE" : "9010@talavera.bournemouth.ac.uk",            
-                    }
-        job['env']=env
+    
         job["cwd"] = f"/render/{self.username}"
 
         job['agenda'] = qb.genframes(frame_range)

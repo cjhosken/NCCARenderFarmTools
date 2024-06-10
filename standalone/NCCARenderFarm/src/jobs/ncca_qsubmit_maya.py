@@ -124,15 +124,15 @@ class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
 
         # Ensure the output_path starts with the desired prefix
         if not output_path.startswith(f"/render/{self.username}/farm"):
-            output_path = os.path.join(f"/render/{self.username}/farm", output_path.lstrip("/")).replace("\\", "/")
+            output_path = join_path(f"/render/{self.username}/farm", output_path.lstrip("/"))
 
         # Ensure the project_path starts with the desired prefix
         if not project_path.startswith(f"/render/{self.username}/farm"):
-            project_path = os.path.join(f"/render/{self.username}/farm", project_path.lstrip("/")).replace("\\", "/")
+            project_path = join_path(f"/render/{self.username}/farm", project_path.lstrip("/"))
 
         # Normalize the paths to handle any path formatting issues
-        output_path = os.path.normpath(output_path).replace("\\", "/")
-        project_path = os.path.normpath(project_path).replace("\\", "/") + "/"
+        output_path = os.path.normpath(output_path)
+        project_path = os.path.normpath(project_path) + "/"
 
 
         frame_range = f"{frame_start}-{frame_end}x{frame_step}"
@@ -143,7 +143,7 @@ class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
         output_file = re.sub(r'#+', '#', output_file)
         output_dir = os.path.dirname(output_path)
 
-        output_path = os.path.join(output_dir, output_file)
+        output_path = join_path(output_dir, output_file)
         
         output_dir, image_name, output_file_extension, frame_number_format = self.convert_render_path(output_path)
 
@@ -176,7 +176,7 @@ class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
         package['shell']="/bin/bash"
         pre_render = ""
 
-        pre_render += f"sed -i 's/\r//' /render/s5605094/ncca/source.sh; source /render/{self.username}/ncca/source.sh;"
+        pre_render += f"sed -i 's/\r//' /render/{self.username}/ncca/source.sh; source /render/{self.username}/ncca/source.sh;"
         pre_render += f"""mayapy /render/{self.username}/ncca/load_plugins.py;"""
 
         render_command = f"Render {render_options} {extra_commands} {self.render_path}"

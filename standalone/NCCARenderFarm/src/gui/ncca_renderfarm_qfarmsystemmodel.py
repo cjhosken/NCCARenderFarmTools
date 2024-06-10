@@ -167,13 +167,19 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
 
                 if "blend" in file_ext:
                     # Provide custom icon for .blend files
-                    return QIcon(join_path(SCRIPT_DIR, "assets/icons/blender.svg"))  
+                    return QIcon(BLENDER_ICON_PATH)  
                 
                 if "hip" in file_ext:
-                    return QIcon(join_path(SCRIPT_DIR, "assets/icons/houdini.png"))  
+                    return QIcon(HOUDINI_ICON_PATH)  
                 
                 if file_ext in [".ma", ".mb"]:
-                    return QIcon(join_path(SCRIPT_DIR, "assets/icons/maya.png"))  
+                    return QIcon(MAYA_ICON_PATH) 
+
+                if "nk" in file_ext:
+                    return QIcon(NUKEX_ICON_PATH)
+                
+                if "katana" in file_ext:
+                    return QIcon(KATANA_ICON_PATH)
 
                 if file_ext.lower() in VIEWABLE_IMAGE_FILES:
                     return QIcon(IMAGE_ICON_PATH)

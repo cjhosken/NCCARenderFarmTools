@@ -6,8 +6,7 @@ For Linux, run `./standalone/NCCARenderFarm/launch.sh` to run the standalone app
 For Windows run `. "./standalone/NCCARenderFarm/launch.ps1"` to run the standalone application.
 
 ## Current TODOs
-1. Fix Drag/Drop
-2. Threading for upload/download (to stop crashes)
+1. Katana and Nuke job submit
 
 ## TODOs
 1. Fix the renderfarm server

@@ -59,7 +59,7 @@ class NCCA_QSubmit_Blender(NCCA_QSubmitWindow):
         
 
         if (not output_path.startswith(f"/render/{self.username}/farm")):
-            output_path = os.path.join(f"/render/{self.username}/farm", output_path).replace("\\", "/")
+            output_path = join_path(f"/render/{self.username}/farm", output_path)
 
 
         output_file = os.path.basename(output_path)
@@ -69,7 +69,7 @@ class NCCA_QSubmit_Blender(NCCA_QSubmitWindow):
         output_file = re.sub(r'#+', '#'*frame_padding, output_file)
         output_dir = os.path.dirname(output_path)
 
-        output_path = os.path.join(output_dir, output_file).replace("\\", "/")
+        output_path = join_path(output_dir, output_file)
 
         frame_range = f"{frame_start}-{frame_end}x{frame_step}"
 
@@ -85,13 +85,14 @@ class NCCA_QSubmit_Blender(NCCA_QSubmitWindow):
         job['prototype'] = 'cmdrange'
         package = {}
         package['shell']="/bin/bash"
-        pre_render=f"chmod +x {BLENDER_PATH};"
+        pre_render=f""
+        pre_render += f"sed -i 's/\r//' /render/{self.username}/ncca/source.sh; source /render/{self.username}/ncca/source.sh;"
 
         # https://docs.blender.org/manual/en/latest/advanced/command_line/render.html
 
         render_command=f"{BLENDER_PATH} -b {self.render_path} -f QB_FRAME_NUMBER"
 
-        render_output_path = os.path.join(os.path.dirname(output_path), output_file_name_without_extension).replace("\\", "/")
+        render_output_path = join_path(os.path.dirname(output_path), output_file_name_without_extension)
 
         render_command+=f" -o {render_output_path}" if (output_path) else ""
         render_command+=f" -F {override_extension}" if override_extension else ""
@@ -104,9 +105,6 @@ class NCCA_QSubmit_Blender(NCCA_QSubmitWindow):
                 
         job['package'] = package
         
-        env={"HOME" :f"/render/{self.username}"}
-        
-        job['env']=env
         job["cwd"] = f"/render/{self.username}"
 
         job['agenda'] = qb.genframes(frame_range)

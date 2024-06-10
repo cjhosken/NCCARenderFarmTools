@@ -1,0 +1,1 @@
+cat katana_render_info.py

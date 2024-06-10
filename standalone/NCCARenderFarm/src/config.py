@@ -137,9 +137,24 @@ if OPERATING_SYSTEM == "windows":
 LOCAL_HYTHON_PATH = "/opt/hfs20.0.506/bin/hython"
 LOCAL_MAYAPY_PATH = "/opt/autodesk/maya2023/bin/mayapy"
 
+NUKEX_PATH=""
+LOCAL_NUKEX_PATH = ""
+
+KATANA_PATH=""
+LOCAL_KATANA_PATH=""
+
 if OPERATING_SYSTEM == "windows":
+    LOCAL_NUKEX_PATH=""
+    LOCAL_KATANA_PATH=""
     LOCAL_HYTHON_PATH = "C:/Program Files/Side Effects Software/Houdini 20.0.506/bin/hython.exe"
     LOCAL_MAYAPY_PATH = "C:/Program Files/Autodesk/Maya2023/bin/mayapy.exe"
+
+BLENDER_ICON_PATH=join_path(SCRIPT_DIR, "assets/icons/blender.svg")
+MAYA_ICON_PATH=join_path(SCRIPT_DIR, "assets/icons/maya.png")
+HOUDINI_ICON_PATH=join_path(SCRIPT_DIR, "assets/icons/houdini.png")
+NUKEX_ICON_PATH=join_path(SCRIPT_DIR, "assets/icons/nukex.png")
+KATANA_ICON_PATH=join_path(SCRIPT_DIR, "assets/icons/katana.png")
+
 
 MAYA_RENDER_ENGINES = {
     "Set by file": "file",

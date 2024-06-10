@@ -10,6 +10,8 @@ from gui.ncca_renderfarm_qfarmsystemmodel import NCCA_RenderFarm_QFarmSystemMode
 from jobs.ncca_qsubmit_blender import NCCA_QSubmit_Blender
 from jobs.ncca_qsubmit_houdini import NCCA_QSubmit_Houdini
 from jobs.ncca_qsubmit_maya import NCCA_QSubmit_Maya
+from jobs.ncca_qsubmit_nukex import NCCA_QSubmit_NukeX
+from jobs.ncca_qsubmit_katana import NCCA_QSubmit_Katana
 
 from utils import get_user_home
 from qube import launch_qube
@@ -498,45 +500,5 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         local_path = join_path(temp_dir.name, file_name)
 
         self.model().renderfarm.download(file_path, local_path, None)
-        data = None
-
-        if "blend" in file_ext:
-            data = read_blend_rend_chunk(local_path)
-            temp_dir.cleanup()
-            self.job_dialog = NCCA_QSubmit_Blender(username=self.username, file_path=file_path, file_data=data)
-            self.job_dialog.setGeometry(self.geometry())
-            self.job_dialog.show()
         
-        elif "hip" in file_ext:
-            QApplication.setOverrideCursor(Qt.WaitCursor)
-            command = [LOCAL_HYTHON_PATH, join_path(SCRIPT_DIR, "libs", "houdini_render_info.py"), local_path]
-            output = subprocess.check_output(command, stderr=subprocess.STDOUT, universal_newlines=True).strip()
-            match = re.search(r'{\s*"NCCA_RENDERFARM":\s*{.*?}\s*}', output, re.DOTALL)
-            
-            if match:
-                json_data = match.group()
-                data = json.loads(json_data)
-            
-            QApplication.restoreOverrideCursor()
-            self.job_dialog = NCCA_QSubmit_Houdini(username=self.username, file_path=file_path, file_data=data)
-            self.job_dialog.setGeometry(self.geometry())
-            self.job_dialog.show()
-
-        elif file_ext in [".mb", ".ma"]:
-            QApplication.setOverrideCursor(Qt.WaitCursor)
-            command = [LOCAL_MAYAPY_PATH, join_path(SCRIPT_DIR, "libs", "maya_render_info.py"), local_path]
-            output = subprocess.check_output(command, stderr=subprocess.STDOUT, universal_newlines=True).strip()
-            match = re.search(r'{\s*"NCCA_RENDERFARM":\s*{.*?}\s*}', output, re.DOTALL)
-
-            if match:
-                json_data = match.group()
-                data = json.loads(json_data)
-
-            QApplication.restoreOverrideCursor()
-            self.job_dialog = NCCA_QSubmit_Maya(username=self.username, file_path=file_path, file_data=data)
-            self.job_dialog.setGeometry(self.geometry())
-            self.job_dialog.show()
-        else:
-            self.job_dialog = NCCA_QSubmitWindow(username=self.username, file_path=file_path)
-            self.job_dialog.setGeometry(self.geometry())
-            self.job_dialog.show()
+        submit(file_path, folder_path, renderfarm, local_path)
