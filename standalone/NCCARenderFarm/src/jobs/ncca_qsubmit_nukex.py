@@ -77,6 +77,8 @@ class NCCA_QSubmit_NukeX(NCCA_QSubmitWindow):
 
         render_command=f"{NUKEX_PATH} -F QB_FRAME_NUMBER -x {self.render_path}"
 
+        print(render_command)
+
         package['cmdline']=f"{pre_render} {render_command}"
                 
         job['package'] = package

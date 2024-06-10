@@ -62,7 +62,7 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
             if child_item is None:
                 return QModelIndex()
 
-            # Only show files that exist within /home/username
+            # Only show files that exist within /home/username/farm
             if child_item['path'].startswith(self.home_path):
                 return self.createIndex(row, column, child_item)
 
@@ -92,9 +92,8 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
 
         # Check if children list exists before accessing its attributes
         if 'children' in grandparent_item and parent_item in grandparent_item['children']:
-            row = grandparent_item['children'].index(parent_item)
-            return self.createIndex(row, 0, parent_item)
-
+            parent_index = self.createIndex(grandparent_item['children'].index(parent_item), 0, parent_item)
+            return parent_index
         return QModelIndex()
 
     def rowCount(self, parent=QModelIndex()):

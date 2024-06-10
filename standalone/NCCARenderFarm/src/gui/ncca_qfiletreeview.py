@@ -230,6 +230,8 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             self.action_upload.triggered.connect(self.uploadFilesToSelectedIndex)
             self.action_upload = self.context_menu.addAction("Upload Folders")
             self.action_upload.triggered.connect(self.uploadFoldersToSelectedIndex)
+            self.action_project_submit = self.context_menu.addAction("Submit Project")
+            self.action_project_submit.triggered.connect(self.uploadProjectToSelectedIndex)
         else:
             _, file_ext = os.path.splitext(os.path.basename(file_path))
 
@@ -453,9 +455,6 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             if index.isValid():
                 self.expand(index)
 
-        if selected_index.isValid():
-            self.selectionModel().setCurrentIndex(selected_index, QItemSelectionModel.ClearAndSelect)
-
     def get_expanded_paths(self):
         """Returns a list of paths of currently expanded folders."""
         expanded_paths = []
@@ -514,6 +513,42 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             self.image_dialog = NCCA_QImageWindow(image_path=local_path)
             self.image_dialog.setGeometry(self.geometry())
             self.image_dialog.show()
+
+    def uploadProjectToSelectedIndex(self):
+        index = self.currentIndex()
+        if not index.isValid():
+            return
+
+        destination_folder = self.model().get_file_path(index)
+
+        self.submit_project(dest_folder=destination_folder)
+
+    def submit_project(self, dest_folder=None):
+        if dest_folder is None:
+            dest_folder = join_path(self.home_path, "projects")
+            if (not self.model().renderfarm.exists(dest_folder)):
+                self.model().renderfarm.mkdir(dest_folder)
+            elif (not self.model().renderfarm.isdir(dest_folder)):
+                self.model().renderfarm.mkdir(dest_folder)
+
+        options = QFileDialog.Options()
+        folder_path = QFileDialog.getExistingDirectory(self, "Select Directory", QDir.homePath(), options=options)
+
+        if not folder_path:
+            return
+
+        file_path, _ = QFileDialog.getOpenFileName(self, "Select Project File", folder_path, "All Files (*)", options=options)
+
+        if not file_path:
+            return
+
+        total_files = sum(len(files) for _, _, files in os.walk(folder_path))
+        progress_dialog = NCCA_QProgressDialog("Uploading project...", 0, total_files, None)
+
+        self.model().renderfarm.upload(folder_path, join_path(dest_folder, os.path.basename(folder_path)), progress_dialog)
+        self.refresh()
+
+        submit(self=self, file_path=file_path, folder_path=folder_path, renderfarm=self.model().renderfarm, username=self.username)
 
     def submitSelectedIndex(self):
         """Opens a window for users to submit their project to the renderfarm"""

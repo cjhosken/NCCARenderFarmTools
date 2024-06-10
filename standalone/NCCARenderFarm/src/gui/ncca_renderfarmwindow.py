@@ -76,17 +76,7 @@ class NCCA_RenderFarmWindow(NCCA_QMainWindow):
         """Sends the user to an info webpage"""
         QDesktopServices.openUrl(QUrl(INFO_LINK))
 
-    def submit_job(self):
-        options = QFileDialog.Options()
-        folder_path = QFileDialog.getExistingDirectory(self, "Select Directory", QDir.homePath(), options=options)
+    def submit_job(self, dest_folder):
+        self.browser.submit_project()
 
-        if not folder_path:
-            return
-
-        file_path, _ = QFileDialog.getOpenFileName(self, "Select Project File", folder_path, "All Files (*)", options=options)
-
-        if not file_path:
-            return
-
-
-        submit(self=self, file_path=file_path, folder_path=folder_path, renderfarm=self.browser.model().renderfarm, username=self.username)
+        
