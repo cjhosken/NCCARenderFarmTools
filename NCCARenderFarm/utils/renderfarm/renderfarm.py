@@ -1,5 +1,5 @@
 from config import *
-from gui.ncca_qprogressdialog import NCCA_QProgressDialog
+from gui.dialogs import *
 
 # Custom exceptions to be caught in the login page.
 class NCCA_RenderfarmConnectionError(Exception):

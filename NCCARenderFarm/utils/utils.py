@@ -1,24 +1,12 @@
 from config import *
 from gui.dialogs import *
 
-class NCCA_QubeError(Exception):
-    pass
-
-def get_user_home() -> str:
+def get_user_home():
     """Get the home directory of the current user."""
     return os.path.expanduser("~")
 
-def svg_to_pixmap(svg_filename: str, size: QSize, color: QColor) -> QPixmap:
-    """Creates a colored QPixmap from an SVG file.
-    
-    Args:
-        svg_filename (str): Path to the SVG file.
-        size (QSize): Desired size of the resulting QPixmap.
-        color (QColor): Color to apply to the SVG.
-
-    Returns:
-        QPixmap: The resulting colored pixmap.
-    """
+def svg_to_pixmap(svg_filename, size, color):
+    """Creates a colored QPixmap from an SVG file."""
 
     # Initialize SVG renderer with the specified SVG file
     svg_renderer = QSvgRenderer(svg_filename)
@@ -54,7 +42,7 @@ def qube_thread():
         # Read any error messages from the subprocess
         error_message = process.stderr.read().decode('utf-8')
         if error_message:
-            raise NCCA_QubeError(error_message)
+            raise Exception(error_message)
     
     except Exception as e:
         traceback_info = traceback.format_exc()
