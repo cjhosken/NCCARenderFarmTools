@@ -1,11 +1,6 @@
 from config import *
 from gui.ncca_qmessagebox import NCCA_QMessageBox
 
-def launch_qube():
-    """Run the qube_thread function in a separate thread."""
-    qube_thread = threading.Thread(target=qube_thread)
-    qube_thread.start()
-
 def qube_thread():
     """Open Qube! in a subprocess and handle any errors."""
     try:
@@ -25,4 +20,8 @@ def qube_thread():
             str(e),
             "Ok"
         )
-    
+
+def launch_qube():
+    """Run the qube_thread function in a separate thread."""
+    q_thread = threading.Thread(target=qube_thread)
+    q_thread.start()

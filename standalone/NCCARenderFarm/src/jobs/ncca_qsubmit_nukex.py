@@ -61,6 +61,8 @@ class NCCA_QSubmit_NukeX(NCCA_QSubmitWindow):
         frame_step = self.frame_step.text()
         external_commands = self.command.text()
 
+        frame_range = f"{frame_start}-{frame_end}x{frame_step}"
+
         job = {}
         job['name'] = job_name
         job['cpus'] = num_cpus
@@ -80,7 +82,7 @@ class NCCA_QSubmit_NukeX(NCCA_QSubmitWindow):
         job['package'] = package
     
         job["cwd"] = f"/render/{self.username}"
-        
+
         job['agenda'] = qb.genframes(frame_range)
 
         self.submit_job(job)

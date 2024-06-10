@@ -24,8 +24,8 @@ if __name__ == "__main__":
         render_cameras = [camera for camera in all_cameras if cmds.getAttr(f"{camera}.renderable")]
 
         # Get the playback options
-        start_frame = cmds.playbackOptions(q=True, min=True)
-        end_frame = cmds.playbackOptions(q=True, max=True)
+        start_frame = cmds.playbackOptions(q=True, animationStartTime=True)
+        end_frame = cmds.playbackOptions(q=True, animationEndTime=True)
         step_frame = cmds.playbackOptions(q=True, by=True)
 
         json_data = {

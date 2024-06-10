@@ -143,7 +143,7 @@ import qb
 LOCAL_HYTHON_PATH = "/opt/hfs20.0.506/bin/hython"
 LOCAL_MAYAPY_PATH = "/opt/autodesk/maya2023/bin/mayapy"
 
-HOUDINI_PATH=""
+HOUDINI_PATH="/opt/software/hfs20.0.506"
 
 NUKEX_PATH=""
 LOCAL_NUKEX_PATH = ""
