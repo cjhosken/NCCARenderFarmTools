@@ -7,13 +7,13 @@ For Windows run `. "./standalone/NCCARenderFarm/launch.ps1"` to run the standalo
 
 ## Current TODOs
 1. Fix the renderfarm server
-2. update Qb for Python 3.11
 
 ## TODOs
-3. Polish the code and check for bugs (reduce hanging)
-4. First release
-5. Implement into the machines
-6. Public Announcements
+1. VFX Reference Platform (update Qube)
+2. Polish the code and check for bugs (reduce hanging)
+3. First release
+4. Implement into the machines
+5. Public Announcements
 
 ## Bugs
 
