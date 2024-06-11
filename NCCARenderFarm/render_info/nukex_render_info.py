@@ -39,5 +39,6 @@ if __name__ == "__main__":
 
         # Print JSON data
         print(json.dumps(json_data, indent=4))
+
     except Exception as e:
         print(e)

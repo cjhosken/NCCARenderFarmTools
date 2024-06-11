@@ -122,8 +122,8 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                 if len(urls) > 1:
                     reply = NCCA_QMessageBox.question(
                         self,
-                        "Confirm Action",
-                        f"Are you sure you want to move the selected items to {destination_path}?",
+                        MOVE_CONFIRM_TITLE,
+                        MOVE_CONFIRM_GENERAL_LABEL.format(destination_path)
                     )
                     
                     if reply == QDialog.Accepted:
@@ -146,8 +146,8 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                             if not self.model().renderfarm.exists(join_path(destination_path, os.path.basename(file_path))):
                                 reply = NCCA_QMessageBox.question(
                                     self,
-                                    "Confirm Action",
-                                    f"Are you sure you want to move {file_path} to {destination_path}?",
+                                    MOVE_CONFIRM_TITLE,
+                                    MOVE_CONFIRM_LABEL.format(file_path, destination_path),
                                 )
                                 if reply == QDialog.Accepted:
                                     self.model().renderfarm.upload(file_path, join_path(destination_path, os.path.basename(file_path)))
@@ -159,8 +159,8 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                             if destination_path != file_path and not self.model().renderfarm.exists(join_path(destination_path, os.path.basename(file_path))):
                                 reply = NCCA_QMessageBox.question(
                                     self,
-                                    "Confirm Action",
-                                    f"Are you sure you want to move {file_path} to {destination_path}?",
+                                    MOVE_CONFIRM_TITLE,
+                                    MOVE_CONFIRM_LABEL.format(file_path, destination_path)
                                 )
                             
                                 if reply == QDialog.Accepted:
@@ -206,41 +206,41 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         self.context_menu.setCursor(Qt.PointingHandCursor)
 
         if file_path == self.home_path:
-            self.action_qube = self.context_menu.addAction("Qube!")
+            self.action_qube = self.context_menu.addAction(LAUNCH_QUBE_ACTION_LABEL)
             self.action_qube.triggered.connect(launch_qube)
         
         if self.model().renderfarm.isdir(file_path):
-            self.action_create = self.context_menu.addAction("New Folder")
+            self.action_create = self.context_menu.addAction(NEW_FOLDER_ACTION_LABEL)
             self.action_create.triggered.connect(self.createFolderUnderSelectedIndex)
-            self.action_upload = self.context_menu.addAction("Upload Files")
+            self.action_upload = self.context_menu.addAction(UPLOAD_FILES_ACTION_LABEL)
             self.action_upload.triggered.connect(self.uploadFilesToSelectedIndex)
-            self.action_upload = self.context_menu.addAction("Upload Folders")
+            self.action_upload = self.context_menu.addAction(UPLOAD_FOLDERS_ACTION_LABEL)
             self.action_upload.triggered.connect(self.uploadFoldersToSelectedIndex)
-            self.action_project_submit = self.context_menu.addAction("Submit Project")
+            self.action_project_submit = self.context_menu.addAction(SUBMIT_PROJECT_ACTION_LABEL)
             self.action_project_submit.triggered.connect(self.uploadProjectToSelectedIndex)
         else:
             _, file_ext = os.path.splitext(os.path.basename(file_path))
 
-            if file_ext in [".mb", ".ma", ".nk", ".katana", ".blend", ".hip", ".hipnc"]:
-                self.action_submit = self.context_menu.addAction("Submit Render Job")
+            if file_ext in SUPPORTED_DCC_EXTENSIONS:
+                self.action_submit = self.context_menu.addAction(SUBMIT_RENDER_JOB_ACTION_LABEL)
                 self.action_submit.triggered.connect(self.submitSelectedIndex)
 
             if file_ext in OPENABLE_FILES:
-                self.action_open = self.context_menu.addAction("Open")
+                self.action_open = self.context_menu.addAction(OPEN_ACTION_LABEL)
                 self.action_open.triggered.connect(self.openSelectedIndex)
 
-        self.action_download = self.context_menu.addAction("Download")
+        self.action_download = self.context_menu.addAction(DOWNLOAD_ACTION_LABEL)
         self.action_download.triggered.connect(self.downloadSelectedIndex)
 
         if file_path != self.home_path:
-            self.action_rename = self.context_menu.addAction("Rename")
+            self.action_rename = self.context_menu.addAction(RENAME_ACTION_LABEL)
             self.action_rename.triggered.connect(self.renameSelectedIndex)
-            self.action_delete = self.context_menu.addAction("Delete")
+            self.action_delete = self.context_menu.addAction(DELETE_ACTION_LABEL)
             self.action_delete.triggered.connect(self.deleteSelectedIndexes)
         else:
-            self.action_refresh = self.context_menu.addAction("Reload Farm")
+            self.action_refresh = self.context_menu.addAction(RELOAD_ACTION_LABEL)
             self.action_refresh.triggered.connect(self.refresh)
-            self.action_wipe = self.context_menu.addAction("Wipe Farm")
+            self.action_wipe = self.context_menu.addAction(WIPE_ACTION_LABEL)
             self.action_wipe.triggered.connect(self.wipeSelectedIndex)
 
         self.context_menu.setStyleSheet(f"""
@@ -277,13 +277,13 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             return
 
         # Prompt user for folder name
-        create_folder_dialog = NCCA_QInputDialog(placeholder="Folder Name", text="Folder", confirm_text="Add Folder", parent=self)
+        create_folder_dialog = NCCA_QInputDialog(placeholder=FOLDER_DIALOG_PLACEHOLDER, text=FOLDER_DIALOG_DEFAULT, confirm_text=FOLDER_DIALOG_CONFIRM, parent=self)
         if create_folder_dialog.exec_():
             folder_name = create_folder_dialog.getText()
             new_folder_path = join_path(parent_path, folder_name)
             # Check if folder already exists
             if self.model().renderfarm.exists(new_folder_path):
-                NCCA_QMessageBox.warning(self, "Error", f"{new_folder_path} already exists.")
+                NCCA_QMessageBox.warning(self, PATH_EXISTING_TITLE, PATH_EXISTING_LABEL.format(new_folder_path))
             else:
                 # Create new folder
                 self.model().renderfarm.mkdir(new_folder_path)
@@ -296,7 +296,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         file_dialog = QFileDialog(self)
         file_dialog.setFileMode(QFileDialog.ExistingFiles)  # Allow selecting files
         file_dialog.setViewMode(QFileDialog.Detail)
-        file_dialog.setWindowTitle("Select file(s) to upload")
+        file_dialog.setWindowTitle(UPLOAD_FILES_TITLE)
         file_dialog.setOption(QFileDialog.HideNameFilterDetails, True)
 
         index = self.currentIndex()
@@ -319,7 +319,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         folder_dialog = QFileDialog(self)
         folder_dialog.setFileMode(QFileDialog.Directory)  # Allow selecting directories
         folder_dialog.setViewMode(QFileDialog.Detail)
-        folder_dialog.setWindowTitle("Select folder(s) to upload")
+        folder_dialog.setWindowTitle(UPLOAD_FOLDERS_TITLE)
         folder_dialog.setOption(QFileDialog.HideNameFilterDetails, True)
 
         index = self.currentIndex()
@@ -341,17 +341,17 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         folder_dialog = QFileDialog(self)
         folder_dialog.setFileMode(QFileDialog.Directory if self.model().renderfarm.isdir(source_path) else QFileDialog.AnyFile)
         folder_dialog.setViewMode(QFileDialog.Detail)
-        folder_dialog.setWindowTitle("Select destination folder for download")
+        folder_dialog.setWindowTitle(DOWNLOAD_DESTINATION_TITLE)
         folder_dialog.setOption(QFileDialog.ShowDirsOnly, True)
         folder_dialog.selectFile(os.path.basename(source_path))
 
-        destination_path, _ = folder_dialog.getSaveFileName(self, "Select destination and rename",
-                                                            join_path(get_user_home(), os.path.basename(source_path)), f"All Files (*)",
+        destination_path, _ = folder_dialog.getSaveFileName(self, DOWNLOAD_DESTINATION_CAPTION,
+                                                            join_path(get_user_home(), os.path.basename(source_path)), DOWNLOAD_DESTINATION_FILTER,
                                                             options=QFileDialog.DontConfirmOverwrite)
 
         if destination_path:
             if os.path.exists(destination_path):
-                NCCA_QMessageBox.warning(self, "Error", f"{destination_path} already exists.")
+                NCCA_QMessageBox.warning(self, PATH_EXISTING_TITLE, PATH_EXISTING_LABEL.format(destination_path))
             else:
                 self.model().renderfarm.download(source_path, destination_path)
             
@@ -359,7 +359,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
     def deleteSelectedIndexes(self):
         """Deletes the selected indexes."""
         selected_indexes = self.selectedIndexes()
-        reply = NCCA_QMessageBox.question(self, "Confirm Deletion", f"Are you sure you want to delete the selected items?")
+        reply = NCCA_QMessageBox.question(self, DELETE_CONFIRM_TITLE, DELETE_CONFIRM_GENERAL_LABEL)
         if reply == QDialog.Accepted:
             file_paths = []
             for index in selected_indexes:
@@ -382,13 +382,13 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         index = self.currentIndex()
         file_path = self.model().get_file_path(index)
         if self.model().renderfarm.isdir(file_path):
-            reply = NCCA_QMessageBox.question(self, "Confirm Deletion", f"Are you sure you want to wipe {file_path}? This will delete ALL files.")
+            reply = NCCA_QMessageBox.question(self, DELETE_CONFIRM_TITLE, DELETE_CONFIRM_LABEL.format(file_path))
             if reply == QDialog.Accepted:
                 children = self.model().renderfarm.listdir(file_path)
                 self.model().renderfarm.delete(children, show_info=False)
-                self.model().renderfarm.mkdir(join_path(self.home_path, "output"))
+                self.model().renderfarm.mkdir(join_path(self.home_path, RENDERFARM_OUTPUT_DIR))
                 self.refresh()
-                NCCA_QMessageBox.info(self, "Wiped!", f"{file_path} has been wiped!")
+                NCCA_QMessageBox.info(self, WIPED_TITLE, file_path + WIPED_LABEL)
 
     def refresh(self):
         """Refreshes the view."""
@@ -432,13 +432,13 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         if file_path == self.home_path:
             return
 
-        rename_dialog = NCCA_QInputDialog(placeholder="Rename", text=os.path.basename(file_path), parent=self)
+        rename_dialog = NCCA_QInputDialog(placeholder=RENAME_PLACEHOLDER, text=os.path.basename(file_path), parent=self)
         if rename_dialog.exec_():
             new_name = rename_dialog.getText()
             new_file_path = join_path(os.path.dirname(file_path), new_name)
             if file_path != new_file_path:
                 if self.model().renderfarm.exists(new_file_path):
-                    NCCA_QMessageBox.warning(self, "Error", f"{new_file_path} already exists.")
+                    NCCA_QMessageBox.warning(self, RENAME_EXISTING_TITLE, RENAME_EXISTING_LABEL.format(new_file_path))
                 else:
                     self.model().renderfarm.rename(file_path, new_file_path)
                     self.refresh()
@@ -474,19 +474,19 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
 
     def submit_project(self, dest_folder=None):
         if dest_folder is None:
-            dest_folder = join_path(self.home_path, "projects")
+            dest_folder = join_path(self.home_path, RENDERFARM_PROJECT_DIR)
             if (not self.model().renderfarm.exists(dest_folder)):
                 self.model().renderfarm.mkdir(dest_folder)
             elif (not self.model().renderfarm.isdir(dest_folder)):
                 self.model().renderfarm.mkdir(dest_folder)
 
         options = QFileDialog.Options()
-        folder_path = QFileDialog.getExistingDirectory(self, "Select Directory", QDir.homePath(), options=options)
+        folder_path = QFileDialog.getExistingDirectory(self, DIR_SELECT_LABEL, QDir.homePath(), options=options)
 
         if not folder_path:
             return
 
-        file_path, _ = QFileDialog.getOpenFileName(self, "Select Project File", folder_path, "All Files (*)", options=options)
+        file_path, _ = QFileDialog.getOpenFileName(self, DCC_FILE_SELECT_LABEL, folder_path, DCC_FILE_FILTER, options=options)
 
         if not file_path:
             return
@@ -508,20 +508,19 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         if local_path is None:
             local_path=file_path
 
-        if "blend" in project_ext:
+        if project_ext in BLENDER_EXTENSIONS:
             data = read_blend_rend_chunk(local_path)
 
             self.job_dialog = NCCA_QSubmit_Blender(renderfarm=renderfarm, username=username, file_path=file_path, folder_path=project_folder, file_data=data)
             self.job_dialog.show()
             
-        elif "hip" in project_ext:
+        elif project_ext in HOUDINI_EXTENSIONS: 
             if (os.path.exists(LOCAL_HYTHON_PATH)):
                 QApplication.setOverrideCursor(Qt.WaitCursor)
                 command = [LOCAL_HYTHON_PATH, join_path(RENDER_INFO_PATH, "houdini_render_info.py"), local_path]
                 output = subprocess.check_output(command, stderr=subprocess.STDOUT, universal_newlines=True).strip()
                 match = re.search(r'{\s*"NCCA_RENDERFARM":\s*{.*?}\s*}', output, re.DOTALL)
 
-                     
                 if match:
                     json_data = match.group()
                     # Load JSON data
@@ -534,14 +533,14 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             else:
                 NCCA_QMessageBox.warning(
                         self,
-                        "NCCA Renderfarm",
-                        f"Hython could not be found on this machine. Proceeding without Houdini scene info."
+                        NO_HOUDINI_TITLE,
+                        NO_HOUDINI_LABEL
                 )
 
             self.job_dialog = NCCA_QSubmit_Houdini(renderfarm=renderfarm, username=username, file_path=file_path, folder_path=project_folder, file_data=data)
             self.job_dialog.show()
 
-        elif project_ext in [".mb", ".ma"]:
+        elif project_ext in MAYA_EXTENSIONS:
             if (os.path.exists(LOCAL_MAYAPY_PATH)):
                 QApplication.setOverrideCursor(Qt.WaitCursor)
                 command = [LOCAL_MAYAPY_PATH, join_path(RENDER_INFO_PATH, "maya_render_info.py"), local_path]
@@ -558,14 +557,14 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             else:
                 NCCA_QMessageBox.warning(
                     self,
-                    "NCCA Renderfarm",
-                    f"Mayapy could not be found on this machine. Proceeding without Maya scene info."
+                    NO_MAYA_TITLE,
+                    NO_MAYA_LABEL
                 )
 
             self.job_dialog = NCCA_QSubmit_Maya(renderfarm=renderfarm, username=username, file_path=file_path, folder_path=project_folder, file_data=data)
             self.job_dialog.show()
 
-        elif project_ext in [".nk", ".nknc"]:
+        elif project_ext in NUKEX_EXTENSIONS:
             if (os.path.exists(LOCAL_NUKEX_PATH)):
                 QApplication.setOverrideCursor(Qt.WaitCursor)
                 command = [LOCAL_NUKEX_PATH, "--nukex", "-t", join_path(SCRIPT_DIR, "libs", "nukex_render_info.py"), local_path]
@@ -584,14 +583,14 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             else:
                 NCCA_QMessageBox.warning(
                     self,
-                    "NCCA Renderfarm",
-                    f"NukeX could not be found on this machine. Proceeding without NukeX scene info."
+                    NO_NUKEX_TITLE,
+                    NO_NUKEX_LABEL
                 )
 
             self.job_dialog = NCCA_QSubmit_NukeX(renderfarm=renderfarm, username=username, file_path=file_path, folder_path=project_folder, file_data=data)
             self.job_dialog.show()
 
-        elif project_ext in [".katana"]:
+        elif project_ext in KATANA_EXTENSIONS:
             if (os.path.exists(LOCAL_KATANA_PATH)):
                 QApplication.setOverrideCursor(Qt.WaitCursor)
                 command = [LOCAL_KATANA_PATH, "--script", join_path(SCRIPT_DIR, "libs", "katana_render_info.py"), local_path]
@@ -607,19 +606,18 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             else:
                 NCCA_QMessageBox.warning(
                     self,
-                    "NCCA Renderfarm",
-                    f"Katana could not be found on this machine. Proceeding without Katana scene info."
+                    NO_KATANA_TITLE,
+                    NO_KATANA_LABEL
                 )
 
             self.job_dialog = NCCA_QSubmit_Katana(renderfarm=renderfarm, username=username, file_path=file_path, folder_path=project_folder, file_data=data)
             self.job_dialog.show()
         else:
             NCCA_QMessageBox.warning(
-                None,
-                "Error",
-                f"{project_ext} not supported. Please choose a supported software file."
+                self,
+                UNSUPPORTED_SOFTWARE_TITLE,
+                UNSUPPORTED_SOFTWARE_LABEL.format(project_ext)
             )
-            return
         
     def run_submit_job_async(self, file_path, folder_path, local_path=None):
         self.submit_job(file_path, folder_path, local_path)

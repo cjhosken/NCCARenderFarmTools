@@ -38,8 +38,9 @@ if __name__ == "__main__":
         }
 
         print(json.dumps(json_data, indent=4))
+    except Exception as e:
+        print(e)
 
-    
     finally:
         # Clean up: close the scene and uninitialize Maya standalone
         cmds.file(force=True, new=True)
