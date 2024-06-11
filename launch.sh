@@ -3,9 +3,9 @@
 # Function to detect the home directory
 detect_home_dir() {
     case "$(uname -s)" in
-        Linux*|Darwin*) HOME_DIR="$HOME";;
-        CYGWIN*|MINGW*|MSYS*|MINGW32*|MINGW64*) HOME_DIR="C:/Users/$(whoami)";;
-        *) HOME_DIR="UNKNOWN"
+        Linux*|Darwin*) CHOME="$HOME";;
+        CYGWIN*|MINGW*|MSYS*|MINGW32*|MINGW64*) CHOME="C:/Users/$(whoami)";;
+        *) CHOME="UNKNOWN"
     esac
 }
 
@@ -20,28 +20,39 @@ detect_os() {
     echo "NCCA | Detected OS: $OS"
 }
 
-# Set the HOME environment variable to the detected home directory
-set_home_env() {
-    export HOME="$HOME_DIR"
-}
-
 # Function to install pyenv-win on Windows
 install_pyenv_windows() {
     if ! command -v pyenv &> /dev/null; then
         echo "NCCA | pyenv-win not found. Installing pyenv-win..."
 
-        INSTALL_DIR="$HOME/.pyenv"
+        INSTALL_DIR="$CHOME/.pyenv"
 
         # Clone pyenv-win repository
-        if [ -d "$INSTALL_DIR" ]; then
+        if [ ! -d "$INSTALL_DIR" ]; then
             echo "NCCA | Removing existing $INSTALL_DIR directory..."
             rm -rf "$INSTALL_DIR"
         fi
+
+        if [ ! -d "$HOME/.pyenv" ]; then
+            echo "NCCA | Removing existing $HOME/.pyenv directory..."
+            rm -rf "$HOME/.pyenv"
+        fi
         
+        git clone https://github.com/pyenv-win/pyenv-win.git "$HOME/.pyenv"
+
         git clone https://github.com/pyenv-win/pyenv-win.git $INSTALL_DIR
 
         # Add pyenv-win paths to the environment
         export PATH="$INSTALL_DIR/pyenv-win/bin:$INSTALL_DIR/pyenv-win/shims:$PATH"
+
+        # Persist pyenv-win paths in shell profile
+        if [ -f "$HOME/.bash_profile" ]; then
+            echo 'export PATH="$INSTALL_DIR/pyenv-win/bin:$INSTALL_DIR/pyenv-win/shims:$PATH"' >> "$HOME/.bash_profile"
+            source "$HOME/.bash_profile"
+        elif [ -f "$HOME/.bashrc" ]; then
+            echo 'export PATH="$INSTALL_DIR/pyenv-win/bin:$INSTALL_DIR/pyenv-win/shims:$PATH"' >> "$HOME/.bashrc"
+            source "$HOME/.bashrc"
+        fi
 
         echo "NCCA | pyenv-win installed successfully."
     else
@@ -64,7 +75,6 @@ verify_pyenv() {
 main() {
     detect_os
     detect_home_dir
-    set_home_env
 
     if [ "$OS" == "UNKNOWN" ]; then
         echo "NCCA | Unsupported OS. Exiting."
