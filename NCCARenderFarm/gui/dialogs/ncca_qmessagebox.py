@@ -27,19 +27,15 @@ class NCCA_QMessageBox(NCCA_QDialog):
         # Message label
         self.label = QLabel("")
         self.label.setWordWrap(True)
-        if (self.size() == LARGE_MESSAGE_BOX_SIZE):
-            self.label.setContentsMargins(10, 10, 10, 10)
-        else:
-            self.label.setContentsMargins(0, 0, 0, 0)
-            self.label.setBaseSize(SMALL_MESSAGE_BOX_SIZE.width(),SMALL_MESSAGE_BOX_SIZE.height() - APP_NAVBAR_HEIGHT)
-        self.label.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        self.label.setAlignment(Qt.AlignCenter)
+        self.label.setContentsMargins(10, 10, 10, 10)
+        self.label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         if (self.size() == LARGE_MESSAGE_BOX_SIZE):
             # Scroll area for message label
             self.scroll_area = QScrollArea()
-            self.scroll_area.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-            self.scroll_area.setMaximumSize(QSize(self.size().width() - 50, self.size().height() - APP_NAVBAR_HEIGHT - 75))
-            self.scroll_area.setContentsMargins(10, 10, 10, 20)
+            self.scroll_area.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+            self.scroll_area.setContentsMargins(10, 10, 10, 10)
             self.scroll_area.setWidgetResizable(True)
             self.scroll_area.setAlignment(Qt.AlignCenter)
             self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -73,12 +69,10 @@ class NCCA_QMessageBox(NCCA_QDialog):
             self.main_layout.addWidget(self.scroll_area)
         else:
             self.main_layout.addWidget(self.label)
-        self.main_layout.addStretch()
 
         # Button box for buttons
         self.button_box = QDialogButtonBox(Qt.Horizontal)
         self.main_layout.addWidget(self.button_box, alignment=Qt.AlignCenter)
-        self.main_layout.addStretch()
 
     @staticmethod
     def _create_popup(parent, title, text, icon_path=INFO_ICON_PATH, confirm_text="Ok", size=SMALL_MESSAGE_BOX_SIZE):

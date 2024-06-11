@@ -65,10 +65,10 @@ class NCCA_QDialog(QDialog):
 
         # Main layout
         self.main_layout = QVBoxLayout()
-        self.main_layout.addStretch()
 
     def end_ui(self):
         """Runs after the customization in classes that inherit from NCCA_QDialog."""
+        #self.main_layout.addStretch()
         self.header_layout.addStretch()
         self.header_layout.addWidget(self.close_button)
         self.root_layout.addLayout(self.header_layout)
