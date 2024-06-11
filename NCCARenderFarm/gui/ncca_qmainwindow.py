@@ -5,6 +5,8 @@ from resources import *
 class NCCA_QMainWindow(QMainWindow):
     """Custom QMainWindow class"""
 
+    TMP_DIRS = []
+
     def __init__(self, name: str, size: QSize):
         """Initialize the main window"""
         super().__init__()
@@ -13,6 +15,7 @@ class NCCA_QMainWindow(QMainWindow):
 
         self.init_ui()
         self.end_ui()
+        self.setFocus()
 
     def init_ui(self):
         """Initialize the UI"""

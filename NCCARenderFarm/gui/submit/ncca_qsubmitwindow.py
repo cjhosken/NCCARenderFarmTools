@@ -18,6 +18,9 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
         self.name = name
         self.username = username
         self.renderfarm = renderfarm
+
+        self.source_command = f"sed -i 's/\r//' /render/{self.username}/{NCCA_PACKAGE_DIR}/source.sh; source /render/{self.username}/{NCCA_PACKAGE_DIR}/source.sh;"
+
         super().__init__(self.name, size=SUBMIT_WINDOW_SIZE)
 
     def init_ui(self):

@@ -172,14 +172,11 @@ class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
         package['shell']="/bin/bash"
         pre_render = ""
 
-        pre_render += f"sed -i 's/\r//' /render/{self.username}/ncca/source.sh; source /render/{self.username}/ncca/source.sh;"
-        pre_render += f"""mayapy /render/{self.username}/ncca/load_plugins.py;"""
+        pre_render += f"""mayapy /render/{self.username}/{NCCA_PACKAGE_DIR}/load_plugins.py;"""
 
         render_command = f"Render {render_options} {extra_commands} {self.render_path}"
 
-        
-
-        package['cmdline'] = f"{pre_render} {render_command}"
+        package['cmdline']=f"{self.source_command} {pre_render} {render_command}"
         
         job['package'] = package
 

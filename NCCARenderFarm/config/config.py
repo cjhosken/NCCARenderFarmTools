@@ -5,7 +5,7 @@ from PySide6.QtSvg import *
 import sys, os, shutil, tempfile, re, json
 from cryptography.fernet import Fernet
 from dotenv import load_dotenv
-import paramiko, socket, subprocess, threading, zipfile, stat
+import paramiko, socket, subprocess, threading, zipfile, stat, queue
 os.environ["OPENCV_IO_ENABLE_OPENEXR"] = "1" 
 from PIL import Image, ImageTk
 import cv2, numpy as np
@@ -90,6 +90,7 @@ SETTINGS_WINDOW_SIZE = QSize(500, 500)
 SUBMIT_WINDOW_SIZE = QSize(500, 600)
 IMAGE_WINDOW_SIZE = QSize(1280, 720 + APP_NAVBAR_HEIGHT)
 MESSAGE_BOX_SIZE = QSize(300, 400)
+PROGRESS_BOX_SIZE = QSize(300, 150)
 
 APP_BORDER_RADIUS="10px"
 NCCA_CONNECTION_ERROR_MESSAGE= "Unable to connect to the NCCA Renderfarm. Try again later."
@@ -104,7 +105,7 @@ if OPERATING_SYSTEM == "windows":
     QUBE_LAUNCHER_PATH = "C:/Program Files (x86)/pfx/qube/bin/qube.exe"
     QUBE_PYTHON_BIN = "C:/Program Files/pfx/qube/api/python"
 
-QUBE_ERROR = ""
+QB_IMPORT_ERROR = ""
 
 try:
     sys.path.append(QUBE_PYTHON_BIN)

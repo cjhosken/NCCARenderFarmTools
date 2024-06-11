@@ -33,6 +33,7 @@ class NCCA_QDialog(QDialog):
         # Set up main layout
         self.init_ui()
         self.end_ui()
+        self.setFocus()
 
     def init_ui(self):
         """Allows customization in classes that inherit from NCCA_QDialog."""

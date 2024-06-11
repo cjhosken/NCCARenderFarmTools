@@ -67,7 +67,7 @@ class NCCA_QSubmit_NukeX(NCCA_QSubmitWindow):
         package = {}
         package['shell']="/bin/bash"
         pre_render=""
-        pre_render += f"sed -i 's/\r//' /render/{self.username}/ncca/source.sh; source /render/{self.username}/ncca/source.sh;"
+        pre_render += f""
 
         # https://learn.foundry.com/nuke/content/comp_environment/configuring_nuke/command_line_operations.html
 
@@ -75,7 +75,7 @@ class NCCA_QSubmit_NukeX(NCCA_QSubmitWindow):
 
         print(render_command)
 
-        package['cmdline']=f"{pre_render} {render_command}"
+        package['cmdline']=f"{self.source_command} {pre_render} {render_command}"
                 
         job['package'] = package
     

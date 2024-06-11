@@ -36,13 +36,12 @@ class NCCA_QSubmit_Katana(NCCA_QSubmitWindow):
         package = {}
         package['shell']="/bin/bash"
         pre_render=f""
-        pre_render += f"sed -i 's/\r//' /render/{self.username}/ncca/source.sh; source /render/{self.username}/ncca/source.sh;"
 
         # https://learn.foundry.com/katana/content/tg/launch_modes/batch_mode.html
 
         render_command=f"{KATANA_PATH} --batch -katana-file {self.render_path} -t QB_FRAME_NUMBER"
 
-        package['cmdline']=f"{pre_render} {render_command}"
+        package['cmdline']=f"{self.source_command} {pre_render} {render_command}"
 
         print(render_command)
                 

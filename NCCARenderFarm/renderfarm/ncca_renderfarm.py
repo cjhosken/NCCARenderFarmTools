@@ -1,5 +1,6 @@
 from config import *
 from gui.dialogs import *
+from .payload import PAYLOAD_DIR
 
 # Custom exceptions to be caught in the login page.
 class NCCA_RenderfarmConnectionError(Exception):
@@ -55,9 +56,9 @@ class NCCA_RenderFarm(paramiko.SSHClient):
                 ncca_dir = join_path("/home", username, NCCA_PACKAGE_DIR)
 
                 if self.exists(ncca_dir) and self.isdir(ncca_dir):
-                    self.delete(ncca_dir)
+                    self.delete_folder(ncca_dir)
                 
-                self.upload_folder(join_path(SCRIPT_DIR, "package", "ncca"), ncca_dir, None)
+                self.upload_folder(PAYLOAD_DIR, ncca_dir, None)
                     
             except paramiko.AuthenticationException:
                 raise NCCA_RenderfarmInvalidLoginError()
@@ -72,7 +73,10 @@ class NCCA_RenderFarm(paramiko.SSHClient):
 
     def listdir(self, remote_path):
         """Returns a list of all children of the directory on the remote SFTP server."""
-        return self.sftp.listdir(remote_path)
+        children = []
+        for child in self.sftp.listdir(remote_path):
+            children.append(join_path(remote_path, child))
+        return children
     
     def isdir(self, remote_path):
         """Checks if the given path is a directory on the remote SFTP server."""
@@ -89,15 +93,24 @@ class NCCA_RenderFarm(paramiko.SSHClient):
         except IOError:
             return False
 
-    def upload(self, local_path, remote_path, total_files=1):
+    def upload(self, upload_items):
         """Uploads a file from local to the remote SFTP server."""
-        
-        progress_dialog = NCCA_QProgressDialog("Uploading files...", 0, total_files, None)
-        
-        if os.path.isdir(local_path):
-            self.upload_folder(local_path, remote_path, progress_dialog)
-        else:
-            self.upload_file(local_path, remote_path, progress_dialog)
+
+        total_files = 1
+        progress_dialog = NCCA_QProgressDialog("Counting files...", 0, 1, None)
+        progress_dialog.show()
+        progress_dialog.setText("Uploadng Files...")
+        progress_dialog.setMaximum(total_files)
+
+        for item in upload_items:
+            if os.path.isdir(item[0]):
+                self.upload_folder(item[0], item[1], progress_dialog)
+            else:
+                self.upload_file(item[0], item[1], progress_dialog)
+
+        progress_dialog.close()
+        NCCA_QMessageBox.info(parent=None, text="Files have been uploaded!")
+        QApplication.restoreOverrideCursor()
 
     def upload_file(self, local_file_path, remote_file_path, progress_dialog=None):
         self.sftp.put(local_file_path, remote_file_path)
@@ -119,13 +132,22 @@ class NCCA_RenderFarm(paramiko.SSHClient):
 
     def download(self, remote_path, local_path):
         """Downloads a file or directory from the remote SFTP server to local."""
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        progress_dialog = NCCA_QProgressDialog("Counting files...", 0, 1, None)
+        progress_dialog.show()
         total_files = self.count_files(remote_path)
-        progress_dialog = NCCA_QProgressDialog("Uploading files...", 0, total_files, None)
+        progress_dialog.setText("Downlading Files...")
+        progress_dialog.setMaximum(total_files)
 
         if self.isdir(remote_path):
             self.download_folder(remote_path, local_path, progress_dialog)
         else:
             self.download_file(remote_path, local_path, progress_dialog)
+
+        progress_dialog.close()
+        NCCA_QMessageBox.info(parent=None, text="Files have been uploaded!")
+        QApplication.restoreOverrideCursor()
+
 
     def download_folder(self, remote_folder_path, local_folder_path, progress_dialog=None):
         os.makedirs(local_folder_path, exist_ok=True)
@@ -142,16 +164,32 @@ class NCCA_RenderFarm(paramiko.SSHClient):
         if progress_dialog is not None:
             progress_dialog.setValue(progress_dialog.value() + 1)
 
-    def delete(self, remote_path):
+    def delete(self, remote_paths):
+        QApplication.setOverrideCursor(Qt.WaitCursor)
         """Deletes a file or directory from the remote SFTP server."""
-        num_files = self.count_files(remote_path)  # Count files before deletion
-        progress_dialog = NCCA_QProgressDialog("Deleting files...", 0, num_files, None)
+        progress_dialog = NCCA_QProgressDialog("Counting files...", 0, 1, None)
+        progress_dialog.show()
+        total_files = 0
+        
+        for remote_path in remote_paths:
+            total_files += self.count_files(remote_path)
 
-        if self.isdir(remote_path):
-            self.delete_dir(remote_path, progress_dialog)
-            self.sftp.rmdir(remote_path)
-        else:
-            self.delete_file(remote_path, progress_dialog)
+        progress_dialog.setText("Deleting Files...")
+        progress_dialog.setMaximum(total_files)
+
+        for path in remote_paths:
+            remote_path = path
+            if (self.exists(remote_path)):
+                if self.isdir(remote_path):
+                    self.delete_folder(remote_path, progress_dialog)
+                    self.sftp.rmdir(remote_path)
+                else:
+                    self.delete_file(remote_path, progress_dialog)
+
+
+        progress_dialog.close()
+        NCCA_QMessageBox.info(parent=None, text="Files have been deleted!")
+        QApplication.restoreOverrideCursor()
 
     def count_files(self, remote_path):
         """Recursively count all files in a directory."""
@@ -165,14 +203,14 @@ class NCCA_RenderFarm(paramiko.SSHClient):
 
         return file_count
     
-    def delete_dir(self, remote_folder_path, progress_dialog=None):
+    def delete_folder(self, remote_folder_path, progress_dialog=None):
         """Recursively delete all contents of a directory."""
         for remote_item_path in self.listdir(remote_folder_path):
             if self.isdir(remote_item_path):
-                self.delete_dir(remote_item_path, progress_dialog)
+                self.delete_folder(remote_item_path, progress_dialog)
                 self.sftp.rmdir(remote_item_path)
             else:
-                self.delete_file()
+                self.delete_file(remote_item_path, progress_dialog)
 
     def delete_file(self, remote_file_path, progress_dialog=None):
         self.sftp.remove(remote_file_path)

@@ -6,6 +6,7 @@ from .dialogs import *
 
 from .ncca_qmainwindow import NCCA_QMainWindow
 from .ncca_renderfarmwindow import NCCA_RenderFarmWindow
+from resources import *
 
 class NCCA_LoginWindow(NCCA_QMainWindow):
     """Interface for the user to login to the application"""

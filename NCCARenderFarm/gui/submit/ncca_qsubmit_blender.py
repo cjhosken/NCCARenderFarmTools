@@ -85,7 +85,6 @@ class NCCA_QSubmit_Blender(NCCA_QSubmitWindow):
         package = {}
         package['shell']="/bin/bash"
         pre_render=f""
-        pre_render += f"sed -i 's/\r//' /render/{self.username}/ncca/source.sh; source /render/{self.username}/ncca/source.sh;"
 
         # https://docs.blender.org/manual/en/latest/advanced/command_line/render.html
 
@@ -98,7 +97,7 @@ class NCCA_QSubmit_Blender(NCCA_QSubmitWindow):
         render_command+=f" -E {renderer}" if renderer else ""
         render_command+=f" {external_commands}" if external_commands else ""
 
-        package['cmdline']=f"{pre_render} {render_command}"
+        package['cmdline']=f"{self.source_command} {pre_render} {render_command}"
 
         print(render_command)
                 
