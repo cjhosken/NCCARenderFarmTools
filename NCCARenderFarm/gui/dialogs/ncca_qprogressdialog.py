@@ -42,6 +42,7 @@ class NCCA_QProgressDialog(NCCA_QDialog):
         """)
 
         self.main_layout.addWidget(self.progress_dialog)
+        self.main_layout.addStretch()
 
     def end_ui(self):
         """Runs after the customization in classes that inherit from NCCA_QDialog."""

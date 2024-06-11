@@ -73,7 +73,7 @@ class NCCA_QMessageBox(NCCA_QDialog):
             self.main_layout.addWidget(self.scroll_area)
         else:
             self.main_layout.addWidget(self.label)
-        self.main_layout.addStretch(1)
+        self.main_layout.addStretch()
 
         # Button box for buttons
         self.button_box = QDialogButtonBox(Qt.Horizontal)

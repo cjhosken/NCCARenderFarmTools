@@ -96,33 +96,40 @@ class NCCA_RenderFarm(paramiko.SSHClient):
     def upload(self, upload_items, show_info=True, show_progress=True):
         """Uploads a file from local to the remote SFTP server."""
         QApplication.setOverrideCursor(Qt.WaitCursor)
-        progress_dialog = None
-        if (show_progress):
-            progress_dialog = NCCA_QProgressDialog("Upload","Counting files...", 0, 1, None)
-            progress_dialog.show()
-            QApplication.processEvents()
-            progress_dialog.setText("Uploadng Files...")
+        try:
+            progress_dialog = None
+            if (show_progress):
+                progress_dialog = NCCA_QProgressDialog("Upload","Counting files...", 0, 1, None)
+                progress_dialog.show()
+                QApplication.processEvents()
+                progress_dialog.setText("Uploadng Files...")
 
-            total_files = 0
+                total_files = 0
+                for item in upload_items:
+                    if os.path.isdir(item[0]):
+                        # This needs fixing
+                        __, __, files = os.walk(item[0])
+                        total_files += len(files)
+                    else:
+                        item += 1
+
+                progress_dialog.setMaximum(total_files)
+
             for item in upload_items:
                 if os.path.isdir(item[0]):
-                    for root, dirs, files in os.walk(item[0]):
-                        total_files += len(files)
+                    self.upload_folder(item[0], item[1], progress_dialog)
                 else:
-                    item += 1
+                    self.upload_file(item[0], item[1], progress_dialog)
 
-            progress_dialog.setMaximum(total_files)
+            if (show_progress):
+                progress_dialog.close()
+            if (show_info):
+                NCCA_QMessageBox.info(parent=None, text="Files have been uploaded!")
+                
+        except Exception as e:
+            traceback_info = traceback.format_exc()
+            NCCA_QMessageBox.warning(None, text=f"Something went wrong in upload. \n {str(e)}\n\nTraceback:\n{traceback_info}")
 
-        for item in upload_items:
-            if os.path.isdir(item[0]):
-                self.upload_folder(item[0], item[1], progress_dialog)
-            else:
-                self.upload_file(item[0], item[1], progress_dialog)
-
-        if (show_progress):
-            progress_dialog.close()
-        if (show_info):
-            NCCA_QMessageBox.info(parent=None, text="Files have been uploaded!")
         QApplication.restoreOverrideCursor()
 
     def upload_file(self, local_file_path, remote_file_path, progress_dialog=None):
@@ -146,24 +153,28 @@ class NCCA_RenderFarm(paramiko.SSHClient):
     def download(self, remote_path, local_path, show_info=True, show_progress=True):
         """Downloads a file or directory from the remote SFTP server to local."""
         QApplication.setOverrideCursor(Qt.WaitCursor)
-        progress_dialog = None
-        if (show_progress):
-            progress_dialog = NCCA_QProgressDialog("Download", "Counting files...", 0, 1, None)
-            progress_dialog.show()
-            QApplication.processEvents()
-            total_files = self.count_files(remote_path)
-            progress_dialog.setText("Downlading Files...")
-            progress_dialog.setMaximum(total_files)
+        try:
+            progress_dialog = None
+            if (show_progress):
+                progress_dialog = NCCA_QProgressDialog("Download", "Counting files...", 0, 1, None)
+                progress_dialog.show()
+                QApplication.processEvents()
+                total_files = self.count_files(remote_path)
+                progress_dialog.setText("Downlading Files...")
+                progress_dialog.setMaximum(total_files)
 
-        if self.isdir(remote_path):
-            self.download_folder(remote_path, local_path, progress_dialog)
-        else:
-            self.download_file(remote_path, local_path, progress_dialog)
+            if self.isdir(remote_path):
+                self.download_folder(remote_path, local_path, progress_dialog)
+            else:
+                self.download_file(remote_path, local_path, progress_dialog)
 
-        if (show_progress):
-            progress_dialog.close()
-        if (show_info):
-            NCCA_QMessageBox.info(parent=None, text="Files have been uploaded!")
+            if (show_progress):
+                progress_dialog.close()
+            if (show_info):
+                NCCA_QMessageBox.info(parent=None, text="Files have been uploaded!")
+        except Exception as e:
+            traceback_info = traceback.format_exc()
+            NCCA_QMessageBox.warning(None, text=f"Something went wrong in download. \n {str(e)}\n\nTraceback:\n{traceback_info}")
         QApplication.restoreOverrideCursor()
 
     def download_folder(self, remote_folder_path, local_folder_path, progress_dialog=None):
@@ -184,33 +195,38 @@ class NCCA_RenderFarm(paramiko.SSHClient):
     def delete(self, remote_paths, show_info=False, show_progress=True):
         QApplication.setOverrideCursor(Qt.WaitCursor)
         """Deletes a file or directory from the remote SFTP server."""
-        progress_dialog = None
-        if (show_progress):
-            progress_dialog = NCCA_QProgressDialog("Delete","Counting files...", 0, 1, None)
-            progress_dialog.show()
-            QApplication.processEvents()
-            total_files = 0
-        
-            for remote_path in remote_paths:
-                total_files += self.count_files(remote_path)
+        try:
+            progress_dialog = None
+            if (show_progress):
+                progress_dialog = NCCA_QProgressDialog("Delete","Counting files...", 0, 1, None)
+                progress_dialog.show()
+                QApplication.processEvents()
+                total_files = 0
+            
+                for remote_path in remote_paths:
+                    total_files += self.count_files(remote_path)
 
-            progress_dialog.setText("Deleting Files...")
-            progress_dialog.setMaximum(total_files)
+                progress_dialog.setText("Deleting Files...")
+                progress_dialog.setMaximum(total_files)
 
-        for path in remote_paths:
-            remote_path = path
-            if (self.exists(remote_path)):
-                if self.isdir(remote_path):
-                    self.delete_folder(remote_path, progress_dialog)
-                    self.sftp.rmdir(remote_path)
-                else:
-                    self.delete_file(remote_path, progress_dialog)
+            for path in remote_paths:
+                remote_path = path
+                if (self.exists(remote_path)):
+                    if self.isdir(remote_path):
+                        self.delete_folder(remote_path, progress_dialog)
+                        self.sftp.rmdir(remote_path)
+                    else:
+                        self.delete_file(remote_path, progress_dialog)
 
 
-        if (show_progress):
-            progress_dialog.close()
-        if (show_info):
-            NCCA_QMessageBox.info(parent=None, text="Files have been deleted!")
+            if (show_progress):
+                progress_dialog.close()
+            if (show_info):
+                NCCA_QMessageBox.info(parent=None, text="Files have been deleted!")
+        except Exception as e:
+            traceback_info = traceback.format_exc()
+            NCCA_QMessageBox.warning(None, text=f"Something went wrong in delete. \n {str(e)}\n\nTraceback:\n{traceback_info}")
+
         QApplication.restoreOverrideCursor()
 
     def count_files(self, remote_path):

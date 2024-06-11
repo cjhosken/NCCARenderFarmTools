@@ -458,7 +458,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             temp_dir = tempfile.TemporaryDirectory(dir=get_user_home())
             local_path = join_path(temp_dir.name, file_name)
 
-            self.model().renderfarm.download(file_path, local_path, show_info=False, show_progress=False)
+            self.model().renderfarm.download(remote_path=file_path, local_path=local_path, show_info=False, show_progress=False)
             self.image_dialog = NCCA_ImageWindow(image_path=local_path)
             self.image_dialog.setGeometry(self.geometry())
             self.image_dialog.show()
@@ -491,7 +491,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         if not file_path:
             return
 
-        self.model().renderfarm.upload(folder_path, join_path(dest_folder, os.path.basename(folder_path)), show_info=False)
+        self.model().renderfarm.upload(upload_items=(folder_path, join_path(dest_folder, os.path.basename(folder_path))), show_info=False)
         self.refresh()
 
         self.run_submit_job_async(file_path=file_path, folder_path=folder_path)
@@ -639,7 +639,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         
         local_path = join_path(temp_dir.name, file_name)
 
-        self.model().renderfarm.download(file_path, local_path, show_info=False, show_progress=False)
+        self.model().renderfarm.download(remote_path=file_path, local_path=local_path, show_info=False, show_progress=False)
 
         self.run_submit_job_async(file_path=file_path, folder_path=None, local_path=local_path)
 
