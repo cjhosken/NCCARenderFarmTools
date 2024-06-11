@@ -97,7 +97,7 @@ class NCCA_RenderFarm(paramiko.SSHClient):
         """Uploads a file from local to the remote SFTP server."""
 
         total_files = 1
-        progress_dialog = NCCA_QProgressDialog("Counting files...", 0, 1, None)
+        progress_dialog = NCCA_QProgressDialog("Upload","Counting files...", 0, 1, None)
         progress_dialog.show()
         progress_dialog.setText("Uploadng Files...")
         progress_dialog.setMaximum(total_files)
@@ -133,7 +133,7 @@ class NCCA_RenderFarm(paramiko.SSHClient):
     def download(self, remote_path, local_path):
         """Downloads a file or directory from the remote SFTP server to local."""
         QApplication.setOverrideCursor(Qt.WaitCursor)
-        progress_dialog = NCCA_QProgressDialog("Counting files...", 0, 1, None)
+        progress_dialog = NCCA_QProgressDialog("Download", "Counting files...", 0, 1, None)
         progress_dialog.show()
         total_files = self.count_files(remote_path)
         progress_dialog.setText("Downlading Files...")
@@ -148,13 +148,12 @@ class NCCA_RenderFarm(paramiko.SSHClient):
         NCCA_QMessageBox.info(parent=None, text="Files have been uploaded!")
         QApplication.restoreOverrideCursor()
 
-
     def download_folder(self, remote_folder_path, local_folder_path, progress_dialog=None):
         os.makedirs(local_folder_path, exist_ok=True)
         for remote_item_path in self.listdir(remote_folder_path):
             item_name = os.path.basename(remote_item_path)
             local_item_path = join_path(local_folder_path, item_name)
-            if self.isdir(remote_folder_path):
+            if self.isdir(remote_item_path):
                 self.download_folder(remote_item_path, local_item_path, progress_dialog)
             else:
                 self.download_file(remote_item_path, local_item_path, progress_dialog)
@@ -167,7 +166,7 @@ class NCCA_RenderFarm(paramiko.SSHClient):
     def delete(self, remote_paths):
         QApplication.setOverrideCursor(Qt.WaitCursor)
         """Deletes a file or directory from the remote SFTP server."""
-        progress_dialog = NCCA_QProgressDialog("Counting files...", 0, 1, None)
+        progress_dialog = NCCA_QProgressDialog("Delete","Counting files...", 0, 1, None)
         progress_dialog.show()
         total_files = 0
         

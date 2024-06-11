@@ -6,11 +6,12 @@ from resources import *
 class NCCA_QProgressDialog(NCCA_QDialog):
     """A custom QDialog class that shows a progress bar."""
 
-    def __init__(self, title="", min=0, max=100, parent=None):
+    def __init__(self, title="", text="", min=0, max=100, parent=None):
         """Initialize the progress bar and UI."""
         super().__init__(parent=parent, size=PROGRESS_BOX_SIZE, title=title)
         self.setMaximum(max)
         self.setMinimum(min)
+        self.progress_dialog.setLabelText(text)
 
         self.setValue(min)
 
@@ -19,6 +20,7 @@ class NCCA_QProgressDialog(NCCA_QDialog):
         # Progress dialog
         self.progress_dialog = QProgressDialog(parent=self)
         self.progress_dialog.setLabelText(self.windowTitle())
+        self.progress_dialog.setCancelButton(None)
 
         # Customize progress dialog appearance
         self.progress_dialog.setStyleSheet(f"""
@@ -41,6 +43,12 @@ class NCCA_QProgressDialog(NCCA_QDialog):
 
         self.main_layout.addWidget(self.progress_dialog)
 
+    def end_ui(self):
+        """Runs after the customization in classes that inherit from NCCA_QDialog."""
+        self.header_layout.addStretch()
+        self.root_layout.addLayout(self.header_layout)
+        self.root_layout.addLayout(self.main_layout)
+
     def setText(self, text):
         self.progress_dialog.setLabelText(text)
 
@@ -61,3 +69,7 @@ class NCCA_QProgressDialog(NCCA_QDialog):
 
     def value(self):
         return self.progress_dialog.value()
+    
+    def show(self):
+        super().show()
+        QApplication.processEvents()
