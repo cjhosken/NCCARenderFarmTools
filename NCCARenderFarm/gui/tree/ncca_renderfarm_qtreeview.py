@@ -211,36 +211,52 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         
         if self.model().renderfarm.isdir(file_path):
             self.action_create = self.context_menu.addAction(NEW_FOLDER_ACTION_LABEL)
+            self.action_create.setToolTip(ACTION_NEW_FOLDER_TOOLTIP)
             self.action_create.triggered.connect(self.createFolderUnderSelectedIndex)
-            self.action_upload = self.context_menu.addAction(UPLOAD_FILES_ACTION_LABEL)
-            self.action_upload.triggered.connect(self.uploadFilesToSelectedIndex)
-            self.action_upload = self.context_menu.addAction(UPLOAD_FOLDERS_ACTION_LABEL)
-            self.action_upload.triggered.connect(self.uploadFoldersToSelectedIndex)
+
+            self.action_upload_files = self.context_menu.addAction(UPLOAD_FILES_ACTION_LABEL)
+            self.action_upload_files.setToolTip(ACTION_UPLOAD_FILES_TOOLTIP)
+            self.action_upload_files.triggered.connect(self.uploadFilesToSelectedIndex)
+
+            self.action_upload_folders = self.context_menu.addAction(UPLOAD_FOLDERS_ACTION_LABEL)
+            self.action_upload_folders.setToolTip(ACTION_UPLOAD_FOLDERS_TOOLTIP)
+            self.action_upload_folders.triggered.connect(self.uploadFoldersToSelectedIndex)
+
             self.action_project_submit = self.context_menu.addAction(SUBMIT_PROJECT_ACTION_LABEL)
+            self.action_project_submit.setToolTip(ACTION_PROJECT_SUBMIT_TOOLTIP)
             self.action_project_submit.triggered.connect(self.uploadProjectToSelectedIndex)
         else:
             _, file_ext = os.path.splitext(os.path.basename(file_path))
 
             if file_ext in SUPPORTED_DCC_EXTENSIONS:
-                self.action_submit = self.context_menu.addAction(SUBMIT_RENDER_JOB_ACTION_LABEL)
-                self.action_submit.triggered.connect(self.submitSelectedIndex)
+                self.action_job_submit = self.context_menu.addAction(SUBMIT_RENDER_JOB_ACTION_LABEL)
+                self.action_job_submit.setToolTip(ACTION_SUBMIT_RENDER_JOB_TOOLTIP)
+                self.action_job_submit.triggered.connect(self.submitSelectedIndex)
 
             if file_ext in OPENABLE_FILES:
                 self.action_open = self.context_menu.addAction(OPEN_ACTION_LABEL)
+                self.action_open.setToolTip(ACTION_OPEN_TOOLTIP)
                 self.action_open.triggered.connect(self.openSelectedIndex)
 
         self.action_download = self.context_menu.addAction(DOWNLOAD_ACTION_LABEL)
+        self.action_download.setToolTip(ACTION_DOWNLOAD_TOOLTIP)
         self.action_download.triggered.connect(self.downloadSelectedIndex)
 
         if file_path != self.home_path:
             self.action_rename = self.context_menu.addAction(RENAME_ACTION_LABEL)
+            self.action_rename.setToolTip(ACTION_RENAME_TOOLTIP)
             self.action_rename.triggered.connect(self.renameSelectedIndex)
+
             self.action_delete = self.context_menu.addAction(DELETE_ACTION_LABEL)
+            self.action_delete.setToolTip(ACTION_DELETE_TOOLTIP)
             self.action_delete.triggered.connect(self.deleteSelectedIndexes)
         else:
             self.action_refresh = self.context_menu.addAction(RELOAD_ACTION_LABEL)
+            self.action_refresh.setToolTip(ACTION_REFRESH_TOOLTIP)
             self.action_refresh.triggered.connect(self.refresh)
+
             self.action_wipe = self.context_menu.addAction(WIPE_ACTION_LABEL)
+            self.action_wipe.setToolTip(ACTION_WIPE_TOOLTIP)
             self.action_wipe.triggered.connect(self.wipeSelectedIndex)
 
         self.context_menu.setStyleSheet(f"""
