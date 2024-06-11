@@ -4,7 +4,7 @@
 detect_home_dir() {
     case "$(uname -s)" in
         Linux*|Darwin*) CHOME="$HOME";;
-        CYGWIN*|MINGW*|MSYS*|MINGW32*|MINGW64*) CHOME="C:/Users/$(whoami)";;
+        CYGWIN*|MINGW*|MSYS*|MINGW32*|MINGW64*) CHOME="/c/Users/$(whoami)";;
         *) CHOME="UNKNOWN"
     esac
 }
@@ -25,34 +25,29 @@ install_pyenv_windows() {
     if ! command -v pyenv &> /dev/null; then
         echo "NCCA | pyenv-win not found. Installing pyenv-win..."
 
-        INSTALL_DIR="$CHOME/.pyenv"
+        # Set pyenv installation directory on the local drive
+        PYENV_ROOT="$CHOME/.pyenv"
+        INSTALL_DIR="$PYENV_ROOT"
 
         # Clone pyenv-win repository
         if [ ! -d "$INSTALL_DIR" ]; then
+            git clone https://github.com/pyenv-win/pyenv-win.git "$INSTALL_DIR"
+        else
             echo "NCCA | Removing existing $INSTALL_DIR directory..."
             rm -rf "$INSTALL_DIR"
+            git clone https://github.com/pyenv-win/pyenv-win.git "$INSTALL_DIR"
         fi
-
-        if [ ! -d "$HOME/.pyenv" ]; then
-            echo "NCCA | Removing existing $HOME/.pyenv directory..."
-            rm -rf "$HOME/.pyenv"
-        fi
-        
-        git clone https://github.com/pyenv-win/pyenv-win.git "$HOME/.pyenv"
-
-        git clone https://github.com/pyenv-win/pyenv-win.git $INSTALL_DIR
 
         # Add pyenv-win paths to the environment
-        export PATH="$INSTALL_DIR/pyenv-win/bin:$INSTALL_DIR/pyenv-win/shims:$PATH"
+        export PYENV="$INSTALL_DIR/pyenv-win"
+        export PATH="$PYENV/bin:$PYENV/shims:$PATH"
+        echo "export PATH=\"$PYENV/bin:$PYENV/libexec/shims:\$PATH\"" >> $HOME/.bashrc  
+        source $HOME/.bashrc
 
-        # Persist pyenv-win paths in shell profile
-        if [ -f "$HOME/.bash_profile" ]; then
-            echo 'export PATH="$INSTALL_DIR/pyenv-win/bin:$INSTALL_DIR/pyenv-win/shims:$PATH"' >> "$HOME/.bash_profile"
-            source "$HOME/.bash_profile"
-        elif [ -f "$HOME/.bashrc" ]; then
-            echo 'export PATH="$INSTALL_DIR/pyenv-win/bin:$INSTALL_DIR/pyenv-win/shims:$PATH"' >> "$HOME/.bashrc"
-            source "$HOME/.bashrc"
-        fi
+        # Source pyenv init scripts
+        eval "$("$PYENV/bin/pyenv" init --path)"
+        eval "$("$PYENV/bin/pyenv" init -)"
+        eval "$("$PYENV/bin/pyenv" virtualenv-init -)"
 
         echo "NCCA | pyenv-win installed successfully."
     else
@@ -62,6 +57,8 @@ install_pyenv_windows() {
 
 # Function to verify pyenv installation
 verify_pyenv() {
+    echo "NCCA | Current PATH: $PATH"
+    
     if ! command -v pyenv &> /dev/null; then
         echo "NCCA | Error: pyenv command not found. Exiting."
         exit 1
@@ -70,7 +67,6 @@ verify_pyenv() {
     fi
 }
 
-# Main script execution
 # Main script execution
 main() {
     detect_os
@@ -83,12 +79,10 @@ main() {
 
     if [ "$OS" == "Windows" ]; then
         install_pyenv_windows
-        verify_pyenv
     fi
     
-    #eval "$(pyenv init --path)"
-    #eval "$(pyenv init -)"
-    #eval "$(pyenv virtualenv-init -)"
+    # Verify pyenv after initialization
+    verify_pyenv
 
     # Define the script directory
     SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -136,7 +130,7 @@ main() {
             echo "NCCA | Installing Requirements"
             python -m pip install -r "$requirements_file"
         else
-            echo "Requirements file not found: $requirements_file"
+            echo "NCCA | Requirements file not found: $requirements_file"
             deactivate
             exit 1
         fi
