@@ -311,6 +311,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                 upload_items.append([file, destination_file])
             
             self.model().renderfarm.upload(upload_items)
+            self.refresh()
 
     def uploadFoldersToSelectedIndex(self):
         """Handles the process of uploading selected folders to the destination folder"""
@@ -330,6 +331,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                 destination_folder = join_path(self.model().get_file_path(index), os.path.basename(folder))
                 upload_items.append([folder, destination_folder])
             self.model().renderfarm.upload(upload_items)
+            self.refresh()
 
     def downloadSelectedIndex(self):
         """Handles the process of downloading the active file to a local destination"""
@@ -348,13 +350,11 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                                                             options=QFileDialog.DontConfirmOverwrite)
 
         if destination_path:
-            QApplication.setOverrideCursor(Qt.WaitCursor)
             if os.path.exists(destination_path):
                 NCCA_QMessageBox.warning(self, "Error", f"{destination_path} already exists.")
             else:
                 self.model().renderfarm.download(source_path, destination_path)
-                NCCA_QMessageBox.info(self, "Downloaded!", f"{source_path} has been downloaded to {destination_path}!")
-            QApplication.restoreOverrideCursor()
+            
 
     def deleteSelectedIndexes(self):
         """Deletes the selected indexes."""
@@ -385,9 +385,9 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             reply = NCCA_QMessageBox.question(self, "Confirm Deletion", f"Are you sure you want to wipe {file_path}? This will delete ALL files.")
             if reply == QDialog.Accepted:
                 children = self.model().renderfarm.listdir(file_path)
-                self.model().renderfarm.delete(children)
-                self.refresh()
+                self.model().renderfarm.delete(children, show_info=False)
                 self.model().renderfarm.mkdir(join_path(self.home_path, "output"))
+                self.refresh()
                 NCCA_QMessageBox.info(self, "Wiped!", f"{file_path} has been wiped!")
 
     def refresh(self):
@@ -458,7 +458,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             temp_dir = tempfile.TemporaryDirectory(dir=get_user_home())
             local_path = join_path(temp_dir.name, file_name)
 
-            self.model().renderfarm.download(file_path, local_path)
+            self.model().renderfarm.download(file_path, local_path, show_info=False, show_progress=False)
             self.image_dialog = NCCA_ImageWindow(image_path=local_path)
             self.image_dialog.setGeometry(self.geometry())
             self.image_dialog.show()
@@ -491,7 +491,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         if not file_path:
             return
 
-        self.model().renderfarm.upload(folder_path, join_path(dest_folder, os.path.basename(folder_path)))
+        self.model().renderfarm.upload(folder_path, join_path(dest_folder, os.path.basename(folder_path)), show_info=False)
         self.refresh()
 
         self.run_submit_job_async(file_path=file_path, folder_path=folder_path)
@@ -639,7 +639,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         
         local_path = join_path(temp_dir.name, file_name)
 
-        self.model().renderfarm.download(file_path, local_path)
+        self.model().renderfarm.download(file_path, local_path, show_info=False, show_progress=False)
 
         self.run_submit_job_async(file_path=file_path, folder_path=None, local_path=local_path)
 

@@ -7,8 +7,9 @@ For Windows run `. "./standalone/NCCARenderFarm/launch.ps1"` to run the standalo
 
 ## Current TODOs
 1. Fix the Renderfarm server
-2. Code Refactoring and Cleanup
-3. Documentation
+2. Threading for large processes
+3. Code Refactoring and Cleanup
+4. Documentation
 
 ## TODOs
 1. VFX Reference Platform (update Qube)

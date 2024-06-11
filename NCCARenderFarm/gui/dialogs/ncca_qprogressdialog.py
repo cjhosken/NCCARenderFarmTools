@@ -8,7 +8,7 @@ class NCCA_QProgressDialog(NCCA_QDialog):
 
     def __init__(self, title="", text="", min=0, max=100, parent=None):
         """Initialize the progress bar and UI."""
-        super().__init__(parent=parent, size=PROGRESS_BOX_SIZE, title=title)
+        super().__init__(parent=parent, size=SMALL_MESSAGE_BOX_SIZE, title=title)
         self.setMaximum(max)
         self.setMinimum(min)
         self.progress_dialog.setLabelText(text)
@@ -72,4 +72,3 @@ class NCCA_QProgressDialog(NCCA_QDialog):
     
     def show(self):
         super().show()
-        QApplication.processEvents()

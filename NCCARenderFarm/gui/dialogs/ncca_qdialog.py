@@ -5,7 +5,7 @@ from resources import *
 class NCCA_QDialog(QDialog):
     """A custom QDialog class for NCCA applications."""
 
-    def __init__(self, parent=None, size=QSize(500, 500), title=""):
+    def __init__(self, parent=None, size=SMALL_MESSAGE_BOX_SIZE, title=""):
         """Initialize the dialog."""
         super().__init__(parent)
         self.setWindowTitle(title)

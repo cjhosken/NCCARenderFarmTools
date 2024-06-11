@@ -7,10 +7,10 @@ from .ncca_qdialog import NCCA_QDialog
 class NCCA_QMessageBox(NCCA_QDialog):
     """A custom NCCA_QDialog class that shows a messagebox"""
 
-    def __init__(self, parent=None, icon=None, title=""):
+    def __init__(self, parent=None, icon=None, size=SMALL_MESSAGE_BOX_SIZE, title=""):
         """Initialize the messagebox"""
         self.icon = icon
-        super().__init__(parent, size=MESSAGE_BOX_SIZE, title=title)
+        super().__init__(parent, size=size, title=title)
         self.show()
 
     def init_ui(self):
@@ -27,45 +27,52 @@ class NCCA_QMessageBox(NCCA_QDialog):
         # Message label
         self.label = QLabel("")
         self.label.setWordWrap(True)
-        self.label.setContentsMargins(10, 10, 10, 10)
+        if (self.size() == LARGE_MESSAGE_BOX_SIZE):
+            self.label.setContentsMargins(10, 10, 10, 10)
+        else:
+            self.label.setContentsMargins(0, 0, 0, 0)
+            self.label.setBaseSize(SMALL_MESSAGE_BOX_SIZE.width(),SMALL_MESSAGE_BOX_SIZE.height() - APP_NAVBAR_HEIGHT)
         self.label.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
 
-        # Scroll area for message label
-        self.scroll_area = QScrollArea()
-        self.scroll_area.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-        self.scroll_area.setFixedSize(QSize(MESSAGE_BOX_SIZE.width() - 50, MESSAGE_BOX_SIZE.height() - APP_NAVBAR_HEIGHT - 75))
-        self.scroll_area.setContentsMargins(10, 10, 10, 20)
-        self.scroll_area.setWidgetResizable(True)
-        self.scroll_area.setAlignment(Qt.AlignCenter)
-        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.scroll_area.setWidget(self.label)
-        self.scroll_area.setStyleSheet(f"""
-            QScrollArea {{
-                border: none;
-                background: transparent;
-            }}
-            QScrollArea > QWidget > QWidget {{
-                background: transparent;
-            }}
-            QScrollBar:vertical {{
-                background: {APP_BACKGROUND_COLOR};  /* Background color of the scroll bar */
-                width: 5px;  /* Width of the scroll bar */
-                margin: 0px;  /* Margin */
-            }}
-            QScrollBar::handle:vertical {{
-                background: {APP_PRIMARY_COLOR};  /* Color of the scroll bar handle */
-                border-radius: 2px;  /* Border radius of the scroll bar handle */
-                min-height: 20px;  /* Minimum height of the scroll bar handle */
-            }}
-            QScrollBar::handle:vertical:hover {{
-                background: {APP_HOVER_BACKGROUND};  /* Color of the scroll bar handle when hovered */
-            }}
-            QScrollBar::sub-line:vertical, QScrollBar::add-line:vertical {{
-                background: transparent;  /* Background of the scroll bar arrows */
-                height: 0px;  /* Height of the scroll bar arrows */
-            }}
-        """)
-        self.main_layout.addWidget(self.scroll_area)
+        if (self.size() == LARGE_MESSAGE_BOX_SIZE):
+            # Scroll area for message label
+            self.scroll_area = QScrollArea()
+            self.scroll_area.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+            self.scroll_area.setMaximumSize(QSize(self.size().width() - 50, self.size().height() - APP_NAVBAR_HEIGHT - 75))
+            self.scroll_area.setContentsMargins(10, 10, 10, 20)
+            self.scroll_area.setWidgetResizable(True)
+            self.scroll_area.setAlignment(Qt.AlignCenter)
+            self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+            self.scroll_area.setWidget(self.label)
+            self.scroll_area.setStyleSheet(f"""
+                QScrollArea {{
+                    border: none;
+                    background: transparent;
+                }}
+                QScrollArea > QWidget > QWidget {{
+                    background: transparent;
+                }}
+                QScrollBar:vertical {{
+                    background: {APP_BACKGROUND_COLOR};  /* Background color of the scroll bar */
+                    width: 5px;  /* Width of the scroll bar */
+                    margin: 0px;  /* Margin */
+                }}
+                QScrollBar::handle:vertical {{
+                    background: {APP_PRIMARY_COLOR};  /* Color of the scroll bar handle */
+                    border-radius: 2px;  /* Border radius of the scroll bar handle */
+                    min-height: 20px;  /* Minimum height of the scroll bar handle */
+                }}
+                QScrollBar::handle:vertical:hover {{
+                    background: {APP_HOVER_BACKGROUND};  /* Color of the scroll bar handle when hovered */
+                }}
+                QScrollBar::sub-line:vertical, QScrollBar::add-line:vertical {{
+                    background: transparent;  /* Background of the scroll bar arrows */
+                    height: 0px;  /* Height of the scroll bar arrows */
+                }}
+            """)
+            self.main_layout.addWidget(self.scroll_area)
+        else:
+            self.main_layout.addWidget(self.label)
         self.main_layout.addStretch(1)
 
         # Button box for buttons
@@ -74,9 +81,9 @@ class NCCA_QMessageBox(NCCA_QDialog):
         self.main_layout.addStretch()
 
     @staticmethod
-    def _create_popup(parent, title, text, icon_path=INFO_ICON_PATH, confirm_text="Ok"):
+    def _create_popup(parent, title, text, icon_path=INFO_ICON_PATH, confirm_text="Ok", size=SMALL_MESSAGE_BOX_SIZE):
         """Creates a popup dialog"""
-        msg_box = NCCA_QMessageBox(parent, icon_path, title=title)
+        msg_box = NCCA_QMessageBox(parent, icon_path, title=title, size=size)
         msg_box.label.setText(text)
 
         confirm_button = NCCA_QFlatButton(confirm_text)
@@ -89,9 +96,9 @@ class NCCA_QMessageBox(NCCA_QDialog):
         return msg_box
 
     @staticmethod
-    def _create_yes_no_popup(parent, title, text, icon_path=QUESTION_ICON_PATH, yes_text="Yes", no_text="No"):
+    def _create_yes_no_popup(parent, title, text, icon_path=QUESTION_ICON_PATH, yes_text="Yes", no_text="No", size=SMALL_MESSAGE_BOX_SIZE):
         """Creates a confirmation popup dialog"""
-        msg_box = NCCA_QMessageBox._create_popup(parent, title, text, icon_path, confirm_text=yes_text)
+        msg_box = NCCA_QMessageBox._create_popup(parent, title, text, icon_path, confirm_text=yes_text, size=size)
 
         no_button = NCCA_QFlatButton(no_text)
         no_button.setFixedSize(QSize(125, 35))
@@ -101,9 +108,9 @@ class NCCA_QMessageBox(NCCA_QDialog):
         return msg_box
 
     @staticmethod
-    def _create_yes_no_cancel_popup(parent, title, text, icon_path=QUESTION_ICON_PATH, yes_text="Yes", no_text="No", cancel_text="Cancel"):
+    def _create_yes_no_cancel_popup(parent, title, text, icon_path=QUESTION_ICON_PATH, yes_text="Yes", no_text="No", cancel_text="Cancel", size=SMALL_MESSAGE_BOX_SIZE):
         """Creates an override popup dialog"""
-        msg_box = NCCA_QMessageBox._create_popup(parent, title, text, icon_path)
+        msg_box = NCCA_QMessageBox._create_popup(parent, title, text, icon_path, size=size)
         override_button = NCCA_QFlatButton(yes_text)
         override_button.clicked.connect(msg_box.accept)
         msg_box.button_box.addButton(override_button, QDialogButtonBox.YesRole)
@@ -134,11 +141,11 @@ class NCCA_QMessageBox(NCCA_QDialog):
         return NCCA_QMessageBox._create_popup(parent, title, text, QUESTION_ICON_PATH, confirm_text).exec_()
 
     @staticmethod
-    def warning(parent, title=MESSAGE_WARNING_HEADER, text="", confirm_text=MESSAGE_WARNING_CONFIRM_TEXT):
+    def warning(parent, title=MESSAGE_WARNING_HEADER, text="", confirm_text=MESSAGE_WARNING_CONFIRM_TEXT, size=LARGE_MESSAGE_BOX_SIZE):
         """Creates a warning popup dialog"""
-        return NCCA_QMessageBox._create_popup(parent, title, text + "\n" + MESSAGE_CONTACT_LABEL, WARNING_ICON_PATH, confirm_text).exec_()
+        return NCCA_QMessageBox._create_popup(parent, title, text + "\n" + MESSAGE_CONTACT_LABEL, WARNING_ICON_PATH, confirm_text, size=size).exec_()
 
     @staticmethod
-    def fatal(parent, title=MESSAGE_FATAL_HEADER, text="", confirm_text=MESSAGE_FATAL_CONFIRM_TEXT):
+    def fatal(parent, title=MESSAGE_FATAL_HEADER, text="", confirm_text=MESSAGE_FATAL_CONFIRM_TEXT, size=LARGE_MESSAGE_BOX_SIZE):
         """Creates a fatal popup dialog"""
-        return NCCA_QMessageBox._create_popup(parent, title, text + "\n" + MESSAGE_CONTACT_LABEL, WARNING_ICON_PATH, confirm_text).exec_()
+        return NCCA_QMessageBox._create_popup(parent, title, text + "\n" + MESSAGE_CONTACT_LABEL, WARNING_ICON_PATH, confirm_text, size=size).exec_()
