@@ -44,7 +44,7 @@ class NCCA_RenderFarm(paramiko.SSHClient):
                 self.connect(RENDERFARM_ADDRESS, port=RENDERFARM_PORT, username=self.username, password=self.password)
                 self.sftp = self.open_sftp()
 
-                output_dir = join_path(self.home_path, "output")
+                output_dir = join_path(self.home_path, RENDERFARM_OUTPUT_DIR)
 
                 if self.exists(self.home_path) and self.isdir(self.home_path):
                     if not self.exists(output_dir) or not self.isdir(output_dir):
@@ -53,7 +53,7 @@ class NCCA_RenderFarm(paramiko.SSHClient):
                     self.mkdir(self.home_path)
                     self.mkdir(output_dir)
 
-                ncca_dir = join_path("/home", username, NCCA_PACKAGE_DIR)
+                ncca_dir = join_path(RENDERFARM_ROOT, username, NCCA_PACKAGE_DIR)
 
                 if self.exists(ncca_dir) and self.isdir(ncca_dir):
                     self.delete_folder(ncca_dir)

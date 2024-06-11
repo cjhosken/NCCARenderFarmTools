@@ -108,7 +108,7 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
             parent_item = parent.internalPointer()
 
         if not parent_item['children']:
-            parent_path = parent_item['path'].replace('\\', '/')
+            parent_path = parent_item['path']
 
             # Check if parent_path is a directory
             try:
@@ -134,7 +134,7 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
         """Returns the remote file path of a given index item"""
         item = index.internalPointer()
         if item:
-            return item.get('path', '').replace('\\', '/') # Convert the paths to / as the renderfarm server is built on linux.
+            return item.get('path', '')
         return ''
 
     def data(self, index, role=Qt.DisplayRole):
@@ -146,7 +146,7 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
 
         if role == Qt.DisplayRole:
             if (item['path'] == self.home_path):
-                return f"/render/{self.username}/farm"
+                return join_path(RENDERFARM_RENDER_ROOT, self.username, RENDERFARM_FARM_DIR)
 
             return os.path.basename(item['path'])  # Return the name of other items
 
@@ -164,26 +164,26 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
             else:
                 _, file_ext = os.path.splitext(file_path)
 
-                if "blend" in file_ext:
+                if file_ext in BLENDER_EXTENSIONS:
                     # Provide custom icon for .blend files
                     return QIcon(BLENDER_ICON_PATH)  
                 
-                if "hip" in file_ext:
+                if file_ext in HOUDINI_EXTENSIONS:
                     return QIcon(HOUDINI_ICON_PATH)  
                 
-                if file_ext in [".ma", ".mb"]:
+                if file_ext in MAYA_EXTENSIONS:
                     return QIcon(MAYA_ICON_PATH) 
 
-                if "nk" in file_ext:
+                if file_ext in NUKEX_EXTENSIONS:
                     return QIcon(NUKEX_ICON_PATH)
                 
-                if "katana" in file_ext:
+                if file_ext in KATANA_EXTENSIONS:
                     return QIcon(KATANA_ICON_PATH)
 
                 if file_ext.lower() in VIEWABLE_IMAGE_FILES:
                     return QIcon(IMAGE_ICON_PATH)
 
-                if (file_ext in [".zip", ".rar"]):
+                if (file_ext in ARCHIVE_EXTENSIONS):
                     return QIcon(ARCHIVE_ICON_PATH)
 
             return QIcon(FILE_ICON_PATH)
@@ -194,8 +194,6 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
         """Custom flags to enable drag dropping and other features"""
         default_flags = super().flags(index)
         if index.isValid():
-            file_path = self.get_file_path(index)
-        
             flags = default_flags | Qt.ItemIsDragEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
 
             return flags

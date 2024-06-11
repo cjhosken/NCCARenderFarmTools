@@ -32,17 +32,9 @@ class NCCA_QIconButton(QPushButton):
             elif event.type() == QEvent.Leave or event.type() == QEvent.FocusOut:
                 self.loadIcon(is_hover=False)
                 color_style = ""
-            
+                
             if (color_style is not None):
-                self.setStyleSheet(f"""
-                    NCCA_QIconButton {{
-                        background: {APP_BACKGROUND_COLOR}; border: none; {color_style}
-                    }}
-
-                    NCCA_QIconButton:hover, NCCA_QIconButton:focus {{
-                        background-color: {APP_BACKGROUND_COLOR}; color: {APP_PRIMARY_COLOR}; outline: none;
-                    }}
-                                """)
+                self.setStyleSheet(NCCA_QICONBUTTON_STYLESHEET.replace("$COLOR_STYLE", color_style))
             
         return super().eventFilter(obj, event)
     

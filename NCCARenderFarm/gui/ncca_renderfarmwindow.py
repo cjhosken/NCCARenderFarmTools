@@ -17,7 +17,7 @@ class NCCA_RenderFarmWindow(NCCA_QMainWindow):
         self.username = username
         self.password = password
 
-        self.home_path = join_path("/home", self.username, RENDERFARM_HOME_DIR)
+        self.home_path = join_path(RENDERFARM_ROOT, self.username, RENDERFARM_FARM_DIR)
 
         super().__init__(name, MAIN_WINDOW_SIZE)
 
@@ -27,7 +27,7 @@ class NCCA_RenderFarmWindow(NCCA_QMainWindow):
 
         # Title
         self.title = QLabel(self.name)
-        self.title.setContentsMargins(25, 0, 0, 0)
+        self.title.setContentsMargins(MARGIN_DEFAULT, 0, 0, 0)
         self.title.setFont(TITLE_FONT)
         self.title.setStyleSheet(f"color: {APP_FOREGROUND_COLOR};")
         self.nav_and_title_layout.addWidget(self.title, alignment=Qt.AlignLeft)

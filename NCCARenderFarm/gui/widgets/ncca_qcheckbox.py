@@ -14,26 +14,4 @@ class NCCA_QCheckBox(QCheckBox):
         self.setObjectName("NCCA_QCheckBox")
         
         # Set checkbox styles
-        self.setStyleSheet(f"""
-            NCCA_QCheckBox::indicator {{
-                width: 20px;
-                height: 20px;
-                border-radius: 5px;
-                border-style: solid;
-                border-width: 2px;
-                color: white;
-                border-color: {APP_GREY_COLOR};
-            }}
-            NCCA_QCheckBox::indicator:hover {{
-                background-color: {APP_HOVER_BACKGROUND};
-            }}
-            NCCA_QCheckBox::indicator:checked {{
-                background-color: {APP_PRIMARY_COLOR};
-                color: white;
-                image: url({CHECKED_ICON_PATH}); 
-                border-color: transparent;
-            }}
-            NCCA_QCheckBox::indicator:unchecked {{
-                image: none;
-            }}
-        """)
+        self.setStyleSheet(NCCA_QCHECKBOX_STYLESHEET)

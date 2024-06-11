@@ -18,7 +18,7 @@ class NCCA_ImageWindow(NCCA_QMainWindow):
     def setup_ui(self):
         """Set up the user interface."""
         self.image_name_label = QLabel(text=os.path.basename(self.image_path))
-        self.image_name_label.setContentsMargins(25, 0, 0, 0)
+        self.image_name_label.setContentsMargins(MARGIN_DEFAULT, 0, 0, 0)
         self.nav_and_title_layout.addWidget(self.image_name_label)
 
         self.image_view = ZoomableImageView(self)
@@ -64,8 +64,8 @@ class ZoomableImageView(QGraphicsView):
         self.setAlignment(Qt.AlignCenter)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setMinimumSize(900, 300)
-        self.setBaseSize(900, 300)
+        self.setMinimumSize(IMAGE_WINDOW_DISPLAY_IMAGE_SIZE)
+        self.setBaseSize(IMAGE_WINDOW_DISPLAY_IMAGE_SIZE)
         self._zoom = 0
         self._pan = False
         self._start_pos = QPoint()
@@ -83,8 +83,8 @@ class ZoomableImageView(QGraphicsView):
 
     def wheelEvent(self, event):
         """Handle zooming using the mouse wheel."""
-        zoom_in_factor = 1.25
-        zoom_out_factor = 0.8
+        zoom_in_factor = IMAGE_WINDOW_ZOOM_IN_FACTOR
+        zoom_out_factor = IMAGE_WINDOW_ZOOM_OUT_FACTOR
         mouse_point = self.mapToScene(event.position().toPoint())
 
         if event.angleDelta().y() > 0:

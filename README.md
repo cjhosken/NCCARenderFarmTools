@@ -1,13 +1,12 @@
 # NCCARenderFarmTools
 My attempt at improving the NCCA renderfarm. Ideally, once the standalone tool is finished, the in-app tools can be deprecated.
 
-For Linux, run `./standalone/NCCARenderFarm/launch.sh` to run the standalone application.
-
-For Windows run `. "./standalone/NCCARenderFarm/launch.ps1"` to run the standalone application.
+Run `./launch.sh` to run the NCCA Renderfarm Tool.
 
 ## Current TODOs
 1. Fix the Renderfarm server
 2. Threading for large processes
+3. TreeView refreshing every minute
 3. Code Refactoring and Cleanup
 4. Documentation
 

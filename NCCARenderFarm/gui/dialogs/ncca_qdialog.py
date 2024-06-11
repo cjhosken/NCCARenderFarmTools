@@ -17,16 +17,7 @@ class NCCA_QDialog(QDialog):
         self.setAttribute(Qt.WA_TranslucentBackground)
 
         # Set window styles
-        self.setStyleSheet(f"""
-            NCCA_QDialog {{
-                background-color: transparent;
-            }}
-            #NCCA_QDialogRootWidget {{
-                background: {APP_BACKGROUND_COLOR};
-                border-radius: {APP_BORDER_RADIUS};
-                border: 2px solid {APP_GREY_COLOR};
-            }}
-        """)
+        self.setStyleSheet(NCCA_DIALOG_STYLESHEET)
 
         self.old_pos = None
 

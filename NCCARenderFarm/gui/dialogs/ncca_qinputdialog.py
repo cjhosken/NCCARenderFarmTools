@@ -7,7 +7,7 @@ from .ncca_qdialog import NCCA_QDialog
 class NCCA_QInputDialog(NCCA_QDialog):
     """A dialog for users to input text"""
 
-    def __init__(self, placeholder="", text="", confirm_text="Ok", parent=None):
+    def __init__(self, placeholder=INPUT_DIALOG_PLACEHOLDER, text=INPUT_DIALOG_DEFAULT, confirm_text=INPUT_DIALOG_CONFIRM_TEXT, parent=None):
         """Initialize the dialog UI"""
         self.placeholder = placeholder
         self.text = text
@@ -26,7 +26,7 @@ class NCCA_QInputDialog(NCCA_QDialog):
 
         # Confirm button
         self.confirm_button = NCCA_QFlatButton(self.confirm_text)
-        self.confirm_button.setFixedSize(QSize(125, 35))
+        self.confirm_button.setFixedSize(QDIALOG_BUTTON_DEFAULT_SIZE)
         self.confirm_button.clicked.connect(self.accept)
         self.main_layout.addWidget(self.confirm_button, alignment=Qt.AlignCenter)
         self.main_layout.addStretch(0)

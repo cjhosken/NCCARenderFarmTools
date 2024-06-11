@@ -42,7 +42,7 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
         self.main_layout.addStretch()
 
         # Title sublabel
-        self.label = QLabel('Sign in to access your farm.')
+        self.label = QLabel(LOGIN_WINDOW_SUBTITLE)
         self.label.setWordWrap(True)
         self.label.setAlignment(Qt.AlignCenter)
         self.label.setFont(TEXT_FONT)
@@ -56,14 +56,14 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
         self.main_layout.addStretch()
 
         # Username input
-        self.username = NCCA_QInput("Username")
+        self.username = NCCA_QInput(LOGIN_WINDOW_USERNAME_PLACEHOLDER)
         self.username.setToolTip(USERNAME_INPUT_TOOLTIP)
         self.setupInputField(self.username)
         self.main_layout.addWidget(self.username)
         self.main_layout.addStretch()
 
         # Password input
-        self.password = NCCA_QInput("Password")
+        self.password = NCCA_QInput(LOGIN_WINDOW_PASSWORD_PLACEHOLDER)
         self.password.setEchoMode(QLineEdit.Password)
         self.password.setToolTip(PASSWORD_INPUT_TOOLTIP)
         self.setupInputField(self.password)
@@ -72,28 +72,27 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
         self.main_layout.addStretch()
 
         # Keep details checkbox
-        self.keep_details = NCCA_QCheckBox('Remember me')
+        self.keep_details = NCCA_QCheckBox(LOGIN_WINDOW_KEEP_DETAILS_LABEL)
         self.keep_details.setFont(TEXT_FONT)
         self.keep_details.setToolTip(KEEP_DETAILS_TOOLTIP)
         self.main_layout.addWidget(self.keep_details)
         self.main_layout.addStretch()
 
         # Login button
-        self.login_button = NCCA_QFlatButton('Login')
+        self.login_button = NCCA_QFlatButton(LOGIN_WINDOW_LOGIN_BUTTON_TEXT)
         self.setupLoginButton()
         self.main_layout.addWidget(self.login_button)
-        self.main_layout.addStretch()
         self.main_layout.addStretch()
 
     def setupInputField(self, input_field):
         """Sets up common properties for input fields"""
-        input_field.setFixedSize(300, 50)
+        input_field.setFixedSize(LOGIN_WINDOW_WIDGET_SIZES)
         input_field.setFont(TEXT_FONT)
         self.main_layout.addWidget(input_field)
 
     def setupLoginButton(self):
         """Sets up the login button"""
-        self.login_button.setFixedSize(300, 50)
+        self.login_button.setFixedSize(LOGIN_WINDOW_WIDGET_SIZES)
         self.login_button.clicked.connect(self.handle_login)
         self.login_button.setFont(TEXT_FONT)
         self.main_layout.addWidget(self.login_button)
@@ -116,24 +115,24 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
         gen_key = Fernet.generate_key()
         cipher = Fernet(gen_key)
         env_variables = {
-            "NCCA_USERNAME": self.username.text(),
-            "NCCA_PASSWORD": self.password.text()
+            NCCA_USERNAME_KEY_TEXT: self.username.text(),
+            NCCA_PASSWORD_KEY_TEXT: self.password.text()
         }
         encrypted_variables = {key: cipher.encrypt(value.encode()).decode() for key, value in env_variables.items()}
         self.remove_environment()
         with open(NCCA_ENVIRONMENT_PATH, 'w') as f:
-            f.write(f"NCCA_ENCRYPTION_KEY={gen_key.decode()}\n")
+            f.write(f"{NCCA_ENCRYPTION_KEY_TEXT}={gen_key.decode()}\n")
             for key, value in encrypted_variables.items():
                 f.write(f"{key}={value}\n")
 
     def load_environment(self):
         """Loads the environment file"""
         load_dotenv(NCCA_ENVIRONMENT_PATH)
-        encryption_key = os.getenv("NCCA_ENCRYPTION_KEY")
+        encryption_key = os.getenv(f"{NCCA_ENCRYPTION_KEY_TEXT}")
         if encryption_key:
             cipher = Fernet(encryption_key.encode())
-            username_encrypted = os.getenv("NCCA_USERNAME")
-            password_encrypted = os.getenv("NCCA_PASSWORD")
+            username_encrypted = os.getenv(NCCA_USERNAME_KEY_TEXT)
+            password_encrypted = os.getenv(NCCA_PASSWORD_KEY_TEXT)
             self.username.setText(cipher.decrypt(username_encrypted.encode()).decode())
             self.password.setText(cipher.decrypt(password_encrypted.encode()).decode())
             self.keep_details.setChecked(True)
@@ -156,7 +155,7 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
         cant_connect_label.setWordWrap(True)
         cant_connect_label.setAlignment(Qt.AlignCenter)
         cant_connect_label.setFont(TEXT_FONT)
-        cant_connect_label.setContentsMargins(25, 0, 25, 0)
+        cant_connect_label.setContentsMargins(MARGIN_DEFAULT, 0, MARGIN_DEFAULT, 0)
         self.main_layout.addWidget(cant_connect_label)
         self.main_layout.addStretch()
 
@@ -171,7 +170,7 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
         """Handles the UI when the login credentials are invalid"""
         self.username.raiseError()
         self.password.raiseError()
-        self.warning_label.setText("Invalid username or password.")
+        self.warning_label.setText(INVALID_CREDENTIALS_WARNING_TEXT)
 
     def open_main_window(self):
         """Opens the main application window"""

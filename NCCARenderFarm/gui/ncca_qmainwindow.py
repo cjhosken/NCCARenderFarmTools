@@ -5,9 +5,7 @@ from resources import *
 class NCCA_QMainWindow(QMainWindow):
     """Custom QMainWindow class"""
 
-    TMP_DIRS = []
-
-    def __init__(self, name: str, size: QSize):
+    def __init__(self, name, size):
         """Initialize the main window"""
         super().__init__()
         self.name = name
@@ -29,14 +27,7 @@ class NCCA_QMainWindow(QMainWindow):
         # Root widget
         self.root = QWidget(self)
         self.root.setObjectName("NCCA_QRootWidget")
-        self.root.setStyleSheet(
-            f"""#NCCA_QRootWidget{{
-                background: {APP_BACKGROUND_COLOR};
-                border-radius: {APP_BORDER_RADIUS};
-                border: 2px solid {APP_BACKGROUND_COLOR};
-            }}
-            """
-        )
+        self.root.setStyleSheet(NCCA_QMAINWINDOW_ROOT_STYLESHEET)
 
         # Store the old position for mouse move events
         self.old_pos = None
@@ -48,12 +39,7 @@ class NCCA_QMainWindow(QMainWindow):
 
         self.nav_and_title_bar = QWidget(self)
         self.nav_and_title_bar.setFixedSize(self.size.width(), APP_NAVBAR_HEIGHT)
-        self.nav_and_title_bar.setStyleSheet(
-            f"""
-            border-top-left-radius: {APP_BORDER_RADIUS};
-            border-top-right-radius: {APP_BORDER_RADIUS};
-            """
-        )
+        self.nav_and_title_bar.setStyleSheet(NCCA_QMAINWINDOW_NAVBAR_STYLESHEET)
 
         self.nav_and_title_layout = QHBoxLayout(self.nav_and_title_bar)
         self.nav_and_title_layout.setSpacing(0)

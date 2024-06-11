@@ -10,7 +10,7 @@ class NCCA_QSubmit_Blender(NCCA_QSubmitWindow):
         self.file_data = file_data
 
         if (self.job_path.text() == "/"):
-            self.job_path.setText(os.path.dirname(file_path).replace(f"/home/{username}/farm/", "/")) 
+            self.job_path.setText(os.path.dirname(file_path).replace(RENDERFARM_ROOT, username, RENDERFARM_FARM_DIR, "/")) 
 
         if file_data is not None:
             file_data = file_data[0]
@@ -57,8 +57,10 @@ class NCCA_QSubmit_Blender(NCCA_QSubmitWindow):
         external_commands = self.command.text()
         
 
-        if (not output_path.startswith(f"/render/{self.username}/farm")):
-            output_path = join_path(f"/render/{self.username}/farm", output_path)
+        path_prefix=join_path(RENDERFARM_RENDER_ROOT, self.username, RENDERFARM_FARM_DIR)
+
+        if (not output_path.startswith(path_prefix)):
+            output_path = join_path(path_prefix, output_path)
 
 
         output_file = os.path.basename(output_path)
@@ -81,9 +83,9 @@ class NCCA_QSubmit_Blender(NCCA_QSubmitWindow):
         job['name'] = job_name
         job['cpus'] = num_cpus
 
-        job['prototype'] = 'cmdrange'
+        job['prototype'] = RENDERFARM_PROTOTYPE
         package = {}
-        package['shell']="/bin/bash"
+        package['shell']=RENDERFARM_SHELL
         pre_render=f""
 
         # https://docs.blender.org/manual/en/latest/advanced/command_line/render.html
@@ -103,7 +105,7 @@ class NCCA_QSubmit_Blender(NCCA_QSubmitWindow):
                 
         job['package'] = package
         
-        job["cwd"] = f"/render/{self.username}"
+        job["cwd"] = join_path(RENDERFARM_RENDER_ROOT, self.username)
 
         job['agenda'] = qb.genframes(frame_range)
 

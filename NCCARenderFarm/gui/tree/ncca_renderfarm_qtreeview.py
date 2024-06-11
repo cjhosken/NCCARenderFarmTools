@@ -23,6 +23,8 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         self.setupUI()
         self.refresh()
 
+        # Create a refresh timer
+
     def setupUI(self):
         """Set up the user interface"""
         self.setModel(NCCA_RenderFarm_QFarmSystemModel(self.home_path, self.username, self.password))
@@ -40,15 +42,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
 
         self.setCursor(Qt.PointingHandCursor)
         self.setIconSize(BROWSER_ICON_SIZE)  
-        self.setStyleSheet("""
-            NCCA_RenderFarm_QTreeView {
-                border: none;
-                background: transparent;
-                outline: 0;
-                font-size: 16px;
-            }
-            ...
-            """)
+        self.setStyleSheet(NCCA_QTREEVIEW_STYLESHEET)
 
         self.scroll_timer = QTimer(self)
         self.scroll_timer.setInterval(10) 
@@ -57,12 +51,11 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
     def autoScroll(self):
         """Adjust scrolling for user drags"""
         cursor_pos = self.viewport().mapFromGlobal(QCursor.pos())
-        scroll_speed = 10  
 
         if cursor_pos.y() < self.viewport().y() + SCROLL_MARGIN:
-            self.verticalScrollBar().setValue(self.verticalScrollBar().value() - scroll_speed)
+            self.verticalScrollBar().setValue(self.verticalScrollBar().value() - SCROLL_SPEED)
         elif cursor_pos.y() > self.viewport().y() + self.viewport().height() - SCROLL_MARGIN:
-            self.verticalScrollBar().setValue(self.verticalScrollBar().value() + scroll_speed)
+            self.verticalScrollBar().setValue(self.verticalScrollBar().value() + SCROLL_SPEED)
 
     def dragEnterEvent(self, event):
         """Actions to perform when the user starts dragging"""
@@ -259,23 +252,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             self.action_wipe.setToolTip(ACTION_WIPE_TOOLTIP)
             self.action_wipe.triggered.connect(self.wipeSelectedIndex)
 
-        self.context_menu.setStyleSheet(f"""
-            QMenu {{
-                background-color: {APP_BACKGROUND_COLOR}; /* Background color */
-                color: {APP_FOREGROUND_COLOR};
-            }}
-
-            QMenu::item {{
-                margin: 0px;
-                padding: 5px; /* Remove padding */
-            }}
-
-            QMenu::item:selected {{
-                background-color: {APP_PRIMARY_COLOR}; /* Highlighted background color */
-                width:100%;
-                color: {APP_BACKGROUND_COLOR}; /* Text color */
-            }}
-        """)
+        self.context_menu.setStyleSheet(NCCA_QTREEVIEW_STYLESHEET)
 
         self.context_menu.exec_(event.globalPos())
 
@@ -583,7 +560,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         elif project_ext in NUKEX_EXTENSIONS:
             if (os.path.exists(LOCAL_NUKEX_PATH)):
                 QApplication.setOverrideCursor(Qt.WaitCursor)
-                command = [LOCAL_NUKEX_PATH, "--nukex", "-t", join_path(SCRIPT_DIR, "libs", "nukex_render_info.py"), local_path]
+                command = [LOCAL_NUKEX_PATH, "--nukex", "-t", join_path(RENDER_INFO_PATH, "nukex_render_info.py"), local_path]
 
                 # Execute the command
                 output = subprocess.check_output(command, stderr=subprocess.STDOUT, universal_newlines=True).strip()
@@ -609,7 +586,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         elif project_ext in KATANA_EXTENSIONS:
             if (os.path.exists(LOCAL_KATANA_PATH)):
                 QApplication.setOverrideCursor(Qt.WaitCursor)
-                command = [LOCAL_KATANA_PATH, "--script", join_path(SCRIPT_DIR, "libs", "katana_render_info.py"), local_path]
+                command = [LOCAL_KATANA_PATH, "--script", join_path(RENDER_INFO_PATH, "katana_render_info.py"), local_path]
                 output = subprocess.check_output(command, stderr=subprocess.STDOUT, universal_newlines=True).strip()
                 match = re.search(r'{\s*"NCCA_RENDERFARM":\s*{.*?}\s*}', output, re.DOTALL)
 
@@ -645,7 +622,6 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             return
 
         file_path = self.model().get_file_path(index)
-        _, file_ext = os.path.splitext(os.path.basename(file_path))
         file_name = os.path.basename(file_path)
 
         temp_dir = tempfile.TemporaryDirectory(dir=get_user_home())
