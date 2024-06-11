@@ -120,9 +120,9 @@ class NCCA_QMessageBox(NCCA_QDialog):
         return msg_box.exec_()
 
     @staticmethod
-    def question(parent, title=MESSAGE_QUESTION_HEADER, text="", yes_text=MESSAGE_QUESTION_YES_TEXT, no_text=MESSAGE_QUESTION_NO_TEXT):
+    def question(parent, title="", text="", yes_text=MESSAGE_QUESTION_YES_TEXT, no_text=MESSAGE_QUESTION_NO_TEXT):
         """Creates an info popup dialog"""
-        return NCCA_QMessageBox._create_yes_no_popup(parent, title, text, QUESTION_ICON_PATH, yes_text, no_text).exec_()
+        return NCCA_QMessageBox._create_yes_no_popup(parent, MESSAGE_QUESTION_HEADER + title, text, QUESTION_ICON_PATH, yes_text, no_text).exec_()
     
     @staticmethod
     def override(parent, title=MESSAGE_OVERRIDE_HEADER, text="", yes_text=MESSAGE_OVERRIDE_YES_TEXT, no_text=MESSAGE_OVERRIDE_NO_TEXT, cancel_text=MESSAGE_OVERRIDE_CANCEL_TEXT):
@@ -130,16 +130,16 @@ class NCCA_QMessageBox(NCCA_QDialog):
         return NCCA_QMessageBox._create_yes_no_cancel_popup(parent, title, text, QUESTION_ICON_PATH, yes_text, no_text, cancel_text).exec_()
 
     @staticmethod
-    def info(parent, title=MESSAGE_INFO_HEADER, text="", confirm_text=MESSAGE_INFO_CONFIRM_TEXT):
+    def info(parent, title="", text="", confirm_text=MESSAGE_INFO_CONFIRM_TEXT):
         """Creates an info popup dialog"""
-        return NCCA_QMessageBox._create_popup(parent, title, text, QUESTION_ICON_PATH, confirm_text).exec_()
+        return NCCA_QMessageBox._create_popup(parent, MESSAGE_INFO_HEADER + title, text, QUESTION_ICON_PATH, confirm_text).exec_()
 
     @staticmethod
-    def warning(parent, title=MESSAGE_WARNING_HEADER, text="", confirm_text=MESSAGE_WARNING_CONFIRM_TEXT, size=LARGE_MESSAGE_BOX_SIZE):
+    def warning(parent, title="", text="", confirm_text=MESSAGE_WARNING_CONFIRM_TEXT, size=LARGE_MESSAGE_BOX_SIZE):
         """Creates a warning popup dialog"""
-        return NCCA_QMessageBox._create_popup(parent, title, text + "\n" + MESSAGE_CONTACT_LABEL, WARNING_ICON_PATH, confirm_text, size=size).exec_()
+        return NCCA_QMessageBox._create_popup(parent, MESSAGE_WARNING_HEADER + title, text + "\n" + MESSAGE_CONTACT_LABEL, WARNING_ICON_PATH, confirm_text, size=size).exec_()
 
     @staticmethod
-    def fatal(parent, title=MESSAGE_FATAL_HEADER, text="", confirm_text=MESSAGE_FATAL_CONFIRM_TEXT, size=LARGE_MESSAGE_BOX_SIZE):
+    def fatal(parent, title="", text="", confirm_text=MESSAGE_FATAL_CONFIRM_TEXT, size=LARGE_MESSAGE_BOX_SIZE):
         """Creates a fatal popup dialog"""
-        return NCCA_QMessageBox._create_popup(parent, title, text + "\n" + MESSAGE_CONTACT_LABEL, WARNING_ICON_PATH, confirm_text, size=size).exec_()
+        return NCCA_QMessageBox._create_popup(parent, MESSAGE_FATAL_HEADER+title, text + "\n" + MESSAGE_CONTACT_LABEL, WARNING_ICON_PATH, confirm_text, size=size).exec_()

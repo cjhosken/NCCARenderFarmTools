@@ -18,10 +18,9 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
 
         if (QB_IMPORT_ERROR):
             NCCA_QMessageBox.fatal(
-                    self,
-                    MESSAGE_FATAL_HEADER + MESSAGE_QUBE_LABEL,
-                    QB_IMPORT_ERROR_MESSAGE + "\n\n" + QB_IMPORT_ERROR,
-                    MESSAGE_FATAL_CONFIRM_TEXT
+                self,
+                title=MESSAGE_QUBE_LABEL,
+                text=QB_IMPORT_ERROR_MESSAGE + "\n\n" + QB_IMPORT_ERROR,
             )
 
             sys.exit(1)

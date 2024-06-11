@@ -49,9 +49,8 @@ def qube_thread():
         # Show a warning message if an error occurs
         NCCA_QMessageBox.warning(
             None,
-            MESSAGE_WARNING_HEADER + MESSAGE_QUBE_LABEL,
-            f"{str(e)}\n\nTraceback:\n{traceback_info}",
-            MESSAGE_WARNING_CONFIRM_TEXT
+            title=MESSAGE_QUBE_LABEL,
+            text=f"{str(e)}\n\nTraceback:\n{traceback_info}"
         )
 
 def launch_qube():

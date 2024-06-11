@@ -20,7 +20,6 @@ FILE_ICON_PATH = join_path(IMAGE_DIR, "file.svg")
 IMAGE_ICON_PATH = join_path(IMAGE_DIR, "image.svg")
 ARCHIVE_ICON_PATH = join_path(IMAGE_DIR, "archive.png")
 
-FOLDERUI_ICON_PATH = join_path(IMAGE_DIR, "folderui.svg")
 NO_CONNECTION_IMAGE = join_path(IMAGE_DIR, "connection_failed.jpg")
 
 
