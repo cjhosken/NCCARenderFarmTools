@@ -28,3 +28,14 @@ ACTION_RENAME_TOOLTIP="Rename the file/folder."
 ACTION_DELETE_TOOLTIP="Delete the file(s)/folder(s)"
 ACTION_REFRESH_TOOLTIP="Refresh the renderfarm. Sometimes this needs to be done to see newly added items."
 ACTION_WIPE_TOOLTIP="Delete all files and folders in the renderfarm."
+
+
+SUBMIT_JOB_NAME_TOOLTIP=""
+SUBMIT_CPUS_TOOLTIP=""
+SUBMIT_JOB_PATH_TOOLTIP=""
+
+SUBMIT_FRAME_START_TOOLTIP=""
+SUBMIT_FRAME_END_TOOLTIP=""
+SUBMIT_FRAME_STEP_TOOLTIP=""
+
+SUBMIT_EXTRA_COMMANDS_TOOLTIP=""

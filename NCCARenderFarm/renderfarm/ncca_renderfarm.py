@@ -99,10 +99,10 @@ class NCCA_RenderFarm(paramiko.SSHClient):
         try:
             progress_dialog = None
             if (show_progress):
-                progress_dialog = NCCA_QProgressDialog("Upload","Counting files...", 0, 1, None)
+                progress_dialog = NCCA_QProgressDialog(RENDERFARM_PROGRESS_UPLOAD_TITLE,RENDERFARM_COUNTING_FILES_LABEL, 0, 1, None)
                 progress_dialog.show()
                 QApplication.processEvents()
-                progress_dialog.setText("Uploadng Files...")
+                progress_dialog.setText(RENDERFARM_PROGRESS_UPLOAD_LABEL)
 
                 total_files = 0
                 for item in upload_items:
@@ -124,11 +124,11 @@ class NCCA_RenderFarm(paramiko.SSHClient):
             if (show_progress):
                 progress_dialog.close()
             if (show_info):
-                NCCA_QMessageBox.info(parent=None, text="Files have been uploaded!")
+                NCCA_QMessageBox.info(parent=None, title=RENDERFARM_DIALOG_TITLE, text=RENDERFARM_PROGRESS_UPLOAD_COMPLETE_TEXT)
                 
         except Exception as e:
             traceback_info = traceback.format_exc()
-            NCCA_QMessageBox.warning(None, text=f"Something went wrong in upload. \n {str(e)}\n\nTraceback:\n{traceback_info}")
+            NCCA_QMessageBox.warning(None, title=RENDERFARM_DIALOG_TITLE, text=RENDERFARM_PROGRESS_UPLOAD_ERROR_TEXT + "\n\n" + f"{str(e)}\n\nTraceback:\n{traceback_info}")
 
         QApplication.restoreOverrideCursor()
 
@@ -156,11 +156,11 @@ class NCCA_RenderFarm(paramiko.SSHClient):
         try:
             progress_dialog = None
             if (show_progress):
-                progress_dialog = NCCA_QProgressDialog("Download", "Counting files...", 0, 1, None)
+                progress_dialog = NCCA_QProgressDialog(RENDERFARM_PROGRESS_DOWNLOAD_TITLE,RENDERFARM_COUNTING_FILES_LABEL, 0, 1, None)
                 progress_dialog.show()
                 QApplication.processEvents()
                 total_files = self.count_files(remote_path)
-                progress_dialog.setText("Downlading Files...")
+                progress_dialog.setText(RENDERFARM_PROGRESS_DOWNLOAD_LABEL)
                 progress_dialog.setMaximum(total_files)
 
             if self.isdir(remote_path):
@@ -171,10 +171,10 @@ class NCCA_RenderFarm(paramiko.SSHClient):
             if (show_progress):
                 progress_dialog.close()
             if (show_info):
-                NCCA_QMessageBox.info(parent=None, text="Files have been uploaded!")
+                NCCA_QMessageBox.info(parent=None, title=RENDERFARM_DIALOG_TITLE, text=RENDERFARM_PROGRESS_DOWNLOAD_COMPLETE_TEXT)
         except Exception as e:
             traceback_info = traceback.format_exc()
-            NCCA_QMessageBox.warning(None, text=f"Something went wrong in download. \n {str(e)}\n\nTraceback:\n{traceback_info}")
+            NCCA_QMessageBox.warning(None, title=RENDERFARM_DIALOG_TITLE, text=RENDERFARM_PROGRESS_DOWNLOAD_ERROR_TEXT + "\n\n" + f"{str(e)}\n\nTraceback:\n{traceback_info}")
         QApplication.restoreOverrideCursor()
 
     def download_folder(self, remote_folder_path, local_folder_path, progress_dialog=None):
@@ -198,7 +198,7 @@ class NCCA_RenderFarm(paramiko.SSHClient):
         try:
             progress_dialog = None
             if (show_progress):
-                progress_dialog = NCCA_QProgressDialog("Delete","Counting files...", 0, 1, None)
+                progress_dialog = NCCA_QProgressDialog(RENDERFARM_PROGRESS_DELETE_TITLE,RENDERFARM_COUNTING_FILES_LABEL, 0, 1, None)
                 progress_dialog.show()
                 QApplication.processEvents()
                 total_files = 0
@@ -206,7 +206,7 @@ class NCCA_RenderFarm(paramiko.SSHClient):
                 for remote_path in remote_paths:
                     total_files += self.count_files(remote_path)
 
-                progress_dialog.setText("Deleting Files...")
+                progress_dialog.setText(RENDERFARM_PROGRESS_DELETE_LABEL)
                 progress_dialog.setMaximum(total_files)
 
             for path in remote_paths:
@@ -222,10 +222,10 @@ class NCCA_RenderFarm(paramiko.SSHClient):
             if (show_progress):
                 progress_dialog.close()
             if (show_info):
-                NCCA_QMessageBox.info(parent=None, text="Files have been deleted!")
+                NCCA_QMessageBox.info(parent=None, title=RENDERFARM_DIALOG_TITLE, text=RENDERFARM_PROGRESS_DELETE_COMPLETE_TEXT)
         except Exception as e:
             traceback_info = traceback.format_exc()
-            NCCA_QMessageBox.warning(None, text=f"Something went wrong in delete. \n {str(e)}\n\nTraceback:\n{traceback_info}")
+            NCCA_QMessageBox.warning(None, title=RENDERFARM_DIALOG_TITLE, text=RENDERFARM_PROGRESS_DELETE_ERROR_TEXT + "\n\n" + f"{str(e)}\n\nTraceback:\n{traceback_info}")
 
         QApplication.restoreOverrideCursor()
 

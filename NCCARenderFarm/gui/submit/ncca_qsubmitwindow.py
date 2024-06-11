@@ -55,11 +55,13 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
         self.job_name_label = QLabel(SUBMIT_JOB_NAME_LABEL)
         self.job_row_layout.addWidget(self.job_name_label)
         self.job_name = NCCA_QInput(placeholder=SUBMIT_JOB_NAME_PLACEHOLDER, text=f"{self.username}_{os.path.basename(self.file_path)}")
+        self.job_name.setToolTip(SUBMIT_JOB_NAME_TOOLTIP)
         self.job_row_layout.addWidget(self.job_name)
 
         self.cpu_label = QLabel(SUBMIT_CPUS_LABEL)
         self.job_row_layout.addWidget(self.cpu_label)
         self.num_cpus = NCCA_QComboBox()
+        self.num_cpus.setToolTip(SUBMIT_CPUS_TOOLTIP)
         self.num_cpus.addItems([str(i) for i in range(1, FARM_CPUS)])
         self.num_cpus.setCurrentText(str(DEFAULT_CPU_USAGE))
         self.job_row_layout.addWidget(self.num_cpus)
@@ -75,6 +77,7 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
         self.job_path_label = QLabel(SUBMIT_JOB_PATH_LABEL)
         self.job_path_row_layout.addWidget(self.job_path_label)
         self.job_path = NCCA_QInput(placeholder=SUBMIT_JOB_PATH_PLACEHOLDER)
+        self.job_path.setToolTip(SUBMIT_JOB_PATH_TOOLTIP)
         self.job_path.setText("/" + os.path.basename(self.folder_path))
         self.job_path_row_layout.addWidget(self.job_path)
 
@@ -91,14 +94,17 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
 
         self.frame_start = NCCA_QInput(placeholder=SUBMIT_FRAME_START_LABEL, text=str(SUBMIT_FRAME_START_DEFAULT))
         self.frame_start.setValidator(QIntValidator())
+        self.frame_start.setToolTip(SUBMIT_FRAME_START_TOOLTIP)
         self.frame_row_layout.addWidget(self.frame_start)
 
         self.frame_end = NCCA_QInput(placeholder=SUBMIT_FRAME_END_LABEL, text=str(SUBMIT_FRAME_END_DEFAULT))
         self.frame_end.setValidator(QIntValidator())
+        self.frame_end.setToolTip(SUBMIT_FRAME_END_TOOLTIP)
         self.frame_row_layout.addWidget(self.frame_end)
 
         self.frame_step = NCCA_QInput(placeholder=SUBMIT_FRAME_STEP_LABEL, text=str(SUBMIT_FRAME_STEP_DEFAULT))
         self.frame_step.setValidator(QIntValidator())
+        self.frame_step.setToolTip(SUBMIT_FRAME_STEP_TOOLTIP)
         self.frame_row_layout.addWidget(self.frame_step)
 
         self.frame_row_widget.setLayout(self.frame_row_layout)
@@ -118,6 +124,7 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
         self.command_label = QLabel(SUBMIT_EXTRA_COMMANDS_LABEL)
         self.command_row_layout.addWidget(self.command_label)
         self.command = NCCA_QInput(placeholder=SUBMIT_EXTRA_COMMANDS_PLACEHOLDER)
+        self.command.setToolTip(SUBMIT_EXTRA_COMMANDS_TOOLTIP)
         self.command_row_layout.addWidget(self.command)
 
         self.command_row_widget.setLayout(self.command_row_layout)
