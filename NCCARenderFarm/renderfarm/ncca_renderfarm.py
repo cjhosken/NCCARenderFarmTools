@@ -107,11 +107,10 @@ class NCCA_RenderFarm(paramiko.SSHClient):
                 total_files = 0
                 for item in upload_items:
                     if os.path.isdir(item[0]):
-                        # This needs fixing
-                        __, __, files = os.walk(item[0])
-                        total_files += len(files)
+                        for root, dirs, files in os.walk(item[0]):
+                            total_files += len(files)
                     else:
-                        item += 1
+                        total_files += 1
 
                 progress_dialog.setMaximum(total_files)
 

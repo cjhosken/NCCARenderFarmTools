@@ -19,12 +19,10 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
         self.username = username
         self.renderfarm = renderfarm
 
-        shell_script_path=join_path(RENDERFARM_RENDER_ROOT, self.username, NCCA_PACKAGE_DIR, "source.sh")
-        sed_command = f"sed -i 's/\r//' {shell_script_path};"
-
-        self.source_command = f"{sed_command} source {shell_script_path};"
-
         super().__init__(self.name, size=SUBMIT_WINDOW_SIZE)
+
+        if (self.job_path.text() == "/"):
+            self.job_path.setText(os.path.dirname(file_path).replace(join_path(RENDERFARM_ROOT, username, RENDERFARM_FARM_DIR), ""))
 
     def init_ui(self):
         """Initializes the UI"""
@@ -178,10 +176,32 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
             else:
                 self.render_path = None
 
+    def build_job(self):
+        job = {}
+        job['name'] = self.job_name.text()
+        job['cpus'] = self.num_cpus.currentText()
+        package={}
+        package['shell']=RENDERFARM_SHELL
+        job['package'] = package
+        job['prototype'] = "cmdline"
+        job['cwd'] = join_path(RENDERFARM_RENDER_ROOT, self.username)
+        job['env'] = {"HOME": join_path(RENDERFARM_RENDER_ROOT, self.username)}
+
+        return job
+
     def submit_job(self, job):
         """Submit the job to the renderfarm."""
 
-        job['env'] = {"HOME": join_path(RENDERFARM_RENDER_ROOT, self.username)}
+        shell_script_path=join_path(RENDERFARM_RENDER_ROOT, self.username, NCCA_PACKAGE_DIR, "source.sh")
+        sed_command = f"sed -i 's/\r//' {shell_script_path};" # Due to developing the shell script on windows
+
+        source_command = f"{sed_command} source {shell_script_path}; echo QB_FRAME_NUMBER;"
+
+        job['package']['cmdline'] = f"{source_command} {job['package']['cmdline']}"
+
+        frame_range = f"{int(self.frame_start.text())}-{int(self.frame_end.text())}x{int(self.frame_step.text())}"
+
+        job['agenda'] = qb.genframes(frame_range)
 
         listOfJobsToSubmit = [job]
         try:

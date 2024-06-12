@@ -3,12 +3,10 @@ from gui.widgets import *
 from .ncca_qsubmitwindow import NCCA_QSubmitWindow
 
 class NCCA_QSubmit_NukeX(NCCA_QSubmitWindow):
-    def __init__(self, renderfarm=None,file_path="", folder_path="", username="", file_data=None, parent=None):
+    def __init__(self, renderfarm=None,file_path="", folder_path="", username="", file_data=None, sourced=True, parent=None):
+        self.sourced=sourced
         super().__init__(renderfarm, file_path, folder_path, name="Submit NukeX Job", username=username, parent=parent)
         self.file_data = file_data
-
-        if (self.job_path.text() == "/"):
-            self.job_path.setText(os.path.dirname(file_path).replace(f"/home/{username}/farm/", "/")) 
 
         # Extract write node paths from file_data
         if file_data is not None:
@@ -27,11 +25,14 @@ class NCCA_QSubmit_NukeX(NCCA_QSubmitWindow):
         self.write_row_layout = QHBoxLayout()
         self.write_row_widget = QWidget()
 
-        self.write_label = QLabel("Write Node")
+        self.write_label = QLabel(NUKEX_JOB_WRITE_LABEL)
         self.write_row_layout.addWidget(self.write_label)
 
-        self.write = NCCA_QComboBox()
-        self.write.currentIndexChanged.connect(self.update_frame_labels)
+        if (self.sourced):
+            self.write = NCCA_QComboBox()
+            self.write.currentIndexChanged.connect(self.update_frame_labels)
+        else:
+            self.write = NCCA_QInput(placeholder=NUKEX_JOB_WRITE_PLACEHOLDER,text=NUKEX_JOB_WRITE_DEFAULT)
         self.write_row_layout.addWidget(self.write)
 
         self.write_row_widget.setLayout(self.write_row_layout)
@@ -57,30 +58,29 @@ class NCCA_QSubmit_NukeX(NCCA_QSubmitWindow):
         frame_step = self.frame_step.text()
         external_commands = self.command.text()
 
-        frame_range = f"{frame_start}-{frame_end}x{frame_step}"
+        if (self.sourced):
+            write_node = self.write.currentText()
+        else:
+            write_node = self.write.text()
 
-        job = {}
-        job['name'] = job_name
-        job['cpus'] = num_cpus
+        job = self.build_job()
 
         job['prototype'] = 'cmdrange'
         package = {}
         package['shell']="/bin/bash"
         pre_render=""
-        pre_render += f""
 
         # https://learn.foundry.com/nuke/content/comp_environment/configuring_nuke/command_line_operations.html
 
-        render_command=f"{NUKEX_PATH} -F QB_FRAME_NUMBER -x {self.render_path}"
+        file_command = f"-x {self.render_path}"
+        if (write_node):
+            file_command = f"-X {write_node} {self.render_path}"
+
+
+        render_command=f"{NUKEX_PATH} -F QB_FRAME_NUMBER {file_command}"
 
         print(render_command)
 
-        package['cmdline']=f"{self.source_command} {pre_render} {render_command}"
-                
-        job['package'] = package
-    
-        job["cwd"] = f"/render/{self.username}"
-
-        job['agenda'] = qb.genframes(frame_range)
+        job['package']['cmdline']=f"{pre_render} {render_command}"
 
         self.submit_job(job)

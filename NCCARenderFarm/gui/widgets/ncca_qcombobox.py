@@ -13,8 +13,6 @@ class NCCA_QComboBox(QComboBox):
         # Set up stylesheet
         self.setStyleSheet(NCCA_QCOMBOBOX_STYLESHEET)
 
-        self.setFont(TEXT_FONT)
-
     def setIconSize(self, size=ICON_SIZE):
         """Set the icon size."""
         super().setIconSize(size)

@@ -484,7 +484,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         if not file_path:
             return
 
-        self.model().renderfarm.upload(upload_items=(folder_path, join_path(dest_folder, os.path.basename(folder_path))), show_info=False)
+        self.model().renderfarm.upload(upload_items=[(folder_path, join_path(dest_folder, os.path.basename(folder_path)))], show_info=False)
         self.refresh()
 
         self.run_submit_job_async(file_path=file_path, folder_path=folder_path)
@@ -497,6 +497,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         username = self.username
 
         data = None
+        sourced = True
 
         if local_path is None:
             local_path=file_path
@@ -527,10 +528,11 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                 NCCA_QMessageBox.warning(
                         self,
                         NO_HOUDINI_TITLE,
-                        NO_HOUDINI_LABEL
+                        NO_HOUDINI_LABEL + "\n"
                 )
+                sourced = False
 
-            self.job_dialog = NCCA_QSubmit_Houdini(renderfarm=renderfarm, username=username, file_path=file_path, folder_path=project_folder, file_data=data)
+            self.job_dialog = NCCA_QSubmit_Houdini(renderfarm=renderfarm, username=username, file_path=file_path, folder_path=project_folder, file_data=data, sourced=sourced)
             self.job_dialog.show()
 
         elif project_ext in MAYA_EXTENSIONS:
@@ -551,10 +553,11 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                 NCCA_QMessageBox.warning(
                     self,
                     NO_MAYA_TITLE,
-                    NO_MAYA_LABEL
+                    NO_MAYA_LABEL + "\n"
                 )
+                sourced = False
 
-            self.job_dialog = NCCA_QSubmit_Maya(renderfarm=renderfarm, username=username, file_path=file_path, folder_path=project_folder, file_data=data)
+            self.job_dialog = NCCA_QSubmit_Maya(renderfarm=renderfarm, username=username, file_path=file_path, folder_path=project_folder, file_data=data, sourced=sourced)
             self.job_dialog.show()
 
         elif project_ext in NUKEX_EXTENSIONS:
@@ -577,10 +580,11 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                 NCCA_QMessageBox.warning(
                     self,
                     NO_NUKEX_TITLE,
-                    NO_NUKEX_LABEL
+                    NO_NUKEX_LABEL + "\n"
                 )
+                sourced = False
 
-            self.job_dialog = NCCA_QSubmit_NukeX(renderfarm=renderfarm, username=username, file_path=file_path, folder_path=project_folder, file_data=data)
+            self.job_dialog = NCCA_QSubmit_NukeX(renderfarm=renderfarm, username=username, file_path=file_path, folder_path=project_folder, file_data=data, sourced=sourced)
             self.job_dialog.show()
 
         elif project_ext in KATANA_EXTENSIONS:
@@ -600,16 +604,17 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                 NCCA_QMessageBox.warning(
                     self,
                     NO_KATANA_TITLE,
-                    NO_KATANA_LABEL
+                    NO_KATANA_LABEL + "\n"
                 )
+                sourced = False
 
-            self.job_dialog = NCCA_QSubmit_Katana(renderfarm=renderfarm, username=username, file_path=file_path, folder_path=project_folder, file_data=data)
+            self.job_dialog = NCCA_QSubmit_Katana(renderfarm=renderfarm, username=username, file_path=file_path, folder_path=project_folder, file_data=data, sourced=sourced)
             self.job_dialog.show()
         else:
             NCCA_QMessageBox.warning(
                 self,
                 UNSUPPORTED_SOFTWARE_TITLE,
-                UNSUPPORTED_SOFTWARE_LABEL.format(project_ext)
+                UNSUPPORTED_SOFTWARE_LABEL.format(project_ext) + "\n"
             )
         
     def run_submit_job_async(self, file_path, folder_path, local_path=None):

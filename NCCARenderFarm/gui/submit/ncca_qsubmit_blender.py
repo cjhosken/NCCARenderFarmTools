@@ -5,12 +5,10 @@ from .ncca_qsubmitwindow import NCCA_QSubmitWindow
 
 
 class NCCA_QSubmit_Blender(NCCA_QSubmitWindow):
-    def __init__(self, renderfarm=None,file_path="", folder_path="", username="", file_data=None, parent=None):
-        super().__init__(renderfarm, file_path, folder_path, name="Submit Blender Job", username=username, parent=parent)
+    def __init__(self, renderfarm=None,file_path="", folder_path="", username="", file_data=None, sourced=True, parent=None):
+        self.sourced=sourced
+        super().__init__(renderfarm, file_path, folder_path, name=BLENDER_JOB_TITLE, username=username, parent=parent)
         self.file_data = file_data
-
-        if (self.job_path.text() == "/"):
-            self.job_path.setText(os.path.dirname(file_path).replace(RENDERFARM_ROOT, username, RENDERFARM_FARM_DIR, "/")) 
 
         if file_data is not None:
             file_data = file_data[0]
@@ -23,9 +21,10 @@ class NCCA_QSubmit_Blender(NCCA_QSubmitWindow):
         self.active_renderer_row_layout = QHBoxLayout()
         self.active_renderer_row_widget = QWidget()
 
-        self.active_renderer_label = QLabel("Renderer")
+        self.active_renderer_label = QLabel(JOB_RENDERER_LABEL)
         self.active_renderer_row_layout.addWidget(self.active_renderer_label)
         self.active_renderer = NCCA_QComboBox()
+        self.active_renderer.setToolTip(SUBMIT_RENDERER_TOOLTIP)
         self.active_renderer.addItems(list(BLENDER_RENDER_ENGINES.keys()))
         self.active_renderer_row_layout.addWidget(self.active_renderer)
 
@@ -35,10 +34,11 @@ class NCCA_QSubmit_Blender(NCCA_QSubmitWindow):
         self.output_path_row_layout = QHBoxLayout()
         self.output_path_row_widget = QWidget()
 
-        self.output_path_label = QLabel("Output Path")
+        self.output_path_label = QLabel(JOB_OUTPUT_LABEL)
         self.output_path_row_layout.addWidget(self.output_path_label)
-        self.output_path = NCCA_QInput(placeholder="Output Path")
-        self.output_path.setText("output/frame_####.exr")
+        self.output_path = NCCA_QInput(placeholder=JOB_OUTPUT_PLACEHOLDER)
+        self.output_path.setText(JOB_OUTPUT_DEFAULT)
+        self.output_path.setToolTip(SUBMIT_OUTPUT_TOOLTIP)
         self.output_path_row_layout.addWidget(self.output_path)
 
         self.output_path_row_widget.setLayout(self.output_path_row_layout)
@@ -46,8 +46,6 @@ class NCCA_QSubmit_Blender(NCCA_QSubmitWindow):
 
     def prepare_job(self):
         super().prepare_job()
-        job_name = self.job_name.text()
-        num_cpus = self.num_cpus.currentText()
         frame_start = self.frame_start.text()
         frame_end = self.frame_end.text()
         frame_step = self.frame_step.text()
@@ -56,11 +54,10 @@ class NCCA_QSubmit_Blender(NCCA_QSubmitWindow):
         output_path = self.output_path.text()
         external_commands = self.command.text()
         
-
         path_prefix=join_path(RENDERFARM_RENDER_ROOT, self.username, RENDERFARM_FARM_DIR)
 
         if (not output_path.startswith(path_prefix)):
-            output_path = join_path(path_prefix, output_path)
+            output_path = join_path(path_prefix, output_path.lstrip("/"))
 
 
         output_file = os.path.basename(output_path)
@@ -72,21 +69,14 @@ class NCCA_QSubmit_Blender(NCCA_QSubmitWindow):
 
         output_path = join_path(output_dir, output_file)
 
-        frame_range = f"{frame_start}-{frame_end}x{frame_step}"
-
         output_file_name = os.path.basename(output_path)
         output_file_name_without_extension, output_file_extension = os.path.splitext(output_file_name)
 
         override_extension = BLENDER_FILE_EXTENSIONS.get(output_file_extension, "")
 
-        job = {}
-        job['name'] = job_name
-        job['cpus'] = num_cpus
+        job = self.build_job()
 
-        job['prototype'] = RENDERFARM_PROTOTYPE
-        package = {}
-        package['shell']=RENDERFARM_SHELL
-        pre_render=f""
+        pre_render=""
 
         # https://docs.blender.org/manual/en/latest/advanced/command_line/render.html
 
@@ -99,14 +89,8 @@ class NCCA_QSubmit_Blender(NCCA_QSubmitWindow):
         render_command+=f" -E {renderer}" if renderer else ""
         render_command+=f" {external_commands}" if external_commands else ""
 
-        package['cmdline']=f"{self.source_command} {pre_render} {render_command}"
-
         print(render_command)
-                
-        job['package'] = package
-        
-        job["cwd"] = join_path(RENDERFARM_RENDER_ROOT, self.username)
 
-        job['agenda'] = qb.genframes(frame_range)
+        job['package']['cmdline']=f"{pre_render} {render_command}" # use single ' not double " as it doesnt work with json properly?
 
         self.submit_job(job)

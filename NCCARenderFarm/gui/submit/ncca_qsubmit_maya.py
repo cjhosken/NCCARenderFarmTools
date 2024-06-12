@@ -3,12 +3,10 @@ from gui.widgets import *
 from .ncca_qsubmitwindow import NCCA_QSubmitWindow
 
 class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
-    def __init__(self, renderfarm=None, file_path="", folder_path="", username="", file_data=None, parent=None):
-        super().__init__(renderfarm, file_path, folder_path=folder_path, name="Submit Maya Job", username=username, parent=parent)
+    def __init__(self, renderfarm=None, file_path="", folder_path="", username="", file_data=None, sourced=True, parent=None):
+        self.sourced=sourced
+        super().__init__(renderfarm, file_path, folder_path=folder_path, name=MAYA_JOB_TITLE, username=username, parent=parent)
         self.file_data = file_data
-
-        if (self.job_path.text() == "/"):
-            self.job_path.setText(os.path.dirname(file_path).replace(f"/home/{username}/farm/", "/")) 
 
         if file_data is not None:
             farm = file_data["NCCA_RENDERFARM"]
@@ -28,9 +26,10 @@ class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
         self.active_renderer_row_layout = QHBoxLayout()
         self.active_renderer_row_widget = QWidget()
 
-        self.active_renderer_label = QLabel("Renderer")
+        self.active_renderer_label = QLabel(JOB_RENDERER_LABEL)
         self.active_renderer_row_layout.addWidget(self.active_renderer_label)
         self.active_renderer = NCCA_QComboBox()
+        self.active_renderer.setToolTip(SUBMIT_RENDERER_TOOLTIP)
         self.active_renderer.addItems(list(MAYA_RENDER_ENGINES.keys()))
         self.active_renderer_row_layout.addWidget(self.active_renderer)
 
@@ -39,9 +38,14 @@ class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
 
         self.render_cam_row_layout = QHBoxLayout()
         self.render_cam_row_widget = QWidget()
-        self.render_cam_label = QLabel("Render Camera")
+        self.render_cam_label = QLabel(MAYA_JOB_CAMERA_LABEL)
         self.render_cam_row_layout.addWidget(self.render_cam_label)
-        self.render_cam = NCCA_QComboBox()
+        if (self.sourced):
+            self.render_cam = NCCA_QComboBox()
+        else:
+            self.render_cam = NCCA_QInput(placeholder=MAYA_JOB_CAMERA_PLACEHOLDER, text=MAYA_JOB_CAMERA_DEFAULT)
+        
+        self.render_cam.setToolTip(SUBMIT_MAYA_CAMERA_TOOLTIP)
         self.render_cam_row_layout.addWidget(self.render_cam)
 
         self.render_cam_row_widget.setLayout(self.render_cam_row_layout)
@@ -50,10 +54,10 @@ class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
         self.output_path_row_layout = QHBoxLayout()
         self.output_path_row_widget = QWidget()
 
-        self.output_path_label = QLabel("Output Path")
+        self.output_path_label = QLabel(JOB_OUTPUT_LABEL)
         self.output_path_row_layout.addWidget(self.output_path_label)
-        self.output_path = NCCA_QInput(placeholder="Output Path")
-        self.output_path.setText("/output/frame_####.exr")
+        self.output_path = NCCA_QInput(placeholder=JOB_OUTPUT_PLACEHOLDER)
+        self.output_path.setText(JOB_OUTPUT_DEFAULT)
         self.output_path_row_layout.addWidget(self.output_path)
 
         self.output_path_row_widget.setLayout(self.output_path_row_layout)
@@ -107,8 +111,6 @@ class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
         
     def prepare_job(self):
         super().prepare_job()
-        job_name = self.job_name.text()
-        num_cpus = self.num_cpus.currentText()
         frame_start = self.frame_start.text()
         frame_end = self.frame_end.text()
         frame_step = self.frame_step.text()
@@ -119,19 +121,18 @@ class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
         extra_commands = self.command.text()
         output_path = self.output_path.text()
 
+        path_prefix=join_path(RENDERFARM_RENDER_ROOT, self.username, RENDERFARM_FARM_DIR)
+
         # Ensure the output_path starts with the desired prefix
-        if not output_path.startswith(f"/render/{self.username}/farm"):
-            output_path = join_path(f"/render/{self.username}/farm", output_path.lstrip("/"))
+        if (not output_path.startswith(path_prefix)):
+            output_path = join_path(path_prefix, output_path.lstrip("/"))
 
         # Ensure the project_path starts with the desired prefix
-        if not project_path.startswith(f"/render/{self.username}/farm"):
-            project_path = join_path(f"/render/{self.username}/farm", project_path.lstrip("/"))
+        if (not project_path.startswith(path_prefix)):
+            project_path = join_path(path_prefix, project_path.lstrip("/"))
 
-        # Normalize the paths to handle any path formatting issues
-        project_path += "/"
+        #project_path += "/"
 
-
-        frame_range = f"{frame_start}-{frame_end}x{frame_step}"
         output_file = os.path.basename(output_path)
 
         frame_padding = max(output_file.count("#"), len(str(int(frame_end)*int(frame_step))) + 1)
@@ -143,7 +144,7 @@ class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
         
         output_dir, image_name, output_file_extension, frame_number_format = self.convert_render_path(output_path)
 
-        output_dir += "/"
+        #output_dir += "/"
 
         override_extension = MAYA_FILE_EXTENSIONS.get(output_file_extension.lower(), "")
         render_options = ""
@@ -163,25 +164,17 @@ class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
         render_options += f" -of {override_extension}" if override_extension else ""
         render_options += f" -cam {camera}" if camera else ""
         
-        job = {}
-        job['name'] = job_name
-        job['cpus'] = num_cpus
 
-        job['prototype'] = 'cmdrange'
-        package = {}
-        package['shell']="/bin/bash"
+        job = self.build_job()
+
         pre_render = ""
 
         pre_render += f"""mayapy /render/{self.username}/{NCCA_PACKAGE_DIR}/load_plugins.py;"""
 
         render_command = f"Render {render_options} {extra_commands} {self.render_path}"
 
-        package['cmdline']=f"{self.source_command} {pre_render} {render_command}"
-        
-        job['package'] = package
+        print(render_command)
 
-        job["cwd"] = f"/render/{self.username}"
-        
-        job['agenda'] = qb.genframes(frame_range)
+        job['package']['cmdline']=f"{pre_render} {render_command}"
         
         self.submit_job(job)

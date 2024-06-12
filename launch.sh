@@ -45,9 +45,9 @@ install_pyenv_windows() {
         source $HOME/.bashrc
 
         # Source pyenv init scripts
-        eval "$("$PYENV/bin/pyenv" init --path)"
-        eval "$("$PYENV/bin/pyenv" init -)"
-        eval "$("$PYENV/bin/pyenv" virtualenv-init -)"
+        #eval "$("$PYENV/bin/pyenv" init --path)"
+        #eval "$("$PYENV/bin/pyenv" init -)"
+        #eval "$("$PYENV/bin/pyenv" virtualenv-init -)"
 
         echo "NCCA | pyenv-win installed successfully."
     else
@@ -57,8 +57,6 @@ install_pyenv_windows() {
 
 # Function to verify pyenv installation
 verify_pyenv() {
-    echo "NCCA | Current PATH: $PATH"
-    
     if ! command -v pyenv &> /dev/null; then
         echo "NCCA | Error: pyenv command not found. Exiting."
         exit 1

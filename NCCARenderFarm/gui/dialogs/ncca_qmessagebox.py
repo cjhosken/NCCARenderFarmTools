@@ -29,12 +29,14 @@ class NCCA_QMessageBox(NCCA_QDialog):
         self.label.setWordWrap(True)
         self.label.setAlignment(Qt.AlignCenter)
         self.label.setContentsMargins(MARGIN_DEFAULT, MARGIN_DEFAULT, MARGIN_DEFAULT, MARGIN_DEFAULT)
-        self.label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.label.setFixedWidth(LARGE_MESSAGE_BOX_SIZE.width() - MARGIN_DEFAULT*2)
+        self.label.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
 
         if (self.size() == LARGE_MESSAGE_BOX_SIZE):
             # Scroll area for message label
             self.scroll_area = QScrollArea()
-            self.scroll_area.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+            self.scroll_area.setFixedWidth(LARGE_MESSAGE_BOX_SIZE.width() - MARGIN_DEFAULT*2)
+            self.scroll_area.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
             self.scroll_area.setContentsMargins(MARGIN_DEFAULT, MARGIN_DEFAULT, MARGIN_DEFAULT, MARGIN_DEFAULT)
             self.scroll_area.setWidgetResizable(True)
             self.scroll_area.setAlignment(Qt.AlignCenter)

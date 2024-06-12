@@ -3,12 +3,10 @@ from gui.widgets import *
 from .ncca_qsubmitwindow import NCCA_QSubmitWindow
 
 class NCCA_QSubmit_Houdini(NCCA_QSubmitWindow):
-    def __init__(self, renderfarm=None, file_path="", folder_path="", username="", file_data=None, parent=None):
-        super().__init__(renderfarm, file_path, folder_path, name="Submit Houdini Job", username=username, parent=parent)
+    def __init__(self, renderfarm=None, file_path="", folder_path="", username="", file_data=None, sourced=True, parent=None):
+        self.sourced = sourced
+        super().__init__(renderfarm, file_path, folder_path, name=HOUDINI_JOB_TITLE, username=username, parent=parent)
         self.file_data = file_data
-
-        if (self.job_path.text() == "/"):
-            self.job_path.setText(os.path.dirname(file_path).replace(f"/home/{username}/farm/", "/")) 
 
         if file_data is not None:
             if "rop_nodes" in file_data["NCCA_RENDERFARM"]:
@@ -22,11 +20,16 @@ class NCCA_QSubmit_Houdini(NCCA_QSubmitWindow):
         self.rop_row_layout = QHBoxLayout()
         self.rop_row_widget = QWidget()
 
-        self.rop_label = QLabel("ROP Node Path")
+        self.rop_label = QLabel(HOUDINI_JOB_ROP_LABEL)
         self.rop_row_layout.addWidget(self.rop_label)
 
-        self.rop = NCCA_QComboBox()
-        self.rop.currentIndexChanged.connect(self.update_frame_labels)
+        if (self.sourced):
+            self.rop = NCCA_QComboBox()
+            self.rop.currentIndexChanged.connect(self.update_frame_labels)
+        else:
+            self.rop = NCCA_QInput(placeholder=HOUDINI_JOB_ROP_PLACEHOLDER, text=HODUINI_JOB_ROP_DEFAULT)
+        
+        self.rop.setToolTip(SUBMIT_HOUDINI_ROP_TOOLTIP)
         self.rop_row_layout.addWidget(self.rop)
 
         self.rop_row_widget.setLayout(self.rop_row_layout)
@@ -46,24 +49,14 @@ class NCCA_QSubmit_Houdini(NCCA_QSubmitWindow):
 
     def prepare_job(self):
         super().prepare_job()
-        job_name = self.job_name.text()
-        num_cpus = self.num_cpus.currentText()
-        frame_start = self.frame_start.text()
-        frame_end = self.frame_end.text()
-        frame_step = self.frame_step.text()
+        if (self.sourced):
+            rop_path = self.rop.currentText()
+        else:
+            rop_path = self.rop.text()
 
-        rop_path = self.rop.currentText()
         external_commands = self.command.text()
 
-        frame_range = f"{frame_start}-{frame_end}x{frame_step}"
-
-        job = {}
-        job['name'] = job_name
-        job['cpus'] = num_cpus
-
-        job['prototype'] = 'cmdrange'
-        package = {}
-        package['shell']="/bin/bash"
+        job = self.build_job()
 
         #https://www.sidefx.com/docs/houdini/ref/utils/hrender.html
         pre_render=f"cd {HOUDINI_PATH}; source houdini_setup_bash; "
@@ -74,12 +67,6 @@ class NCCA_QSubmit_Houdini(NCCA_QSubmitWindow):
 
         print(render_command)
 
-        package['cmdline']=f"{self.source_command} {pre_render} {render_command}"
-
-        job['package'] = package
-    
-        job["cwd"] = f"/render/{self.username}"
-
-        job['agenda'] = qb.genframes(frame_range)
+        job["package"]["cmdline"]=f"{pre_render} {render_command}"
 
         self.submit_job(job)
