@@ -11,6 +11,7 @@ class NCCA_QDialog(QDialog):
         self.setWindowTitle(title)
         self.setFixedSize(size)
         self.setObjectName("NCCA_QDialog")
+        self.setModal(True)
 
         # Set window attributes
         self.setWindowFlag(Qt.WindowType.FramelessWindowHint)

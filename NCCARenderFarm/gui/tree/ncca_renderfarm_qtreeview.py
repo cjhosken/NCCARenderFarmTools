@@ -134,7 +134,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                             file_path = url.toLocalFile()
                             if (os.path.exists(file_path)):
                                 if not self.model().renderfarm.exists(join_path(destination_path, os.path.basename(file_path))):
-                                    self.model().renderfarm.upload_async(file_path, join_path(destination_path, os.path.basename(file_path)))
+                                    self.model().renderfarm.upload(file_path, join_path(destination_path, os.path.basename(file_path)))
                             else:
                                 file_path = url.toString()
                                 if self.model().renderfarm.exists(file_path):
@@ -153,7 +153,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                                     MOVE_CONFIRM_LABEL.format(file_path, destination_path),
                                 )
                                 if reply == QDialog.DialogCode.Accepted:
-                                    self.model().renderfarm.upload_async(file_path, join_path(destination_path, os.path.basename(file_path)))
+                                    self.model().renderfarm.upload(file_path, join_path(destination_path, os.path.basename(file_path)))
                                     self.refresh()
                                     
                     else:
@@ -315,7 +315,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                 destination_file = join_path(destination_folder, os.path.basename(file))
                 upload_items.append([file, destination_file])
             
-            self.model().renderfarm.upload_async(upload_items)
+            self.model().renderfarm.upload(upload_items)
             self.refresh()
 
     def uploadFoldersToSelectedIndex(self):
@@ -335,7 +335,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             for folder in selected_folders:
                 destination_folder = join_path(self.model().get_file_path(index), os.path.basename(folder))
                 upload_items.append([folder, destination_folder])
-            self.model().renderfarm.upload_async(upload_items)
+            self.model().renderfarm.upload(upload_items)
             self.refresh()
 
     def downloadSelectedIndex(self):
@@ -358,7 +358,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             if os.path.exists(destination_path):
                 NCCA_QMessageBox.warning(self, PATH_EXISTING_TITLE, PATH_EXISTING_LABEL.format(destination_path))
             else:
-                self.model().renderfarm.download_async(source_path, destination_path)
+                self.model().renderfarm.download(source_path, destination_path)
             
 
     def deleteSelectedIndexes(self):
@@ -370,7 +370,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             for index in selected_indexes:
                 file_paths.append(self.model().get_file_path(index))
             
-            self.model().renderfarm.delete_async(file_paths)
+            self.model().renderfarm.delete(file_paths)
             self.refresh()
 
 
@@ -378,7 +378,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         """Deletes the specified index."""
         file_path = [self.model().get_file_path(index)]
         if file_path != self.home_path:
-            self.model().renderfarm.delete_async(file_path)
+            self.model().renderfarm.delete(file_path)
             self.refresh()
 
 
@@ -390,7 +390,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             reply = NCCA_QMessageBox.question(self, DELETE_CONFIRM_TITLE, DELETE_CONFIRM_LABEL.format(file_path))
             if reply == QDialog.DialogCode.Accepted:
                 children = self.model().renderfarm.listdir(file_path)
-                self.model().renderfarm.delete_async(children, show_info=False)
+                self.model().renderfarm.delete(children, show_info=False)
                 self.model().renderfarm.mkdir(join_path(self.home_path, RENDERFARM_OUTPUT_DIR))
                 self.refresh()
                 NCCA_QMessageBox.info(self, WIPED_TITLE, file_path + WIPED_LABEL)
@@ -468,7 +468,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             temp_dir = tempfile.TemporaryDirectory(dir=get_user_home())
             local_path = join_path(temp_dir.name, file_name)
 
-            self.model().renderfarm.download_async(remote_path=file_path, local_path=local_path, show_info=False, show_progress=False)
+            self.model().renderfarm.download(remote_path=file_path, local_path=local_path, show_info=False, show_progress=False)
             self.image_dialog = NCCA_ImageWindow(image_path=local_path)
             self.image_dialog.setGeometry(self.geometry())
             self.image_dialog.show()
@@ -501,7 +501,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         if not file_path:
             return
 
-        self.model().renderfarm.upload_async(upload_items=[(folder_path, join_path(dest_folder, os.path.basename(folder_path)))], show_info=False)
+        self.model().renderfarm.upload(upload_items=[(folder_path, join_path(dest_folder, os.path.basename(folder_path)))], show_info=False)
         self.refresh()
 
         self.submit_job(file_path=file_path, folder_path=folder_path)
@@ -640,7 +640,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         
         local_path = join_path(temp_dir.name, file_name)
 
-        self.model().renderfarm.download_async(remote_path=file_path, local_path=local_path, show_info=False, show_progress=False)
+        self.model().renderfarm.download(remote_path=file_path, local_path=local_path, show_info=False, show_progress=False)
 
         self.submit_job(file_path=file_path, folder_path=None, local_path=local_path)
 
