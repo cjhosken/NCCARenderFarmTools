@@ -11,7 +11,7 @@ class NCCA_DCCDataThread(QThread):
         self.command = command
 
     def run(self):
-        result = self.get_dcc_data(self.command)
+        result = None
         self.data_ready.emit(result)
 
     def get_dcc_data(self, command):
@@ -21,6 +21,5 @@ class NCCA_DCCDataThread(QThread):
 
             if match:
                 json_data = match.group()
-                # Load JSON data
-                return json.loads(json_data)
+                return json.loads(json_data)   
         return None

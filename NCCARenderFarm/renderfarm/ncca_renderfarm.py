@@ -154,7 +154,7 @@ class NCCA_RenderFarm(paramiko.SSHClient):
 
     def download(self, remote_path, local_path, show_info=True, show_progress=True):
         """Downloads a file or directory from the remote SFTP server to local."""
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
         try:
             progress_dialog = None
             if (show_progress):

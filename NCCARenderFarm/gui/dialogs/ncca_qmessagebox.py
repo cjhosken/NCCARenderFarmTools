@@ -28,7 +28,6 @@ class NCCA_QMessageBox(NCCA_QDialog):
         self.label = QLabel("")
         self.label.setWordWrap(True)
         self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.label.setContentsMargins(MARGIN_DEFAULT, MARGIN_DEFAULT, MARGIN_DEFAULT, MARGIN_DEFAULT)
         self.label.setFixedWidth(LARGE_MESSAGE_BOX_SIZE.width() - MARGIN_DEFAULT*2)
         self.label.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
 
@@ -45,6 +44,7 @@ class NCCA_QMessageBox(NCCA_QDialog):
             self.scroll_area.setStyleSheet(NCCA_QMESSAGEBOX_SCROLL_AREA_STYLESHEET)
             self.main_layout.addWidget(self.scroll_area)
         else:
+            self.label.setContentsMargins(MARGIN_DEFAULT, MARGIN_DEFAULT, MARGIN_DEFAULT, MARGIN_DEFAULT)
             self.main_layout.addWidget(self.label)
 
         # Button box for buttons

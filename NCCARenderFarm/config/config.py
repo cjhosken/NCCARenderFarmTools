@@ -142,10 +142,9 @@ SUPPORTED_DCC_EXTENSIONS=BLENDER_EXTENSIONS+HOUDINI_EXTENSIONS+MAYA_EXTENSIONS+N
 
 if OPERATING_SYSTEM == "windows":
     LOCAL_NUKEX_PATH="C:/Program Files/Nuke14.0v4/Nuke14.0.exe"
-    LOCAL_KATANA_PATH = "C:/Program Files/Katana"
+    LOCAL_KATANA_PATH = "C:/Program Files/Katana3.1v5/bin/katanaBin.exe"
     LOCAL_HYTHON_PATH = "C:/Program Files/Side Effects Software/Houdini 20.0.506/bin/hython.exe"
     LOCAL_MAYAPY_PATH = "C:/Program Files/Autodesk/Maya2023/bin/mayapy.exe"
-
 
 MAYA_RENDER_ENGINES = {
     "Set by file": "file",
