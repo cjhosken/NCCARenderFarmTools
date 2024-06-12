@@ -1,11 +1,11 @@
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
-from PySide6.QtSvg import *
+from PyQt6.QtCore import *
+from PyQt6.QtGui import *
+from PyQt6.QtWidgets import *
+from PyQt6.QtSvg import *
 import sys, os, shutil, tempfile, re, json
 from cryptography.fernet import Fernet
 from dotenv import load_dotenv
-import paramiko, socket, subprocess, threading, zipfile, stat, queue
+import paramiko, socket, subprocess, threading, zipfile, stat, queue, multiprocessing
 os.environ["OPENCV_IO_ENABLE_OPENEXR"] = "1" 
 from PIL import Image, ImageTk
 import cv2, numpy as np

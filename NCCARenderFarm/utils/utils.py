@@ -22,7 +22,7 @@ def svg_to_pixmap(svg_filename, size, color):
     svg_renderer.render(painter)
     
     # Set the composition mode to apply the color
-    painter.setCompositionMode(QPainter.CompositionMode_SourceIn)
+    painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_SourceIn)
     
     # Fill the pixmap with the specified color
     painter.fillRect(pixmap.rect(), color)

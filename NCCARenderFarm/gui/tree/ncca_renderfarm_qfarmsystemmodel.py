@@ -116,7 +116,7 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
                 if stat.S_ISDIR(parent_stat.st_mode):
                     children = self.renderfarm.listdir(parent_path)
                     parent_item['children'] = [self.create_item(join_path(parent_path, child), parent_item) for child in children]
-                    self.sort_children(parent_item['children'], Qt.AscendingOrder)
+                    self.sort_children(parent_item['children'], Qt.SortOrder.AscendingOrder)
                 else:
                     # If it's not a directory, return 0 as it has no children
                     return 0
@@ -137,20 +137,20 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
             return item.get('path', '')
         return ''
 
-    def data(self, index, role=Qt.DisplayRole):
+    def data(self, index, role=Qt.ItemDataRole.DisplayRole):
         """Edits the data to fit nicely into the application"""
         if not index.isValid():
             return None
 
         item = index.internalPointer()
 
-        if role == Qt.DisplayRole:
+        if role == Qt.ItemDataRole.DisplayRole:
             if (item['path'] == self.home_path):
                 return join_path(RENDERFARM_RENDER_ROOT, self.username, RENDERFARM_FARM_DIR)
 
             return os.path.basename(item['path'])  # Return the name of other items
 
-        elif role == Qt.DecorationRole and index.isValid():
+        elif role == Qt.ItemDataRole.DecorationRole and index.isValid():
             file_path = self.get_file_path(index)
 
             # Sets folder icons
@@ -194,7 +194,7 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
         """Custom flags to enable drag dropping and other features"""
         default_flags = super().flags(index)
         if index.isValid():
-            flags = default_flags | Qt.ItemIsDragEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
+            flags = default_flags | Qt.ItemFlag.ItemIsDragEnabled | Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsDropEnabled
 
             return flags
         
@@ -226,7 +226,7 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
 
         return QModelIndex()
     
-    def sort(self, column, order=Qt.AscendingOrder):
+    def sort(self, column, order=Qt.SortOrder.AscendingOrder):
         """
         Sort the model data.
         """
@@ -236,7 +236,7 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
         # Recursively sort all children of the root item
         def recursive_sort(item):
             if item['children']:
-                item['children'].sort(key=lambda x: os.path.basename(x['path']).lower(), reverse=(order == Qt.DescendingOrder))
+                item['children'].sort(key=lambda x: os.path.basename(x['path']).lower(), reverse=(order == Qt.SortOrder.DescendingOrder))
                 for child in item['children']:
                     recursive_sort(child)
 
@@ -248,7 +248,7 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
         """
         Sorts the children list alphabetically.
         """
-        children.sort(key=lambda x: os.path.basename(x['path']).lower(), reverse=(order == Qt.DescendingOrder))
+        children.sort(key=lambda x: os.path.basename(x['path']).lower(), reverse=(order == Qt.SortOrder.DescendingOrder))
 
     def mimeData(self, indexes):
         """Create a QMimeData object with the URLs of the selected items"""

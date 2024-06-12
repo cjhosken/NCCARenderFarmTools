@@ -32,11 +32,11 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
 
     def setup_ui(self):
         """Sets up the user interface elements"""
-        self.main_layout.setAlignment(Qt.AlignCenter)
+        self.main_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         # Title
         self.title = QLabel(APPLICATION_NAME)
-        self.title.setAlignment(Qt.AlignCenter)
+        self.title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.title.setFont(TITLE_FONT)
         self.main_layout.addWidget(self.title)
         self.main_layout.addStretch()
@@ -44,7 +44,7 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
         # Title sublabel
         self.label = QLabel(LOGIN_WINDOW_SUBTITLE)
         self.label.setWordWrap(True)
-        self.label.setAlignment(Qt.AlignCenter)
+        self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.label.setFont(TEXT_FONT)
         self.main_layout.addWidget(self.label)
 
@@ -64,7 +64,7 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
 
         # Password input
         self.password = NCCA_QInput(LOGIN_WINDOW_PASSWORD_PLACEHOLDER)
-        self.password.setEchoMode(QLineEdit.Password)
+        self.password.setEchoMode(QLineEdit.EchoMode.Password)
         self.password.setToolTip(PASSWORD_INPUT_TOOLTIP)
         self.setupInputField(self.password)
         self.password.returnPressed.connect(self.handle_login)
@@ -145,7 +145,7 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
     def handleFailedConnection(self):
         """Handles the UI when the connection to the render farm fails"""
         self.clearLayout()
-        self.main_layout.setAlignment(Qt.AlignCenter)
+        self.main_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.title = QLabel(APPLICATION_NAME)
         self.title.setAlignment(Qt.AlignCenter)
         self.title.setFont(TITLE_FONT)
@@ -153,7 +153,7 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
 
         cant_connect_label = QLabel(NCCA_CONNECTION_ERROR_MESSAGE)
         cant_connect_label.setWordWrap(True)
-        cant_connect_label.setAlignment(Qt.AlignCenter)
+        cant_connect_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         cant_connect_label.setFont(TEXT_FONT)
         cant_connect_label.setContentsMargins(MARGIN_DEFAULT, 0, MARGIN_DEFAULT, 0)
         self.main_layout.addWidget(cant_connect_label)
@@ -162,7 +162,7 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
         image_label = QLabel()
         pixmap = QPixmap(NO_CONNECTION_IMAGE).scaled(NO_CONNECTION_IMAGE_SIZE, Qt.KeepAspectRatio)
         image_label.setPixmap(pixmap)
-        image_label.setAlignment(Qt.AlignCenter)
+        image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.main_layout.addWidget(image_label)
         self.main_layout.addStretch()
 

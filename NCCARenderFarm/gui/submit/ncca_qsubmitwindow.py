@@ -31,14 +31,14 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
 
     def setupJobInputs(self):
         """Set up job input fields."""
-        self.main_layout.setAlignment(Qt.AlignCenter)
+        self.main_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         # Title
         self.title = QLabel(self.name)
         self.title.setContentsMargins(MARGIN_DEFAULT, 0, 0, 0)
         self.title.setFont(TITLE_FONT)
         self.title.setStyleSheet(f"color: {APP_FOREGROUND_COLOR};")
-        self.nav_and_title_layout.addWidget(self.title, alignment=Qt.AlignLeft)
+        self.nav_and_title_layout.addWidget(self.title, alignment=Qt.AlignmentFlag.AlignLeft)
         self.nav_and_title_layout.addStretch()
 
         self.setupJobNameInput()
@@ -130,21 +130,21 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
 
     def setupButtons(self):
         """Set up submit and cancel buttons."""
-        self.button_box = QDialogButtonBox(Qt.Horizontal)
+        self.button_box = QDialogButtonBox(Qt.Orientation.Horizontal)
 
         # Submit button
         submit_button = NCCA_QFlatButton(SUBMIT_BUTTON_SUBMIT_TEXT)
         submit_button.setFixedSize(QDIALOG_BUTTON_DEFAULT_SIZE)
         submit_button.clicked.connect(self.prepare_job)
-        self.button_box.addButton(submit_button, QDialogButtonBox.YesRole)
+        self.button_box.addButton(submit_button, QDialogButtonBox.ButtonRole.AcceptRole)
 
         # Cancel button
         cancel_button = NCCA_QFlatButton(SUBMIT_BUTTON_CANCEL_TEXT)
         cancel_button.setFixedSize(QDIALOG_BUTTON_DEFAULT_SIZE)
         cancel_button.clicked.connect(self.close)
-        self.button_box.addButton(cancel_button, QDialogButtonBox.NoRole)
+        self.button_box.addButton(cancel_button, QDialogButtonBox.ButtonRole.AcceptRole)
 
-        self.main_layout.addWidget(self.button_box, alignment=Qt.AlignCenter)
+        self.main_layout.addWidget(self.button_box, alignment=Qt.AlignmentFlag.AlignCenter)
 
     def prepare_job(self):
         
@@ -161,10 +161,10 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
                 PATH_EXISTING_OVERRIDE_LABEL.format(remote_job_path)
             )
 
-            if response == QDialogButtonBox.YesRole:
+            if response == QDialogButtonBox.ButtonLayout.YesRole:
                 self.renderfarm.delete(remote_job_path)
                 self.renderfarm.upload_folder(self.folder_path, remote_job_path, None)
-            elif response == QDialogButtonBox.NoRole: 
+            elif response == QDialogButtonBox.ButtonLayout.NoRole: 
                 remote_render_path = join_path(RENDERFARM_RENDER_ROOT, self.username, RENDERFARM_FARM_DIR,
                                                 self.job_path.text())
 

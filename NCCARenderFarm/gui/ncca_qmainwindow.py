@@ -20,8 +20,8 @@ class NCCA_QMainWindow(QMainWindow):
         self.setWindowTitle(self.name)
         self.setFixedSize(self.size)
 
-        self.setWindowFlags(Qt.FramelessWindowHint)
-        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
         self.old_pos = None
 
         # Root widget
@@ -55,22 +55,22 @@ class NCCA_QMainWindow(QMainWindow):
         # Exit button
         self.exit_button = NCCA_QIconButton(CLOSE_ICON_PATH, ICON_SIZE)
         self.exit_button.clicked.connect(self.close)
-        self.nav_and_title_layout.addWidget(self.exit_button, alignment=Qt.AlignRight)
+        self.nav_and_title_layout.addWidget(self.exit_button, alignment=Qt.AlignmentFlag.AlignRight)
         self.root_layout.addWidget(self.nav_and_title_bar)
         self.root_layout.addWidget(self.main_widget)
 
     def mousePressEvent(self, event):
         """Store the mouse position when the left button is pressed"""
-        if event.button() == Qt.LeftButton:
-            if self.nav_and_title_bar.geometry().contains(event.pos()):
-                self.old_pos = event.globalPos()
+        if event.button() == Qt.MouseButton.LeftButton:
+            if self.nav_and_title_bar.geometry().contains(event.position().toPoint()):
+                self.old_pos = event.globalPosition().toPoint()
 
     def mouseMoveEvent(self, event):
         """Move the window based on mouse drag on the navigation bar"""
         if self.old_pos:
-            delta = event.globalPos() - self.old_pos
+            delta = event.globalPosition().toPoint() - self.old_pos
             self.move(self.pos() + delta)
-            self.old_pos = event.globalPos()
+            self.old_pos = event.globalPosition().toPoint()
 
     def mouseReleaseEvent(self, event):
         """Clear the stored position when mouse button is released"""

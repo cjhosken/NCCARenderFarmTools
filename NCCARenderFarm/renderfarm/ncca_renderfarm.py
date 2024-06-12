@@ -30,6 +30,11 @@ class NCCA_RenderFarm(paramiko.SSHClient):
         sftp (paramiko.SFTPClient): The SFTP client used for file operations.
     """
 
+    download_signal = pyqtSignal()
+    upload_signal = pyqtSignal()
+    delete_signal = pyqtSignal()
+
+
     def __init__(self, home_path, username, password):
         """Initialize the connection to the remote SFTP server."""
         super().__init__()
@@ -66,6 +71,10 @@ class NCCA_RenderFarm(paramiko.SSHClient):
             except (paramiko.SSHException, socket.gaierror):
                 if attempt >= MAX_CONNECTION_ATTEMPTS - 1:
                     raise NCCA_RenderfarmConnectionError()
+                
+        #self.download_signal.connect(self.download)
+        #self.upload_signal.connect(self.upload)
+        #self.delete_signal.connect(self.delete)
 
     def stat(self, remote_path):
         """Returns the stat of the given path on the remote SFTP server."""
@@ -95,7 +104,7 @@ class NCCA_RenderFarm(paramiko.SSHClient):
 
     def upload(self, upload_items, show_info=True, show_progress=True):
         """Uploads a file from local to the remote SFTP server."""
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
         try:
             progress_dialog = None
             if (show_progress):
@@ -151,7 +160,7 @@ class NCCA_RenderFarm(paramiko.SSHClient):
 
     def download(self, remote_path, local_path, show_info=True, show_progress=True):
         """Downloads a file or directory from the remote SFTP server to local."""
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
         try:
             progress_dialog = None
             if (show_progress):
@@ -192,7 +201,7 @@ class NCCA_RenderFarm(paramiko.SSHClient):
             progress_dialog.setValue(progress_dialog.value() + 1)
 
     def delete(self, remote_paths, show_info=False, show_progress=True):
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
         """Deletes a file or directory from the remote SFTP server."""
         try:
             progress_dialog = None
@@ -233,9 +242,18 @@ class NCCA_RenderFarm(paramiko.SSHClient):
         file_count = 0
 
         if self.isdir(remote_path):
-            for remote_item_path in self.listdir(remote_path):
-                file_count += self.count_files(remote_item_path)
+            # Fetch directory contents in a single call
+            dir_contents = self.listdir(remote_path)
+            for item_name in dir_contents:
+                remote_item_path = os.path.join(remote_path, item_name)
+                if self.isdir(remote_item_path):
+                    # Recursively count files in subdirectory
+                    file_count += self.count_files(remote_item_path)
+                else:
+                    # Increment file count for each file
+                    file_count += 1
         else:
+            # If it's a file, count it
             file_count = 1
 
         return file_count
@@ -267,3 +285,30 @@ class NCCA_RenderFarm(paramiko.SSHClient):
         file_name = os.path.basename(file_path)
         new_file_path = join_path(destination_folder, file_name)
         self.rename(file_path, new_file_path)
+
+
+    #https://stackoverflow.com/questions/58229629/calling-exec-on-a-qdialog-in-a-thread-doesnt-work-well
+        
+    def upload_async(self, upload_items, show_info=True, show_progress=True):
+        """Starts a process to upload files asynchronously."""
+        self.upload_upload_items=upload_items
+        self.upload_show_info=show_info
+        self.upload_show_progress=show_progress
+
+        self.upload(upload_items=upload_items, show_info=show_info, show_progress=show_progress)
+
+    def download_async(self, remote_path, local_path, show_info=True, show_progress=True):
+        """Starts a process to download files asynchronously."""
+        self.download_remote_path=remote_path
+        self.download_show_info=show_info
+        self.download_show_progress=show_progress
+
+        self.download(remote_path=remote_path, local_path=local_path, show_info=show_info, show_progress=show_progress)
+
+    def delete_async(self, remote_paths, show_info=False, show_progress=True):
+        """Starts a process to delete files asynchronously."""
+        self.delete_remote_paths=remote_paths
+        self.delete_show_info=show_info
+        self.delete_show_progress=show_progress
+
+        self.delete(remote_paths=remote_paths, show_info=show_info, show_progress=show_progress)

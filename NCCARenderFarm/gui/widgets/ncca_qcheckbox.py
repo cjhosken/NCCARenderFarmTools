@@ -10,7 +10,7 @@ class NCCA_QCheckBox(QCheckBox):
         
         # Set checkbox attributes
         self.setCheckable(True)
-        self.setCursor(Qt.PointingHandCursor)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.setObjectName("NCCA_QCheckBox")
         
         # Set checkbox styles

@@ -11,7 +11,7 @@ class NCCA_QIconButton(QPushButton):
         
         # Set button attributes
         self.setFlat(True)
-        self.setCursor(Qt.PointingHandCursor)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.setObjectName("NCCA_QIconButton")
         self.installEventFilter(self)
 
@@ -25,11 +25,11 @@ class NCCA_QIconButton(QPushButton):
         """Check for mouse events over the button and style accordingly."""
         if obj == self:
             color_style = None
-            if event.type() == QEvent.Enter or event.type() == QEvent.FocusIn:
+            if event.type() == QEvent.Type.Enter or event.type() == QEvent.Type.FocusIn:
                 self.loadIcon(is_hover=True)
                 color_style = f"color: {APP_PRIMARY_COLOR};"
 
-            elif event.type() == QEvent.Leave or event.type() == QEvent.FocusOut:
+            elif event.type() == QEvent.Type.Leave or event.type() == QEvent.Type.FocusOut:
                 self.loadIcon(is_hover=False)
                 color_style = ""
                 
@@ -44,4 +44,4 @@ class NCCA_QIconButton(QPushButton):
 
         # Set different icon colors for when the button is hovered
         icon_color = APP_PRIMARY_COLOR if is_hover else APP_FOREGROUND_COLOR
-        self.setIcon(svg_to_pixmap(self.icon_path, icon_size, QColor(icon_color)))
+        self.setIcon(QIcon(svg_to_pixmap(self.icon_path, icon_size, QColor(icon_color))))

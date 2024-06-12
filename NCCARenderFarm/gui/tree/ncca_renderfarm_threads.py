@@ -4,7 +4,7 @@ from gui.submit import *
 from gui.dialogs import *
 
 class NCCA_DCCDataThread(QThread):
-    data_ready = Signal(object)
+    data_ready = pyqtSignal(object)
 
     def __init__(self, command, parent=None):
         super().__init__(parent)

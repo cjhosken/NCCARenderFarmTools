@@ -10,7 +10,7 @@ class NCCA_QFlatButton(QPushButton):
 
         # Set button attributes
         self.setFlat(True)
-        self.setCursor(Qt.PointingHandCursor)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.setText(text)
         self.setObjectName("NCCA_QFlatButton")
         self.installEventFilter(self)

@@ -13,8 +13,8 @@ class NCCA_QDialog(QDialog):
         self.setObjectName("NCCA_QDialog")
 
         # Set window attributes
-        self.setWindowFlag(Qt.FramelessWindowHint)
-        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setWindowFlag(Qt.WindowType.FramelessWindowHint)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
 
         # Set window styles
         self.setStyleSheet(NCCA_DIALOG_STYLESHEET)
@@ -67,16 +67,16 @@ class NCCA_QDialog(QDialog):
 
     def mousePressEvent(self, event):
         """Store the mouse position when the left button is pressed"""
-        if event.button() == Qt.LeftButton:
-            if self.header_layout.geometry().contains(event.pos()):
-                self.old_pos = event.globalPos()
+        if event.button() == Qt.MouseButton.LeftButton:
+            if self.header_layout.geometry().contains(event.position().toPoint()):
+                self.old_pos = event.globalPosition().toPoint()
 
     def mouseMoveEvent(self, event):
         """Move the window based on mouse drag on the navigation bar"""
         if self.old_pos:
-            delta = event.globalPos() - self.old_pos
+            delta = event.globalPosition().toPoint() - self.old_pos
             self.move(self.pos() + delta)
-            self.old_pos = event.globalPos()
+            self.old_pos = event.globalPosition().toPoint()
 
     def mouseReleaseEvent(self, event):
         """Clear the stored position when mouse button is released"""

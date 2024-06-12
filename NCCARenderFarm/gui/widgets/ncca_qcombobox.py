@@ -8,7 +8,7 @@ class NCCA_QComboBox(QComboBox):
         """Initialize the custom QComboBox."""
         super().__init__(parent)
         self.setObjectName("NCCA_QComboBox")
-        self.setCursor(Qt.PointingHandCursor)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
         
         # Set up stylesheet
         self.setStyleSheet(NCCA_QCOMBOBOX_STYLESHEET)

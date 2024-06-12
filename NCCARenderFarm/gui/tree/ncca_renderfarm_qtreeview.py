@@ -30,7 +30,9 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         self.refresh_timer.timeout.connect(self.refresh)
         # Set the interval for the timer (in milliseconds)
         # Adjust the interval according to your requirement
-        self.refresh_timer.start(RENDERFARM_REFRESH_INTERVAL)
+
+        # intervals are causing the job submit pages to crash
+        #self.refresh_timer.start(RENDERFARM_REFRESH_INTERVAL)
 
 
     def setupUI(self):
@@ -45,10 +47,10 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         self.setDragEnabled(True)
         self.setAcceptDrops(True)
         self.setDropIndicatorShown(True)
-        self.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         self.setSortingEnabled(True)
 
-        self.setCursor(Qt.PointingHandCursor)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.setIconSize(BROWSER_ICON_SIZE)  
         self.setStyleSheet(NCCA_QTREEVIEW_STYLESHEET)
 
@@ -127,12 +129,12 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                         MOVE_CONFIRM_GENERAL_LABEL.format(destination_path)
                     )
                     
-                    if reply == QDialog.Accepted:
+                    if reply == QDialog.DialogCode.Accepted:
                         for url in urls:
                             file_path = url.toLocalFile()
                             if (os.path.exists(file_path)):
                                 if not self.model().renderfarm.exists(join_path(destination_path, os.path.basename(file_path))):
-                                    self.model().renderfarm.upload(file_path, join_path(destination_path, os.path.basename(file_path)))
+                                    self.model().renderfarm.upload_async(file_path, join_path(destination_path, os.path.basename(file_path)))
                             else:
                                 file_path = url.toString()
                                 if self.model().renderfarm.exists(file_path):
@@ -150,8 +152,8 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                                     MOVE_CONFIRM_TITLE,
                                     MOVE_CONFIRM_LABEL.format(file_path, destination_path),
                                 )
-                                if reply == QDialog.Accepted:
-                                    self.model().renderfarm.upload(file_path, join_path(destination_path, os.path.basename(file_path)))
+                                if reply == QDialog.DialogCode.Accepted:
+                                    self.model().renderfarm.upload_async(file_path, join_path(destination_path, os.path.basename(file_path)))
                                     self.refresh()
                                     
                     else:
@@ -164,7 +166,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                                     MOVE_CONFIRM_LABEL.format(file_path, destination_path)
                                 )
                             
-                                if reply == QDialog.Accepted:
+                                if reply == QDialog.DialogCode.Accepted:
                                     self.model().renderfarm.move(file_path=file_path, destination_folder=destination_path)
                                     self.refresh()
 
@@ -174,12 +176,14 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
 
     def keyPressEvent(self, event):
         """Actions to perform when a key is pressed"""        
-        if event.key() == Qt.Key_Delete:
+        if event.key() == Qt.Key.Key_Delete:
             self.deleteSelectedIndexes()
-        elif event.key() == Qt.Key_F2:
+        elif event.key() == Qt.Key.Key_F2:
             self.renameSelectedIndex()
-        elif event.key() == Qt.Key_R:
+        elif event.key() == Qt.Key.Key_R:
             self.refresh()
+        elif event.key() == Qt.Key.Key_P:
+            self.submit_project()
         else:
             super().keyPressEvent(event)
 
@@ -204,7 +208,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         file_path = self.model().get_file_path(index)
 
         self.context_menu = QMenu(self)
-        self.context_menu.setCursor(Qt.PointingHandCursor)
+        self.context_menu.setCursor(Qt.CursorShape.PointingHandCursor)
 
         if file_path == self.home_path:
             self.action_qube = self.context_menu.addAction(LAUNCH_QUBE_ACTION_LABEL)
@@ -262,7 +266,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
 
         self.context_menu.setStyleSheet(NCCA_QTREEVIEW_STYLESHEET)
 
-        self.context_menu.exec_(event.globalPos())
+        self.context_menu.exec(event.globalPos())
 
     # Action functions
 
@@ -279,7 +283,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
 
         # Prompt user for folder name
         create_folder_dialog = NCCA_QInputDialog(placeholder=FOLDER_DIALOG_PLACEHOLDER, text=FOLDER_DIALOG_DEFAULT, confirm_text=FOLDER_DIALOG_CONFIRM, parent=self)
-        if create_folder_dialog.exec_():
+        if create_folder_dialog.exec():
             folder_name = create_folder_dialog.getText()
             new_folder_path = join_path(parent_path, folder_name)
             # Check if folder already exists
@@ -295,10 +299,10 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         """Handles the process of uploading selected files to the destination folder"""
         # Open file dialog to select files
         file_dialog = QFileDialog(self)
-        file_dialog.setFileMode(QFileDialog.ExistingFiles)  # Allow selecting files
-        file_dialog.setViewMode(QFileDialog.Detail)
+        file_dialog.setFileMode(QFileDialog.FileMode.ExistingFiles)  # Allow selecting files
+        file_dialog.setViewMode(QFileDialog.ViewMode.Detail)
         file_dialog.setWindowTitle(UPLOAD_FILES_TITLE)
-        file_dialog.setOption(QFileDialog.HideNameFilterDetails, True)
+        file_dialog.setOption(QFileDialog.Option.HideNameFilterDetails, True)
 
         index = self.currentIndex()
         destination_folder = self.model().get_file_path(index)
@@ -311,17 +315,17 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                 destination_file = join_path(destination_folder, os.path.basename(file))
                 upload_items.append([file, destination_file])
             
-            self.model().renderfarm.upload(upload_items)
+            self.model().renderfarm.upload_async(upload_items)
             self.refresh()
 
     def uploadFoldersToSelectedIndex(self):
         """Handles the process of uploading selected folders to the destination folder"""
         # Open file dialog to select folders
         folder_dialog = QFileDialog(self)
-        folder_dialog.setFileMode(QFileDialog.Directory)  # Allow selecting directories
-        folder_dialog.setViewMode(QFileDialog.Detail)
+        folder_dialog.setFileMode(QFileDialog.FileMode.Directory)  # Allow selecting directories
+        folder_dialog.setViewMode(QFileDialog.ViewMode.Detail)
         folder_dialog.setWindowTitle(UPLOAD_FOLDERS_TITLE)
-        folder_dialog.setOption(QFileDialog.HideNameFilterDetails, True)
+        folder_dialog.setOption(QFileDialog.Option.HideNameFilterDetails, True)
 
         index = self.currentIndex()
 
@@ -331,7 +335,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             for folder in selected_folders:
                 destination_folder = join_path(self.model().get_file_path(index), os.path.basename(folder))
                 upload_items.append([folder, destination_folder])
-            self.model().renderfarm.upload(upload_items)
+            self.model().renderfarm.upload_async(upload_items)
             self.refresh()
 
     def downloadSelectedIndex(self):
@@ -340,33 +344,33 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         source_path = self.model().get_file_path(index)
 
         folder_dialog = QFileDialog(self)
-        folder_dialog.setFileMode(QFileDialog.Directory if self.model().renderfarm.isdir(source_path) else QFileDialog.AnyFile)
-        folder_dialog.setViewMode(QFileDialog.Detail)
+        folder_dialog.setFileMode(QFileDialog.FileMode.Directory if self.model().renderfarm.isdir(source_path) else QFileDialog.FileMode.AnyFile)
+        folder_dialog.setViewMode(QFileDialog.ViewMode.Detail)
         folder_dialog.setWindowTitle(DOWNLOAD_DESTINATION_TITLE)
-        folder_dialog.setOption(QFileDialog.ShowDirsOnly, True)
+        folder_dialog.setOption(QFileDialog.Option.ShowDirsOnly, True)
         folder_dialog.selectFile(os.path.basename(source_path))
 
         destination_path, _ = folder_dialog.getSaveFileName(self, DOWNLOAD_DESTINATION_CAPTION,
                                                             join_path(get_user_home(), os.path.basename(source_path)), DOWNLOAD_DESTINATION_FILTER,
-                                                            options=QFileDialog.DontConfirmOverwrite)
+                                                            options=QFileDialog.Option.DontConfirmOverwrite)
 
         if destination_path:
             if os.path.exists(destination_path):
                 NCCA_QMessageBox.warning(self, PATH_EXISTING_TITLE, PATH_EXISTING_LABEL.format(destination_path))
             else:
-                self.model().renderfarm.download(source_path, destination_path)
+                self.model().renderfarm.download_async(source_path, destination_path)
             
 
     def deleteSelectedIndexes(self):
         """Deletes the selected indexes."""
         selected_indexes = self.selectedIndexes()
         reply = NCCA_QMessageBox.question(self, DELETE_CONFIRM_TITLE, DELETE_CONFIRM_GENERAL_LABEL)
-        if reply == QDialog.Accepted:
+        if reply == QDialog.DialogCode.Accepted:
             file_paths = []
             for index in selected_indexes:
                 file_paths.append(self.model().get_file_path(index))
             
-            self.model().renderfarm.delete(file_paths)
+            self.model().renderfarm.delete_async(file_paths)
             self.refresh()
 
 
@@ -374,7 +378,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         """Deletes the specified index."""
         file_path = [self.model().get_file_path(index)]
         if file_path != self.home_path:
-            self.model().renderfarm.delete(file_path)
+            self.model().renderfarm.delete_async(file_path)
             self.refresh()
 
 
@@ -384,16 +388,16 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         file_path = self.model().get_file_path(index)
         if self.model().renderfarm.isdir(file_path):
             reply = NCCA_QMessageBox.question(self, DELETE_CONFIRM_TITLE, DELETE_CONFIRM_LABEL.format(file_path))
-            if reply == QDialog.Accepted:
+            if reply == QDialog.DialogCode.Accepted:
                 children = self.model().renderfarm.listdir(file_path)
-                self.model().renderfarm.delete(children, show_info=False)
+                self.model().renderfarm.delete_async(children, show_info=False)
                 self.model().renderfarm.mkdir(join_path(self.home_path, RENDERFARM_OUTPUT_DIR))
                 self.refresh()
                 NCCA_QMessageBox.info(self, WIPED_TITLE, file_path + WIPED_LABEL)
 
     def refresh(self):
         """Refreshes the view."""
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
         expanded_paths = self.get_expanded_paths()
         selected_index = self.selectedIndexes()[0] if self.selectedIndexes() else QModelIndex()
 
@@ -407,6 +411,8 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                 self.expand(index)
 
         QApplication.restoreOverrideCursor()
+
+                
 
     def get_expanded_paths(self):
         """Returns a list of paths of currently expanded folders."""
@@ -437,7 +443,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             return
 
         rename_dialog = NCCA_QInputDialog(placeholder=RENAME_PLACEHOLDER, text=os.path.basename(file_path), parent=self)
-        if rename_dialog.exec_():
+        if rename_dialog.exec():
             new_name = rename_dialog.getText()
             new_file_path = join_path(os.path.dirname(file_path), new_name)
             if file_path != new_file_path:
@@ -462,7 +468,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             temp_dir = tempfile.TemporaryDirectory(dir=get_user_home())
             local_path = join_path(temp_dir.name, file_name)
 
-            self.model().renderfarm.download(remote_path=file_path, local_path=local_path, show_info=False, show_progress=False)
+            self.model().renderfarm.download_async(remote_path=file_path, local_path=local_path, show_info=False, show_progress=False)
             self.image_dialog = NCCA_ImageWindow(image_path=local_path)
             self.image_dialog.setGeometry(self.geometry())
             self.image_dialog.show()
@@ -484,18 +490,18 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             elif (not self.model().renderfarm.isdir(dest_folder)):
                 self.model().renderfarm.mkdir(dest_folder)
 
-        options = QFileDialog.Options()
-        folder_path = QFileDialog.getExistingDirectory(self, DIR_SELECT_LABEL, QDir.homePath(), options=options)
+        folder_path = QFileDialog.getExistingDirectory(self, DIR_SELECT_LABEL, QDir.homePath())
+
 
         if not folder_path:
             return
 
-        file_path, _ = QFileDialog.getOpenFileName(self, DCC_FILE_SELECT_LABEL, folder_path, DCC_FILE_FILTER, options=options)
+        file_path, _ = QFileDialog.getOpenFileName(self, DCC_FILE_SELECT_LABEL, folder_path, DCC_FILE_FILTER)
 
         if not file_path:
             return
 
-        self.model().renderfarm.upload(upload_items=[(folder_path, join_path(dest_folder, os.path.basename(folder_path)))], show_info=False)
+        self.model().renderfarm.upload_async(upload_items=[(folder_path, join_path(dest_folder, os.path.basename(folder_path)))], show_info=False)
         self.refresh()
 
         self.submit_job(file_path=file_path, folder_path=folder_path)
@@ -535,7 +541,6 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                 UNSUPPORTED_SOFTWARE_LABEL.format(project_ext) + "\n"
             )
             return
-
 
         self.get_dcc_data_async(command)
 
@@ -616,7 +621,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             )
         
     def get_dcc_data_async(self, command):
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
         self.get_data_thread = NCCA_DCCDataThread(command)
         self.get_data_thread.data_ready.connect(self.load_job_submission)
         self.get_data_thread.start()
@@ -635,7 +640,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         
         local_path = join_path(temp_dir.name, file_name)
 
-        self.model().renderfarm.download(remote_path=file_path, local_path=local_path, show_info=False, show_progress=False)
+        self.model().renderfarm.download_async(remote_path=file_path, local_path=local_path, show_info=False, show_progress=False)
 
         self.submit_job(file_path=file_path, folder_path=None, local_path=local_path)
 

@@ -20,7 +20,7 @@ class NCCA_QInputDialog(NCCA_QDialog):
 
         # Text input
         self.line_edit = NCCA_QInput(placeholder=self.placeholder, text=self.text)
-        self.line_edit.setAlignment(Qt.AlignCenter)
+        self.line_edit.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.main_layout.addWidget(self.line_edit)
         self.main_layout.addStretch(1)
 
@@ -28,7 +28,7 @@ class NCCA_QInputDialog(NCCA_QDialog):
         self.confirm_button = NCCA_QFlatButton(self.confirm_text)
         self.confirm_button.setFixedSize(QDIALOG_BUTTON_DEFAULT_SIZE)
         self.confirm_button.clicked.connect(self.accept)
-        self.main_layout.addWidget(self.confirm_button, alignment=Qt.AlignCenter)
+        self.main_layout.addWidget(self.confirm_button, alignment=Qt.AlignmentFlag.AlignCenter)
         self.main_layout.addStretch(0)
 
         self.line_edit.returnPressed.connect(self.accept)
