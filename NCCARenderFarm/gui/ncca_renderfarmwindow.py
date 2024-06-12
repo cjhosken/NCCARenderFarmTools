@@ -56,10 +56,11 @@ class NCCA_RenderFarmWindow(NCCA_QMainWindow):
         self.report_bug_button.setToolTip(REPORT_BUG_TOOLTIP)
         self.report_bug_button.clicked.connect(self.report_bug)
         self.nav_and_title_layout.addWidget(self.report_bug_button, alignment=Qt.AlignmentFlag.AlignRight)
-        
+
         # File browser
         self.browser = NCCA_RenderFarm_QTreeView(self.home_path, self.username, self.password, parent=self)
         self.main_layout.addWidget(self.browser)
+
 
     def report_bug(self):
         """Sends the user to a report bug webpage"""
