@@ -24,6 +24,14 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         self.setupUI()
         self.refresh()
 
+        # Create a QTimer instance
+        self.refresh_timer = QTimer(self)
+        # Connect the timeout signal of the timer to the refresh method
+        self.refresh_timer.timeout.connect(self.refresh)
+        # Set the interval for the timer (in milliseconds)
+        # Adjust the interval according to your requirement
+        self.refresh_timer.start(RENDERFARM_REFRESH_INTERVAL)
+
 
     def setupUI(self):
         """Set up the user interface"""
@@ -385,6 +393,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
 
     def refresh(self):
         """Refreshes the view."""
+        QApplication.setOverrideCursor(Qt.WaitCursor)
         expanded_paths = self.get_expanded_paths()
         selected_index = self.selectedIndexes()[0] if self.selectedIndexes() else QModelIndex()
 
@@ -396,6 +405,8 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             index = self.model().findIndex(path)
             if index.isValid():
                 self.expand(index)
+
+        QApplication.restoreOverrideCursor()
 
     def get_expanded_paths(self):
         """Returns a list of paths of currently expanded folders."""
