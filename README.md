@@ -5,8 +5,6 @@ Run `./launch.sh` to run the NCCA Renderfarm Tool.
 
 ## Current TODOs
 1. Fix the Renderfarm server
-2. Threading for large processes
-3. TreeView refreshing every minute
 3. Code Refactoring and Cleanup
 4. Documentation
 
