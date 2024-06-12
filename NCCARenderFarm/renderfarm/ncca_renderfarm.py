@@ -102,7 +102,6 @@ class NCCA_RenderFarm(paramiko.SSHClient):
             if (show_progress):
                 progress_dialog = NCCA_QProgressDialog(RENDERFARM_PROGRESS_UPLOAD_TITLE,RENDERFARM_COUNTING_FILES_LABEL, 0, 1, None)
                 progress_dialog.show()
-                QApplication.processEvents()
                 progress_dialog.setText(RENDERFARM_PROGRESS_UPLOAD_LABEL)
 
                 total_files = 0
@@ -112,6 +111,7 @@ class NCCA_RenderFarm(paramiko.SSHClient):
                             total_files += len(files)
                     else:
                         total_files += 1
+                    QApplication.processEvents()
 
                 progress_dialog.setMaximum(total_files)
 
@@ -136,6 +136,7 @@ class NCCA_RenderFarm(paramiko.SSHClient):
         self.sftp.put(local_file_path, remote_file_path)
         if progress_dialog is not None:
             progress_dialog.setValue(progress_dialog.value() + 1)
+        QApplication.processEvents()
 
     def upload_folder(self, local_folder_path, remote_folder_path, progress_dialog=None):
         """Recursively uploads a local folder and its contents to a remote folder."""
@@ -149,6 +150,7 @@ class NCCA_RenderFarm(paramiko.SSHClient):
                 self.upload_folder(local_item_path, remote_item_path, progress_dialog)
             else:
                 self.upload_file(local_item_path, remote_item_path, progress_dialog)
+        QApplication.processEvents()
 
     def download(self, remote_path, local_path, show_info=True, show_progress=True):
         """Downloads a file or directory from the remote SFTP server to local."""
@@ -186,11 +188,13 @@ class NCCA_RenderFarm(paramiko.SSHClient):
                 self.download_folder(remote_item_path, local_item_path, progress_dialog)
             else:
                 self.download_file(remote_item_path, local_item_path, progress_dialog)
+        QApplication.processEvents()
 
     def download_file(self, remote_file_path, local_file_path, progress_dialog=None):
         self.sftp.get(remote_file_path, local_file_path)
         if progress_dialog is not None:
             progress_dialog.setValue(progress_dialog.value() + 1)
+        QApplication.processEvents()
 
     def delete(self, remote_paths, show_info=False, show_progress=True):
         QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
@@ -200,7 +204,6 @@ class NCCA_RenderFarm(paramiko.SSHClient):
             if (show_progress):
                 progress_dialog = NCCA_QProgressDialog(RENDERFARM_PROGRESS_DELETE_TITLE,RENDERFARM_COUNTING_FILES_LABEL, 0, 1, None)
                 progress_dialog.show()
-                QApplication.processEvents()
                 total_files = 0
             
                 for remote_path in remote_paths:
@@ -232,12 +235,13 @@ class NCCA_RenderFarm(paramiko.SSHClient):
     def count_files(self, remote_path):
         """Recursively count all files in a directory."""
         file_count = 0
-
+        
         if self.isdir(remote_path):
             for remote_item_path in self.listdir(remote_path):
                 file_count += self.count_files(remote_item_path)
         else:
             file_count = 1
+        QApplication.processEvents()
 
         return file_count
     
@@ -254,6 +258,7 @@ class NCCA_RenderFarm(paramiko.SSHClient):
         self.sftp.remove(remote_file_path)
         if progress_dialog is not None:
             progress_dialog.setValue(progress_dialog.value() + 1)
+        QApplication.processEvents()
 
     def mkdir(self, remote_path):
         """Creates a directory on the remote SFTP server."""
