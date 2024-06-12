@@ -17,6 +17,7 @@ class NCCA_QProgressDialog(NCCA_QDialog):
 
     def init_ui(self):
         super().init_ui()
+        self.main_layout.addStretch()
         # Progress dialog
         self.progress_dialog = QProgressDialog(parent=self)
         self.progress_dialog.setLabelText(self.windowTitle())
@@ -73,3 +74,4 @@ class NCCA_QProgressDialog(NCCA_QDialog):
     
     def show(self):
         super().show()
+        QApplication.processEvents()
