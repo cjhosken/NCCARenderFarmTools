@@ -74,4 +74,4 @@ class NCCA_QProgressDialog(NCCA_QDialog):
     
     def show(self):
         super().show()
-        QApplication.processEvents()
+        QCoreApplication.processEvents()
