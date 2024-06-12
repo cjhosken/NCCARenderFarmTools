@@ -195,7 +195,7 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
         shell_script_path=join_path(RENDERFARM_RENDER_ROOT, self.username, NCCA_PACKAGE_DIR, "source.sh")
         sed_command = f"sed -i 's/\r//' {shell_script_path};" # Due to developing the shell script on windows
 
-        source_command = f"{sed_command} source {shell_script_path}; echo QB_FRAME_NUMBER;"
+        source_command = f"{sed_command} source {shell_script_path};"
 
         job['package']['cmdline'] = f"{source_command} {job['package']['cmdline']}"
 
