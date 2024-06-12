@@ -5,6 +5,7 @@ from gui.dialogs import *
 from render_info import *
 from gui.ncca_imagewindow import NCCA_ImageWindow
 from .ncca_renderfarm_qfarmsystemmodel import NCCA_RenderFarm_QFarmSystemModel
+from .ncca_renderfarm_threads import NCCA_DCCDataThread
 
 
 class NCCA_RenderFarm_QTreeView(QTreeView):
@@ -23,7 +24,6 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         self.setupUI()
         self.refresh()
 
-        # Create a refresh timer
 
     def setupUI(self):
         """Set up the user interface"""
@@ -487,17 +487,59 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         self.model().renderfarm.upload(upload_items=[(folder_path, join_path(dest_folder, os.path.basename(folder_path)))], show_info=False)
         self.refresh()
 
-        self.run_submit_job_async(file_path=file_path, folder_path=folder_path)
+        self.submit_job(file_path=file_path, folder_path=folder_path)
 
     def submit_job(self, file_path, folder_path, local_path=None):
-        project_folder = folder_path
+        self.job_project_folder = folder_path
+        self.job_file_path = file_path
+        self.job_local_path=local_path
+
         _, project_ext = os.path.splitext(os.path.basename(file_path))
 
+        self.job_project_type = "unknown"
+        command = ""
+        if project_ext in BLENDER_EXTENSIONS:
+            project_type = "blender"
+        
+        elif project_ext in MAYA_EXTENSIONS:
+            project_type = "maya"
+            command = [LOCAL_MAYAPY_PATH, join_path(RENDER_INFO_PATH, "maya_render_info.py"), local_path]
+
+        elif project_ext in HOUDINI_EXTENSIONS:
+            project_type = "houdini"
+            command = [LOCAL_HYTHON_PATH, join_path(RENDER_INFO_PATH, "houdini_render_info.py"), local_path]
+        
+        elif project_ext in NUKEX_EXTENSIONS:
+            project_type = "nukex"
+            command = [LOCAL_NUKEX_PATH, "--nukex", "-t", join_path(RENDER_INFO_PATH, "nukex_render_info.py"), local_path]
+        
+        elif project_ext in KATANA_EXTENSIONS:
+            project_type = "katana"
+            command = [LOCAL_KATANA_PATH, "--script", join_path(RENDER_INFO_PATH, "katana_render_info.py"), local_path]
+
+        if project_type == "unknown":
+            NCCA_QMessageBox.warning(
+                self,
+                UNSUPPORTED_SOFTWARE_TITLE,
+                UNSUPPORTED_SOFTWARE_LABEL.format(project_ext) + "\n"
+            )
+            return
+
+
+        self.get_dcc_data_async(command)
+
+
+    def load_job_submission(self, data):
+        QApplication.restoreOverrideCursor()
         renderfarm = self.model().renderfarm
         username = self.username
 
-        data = None
         sourced = True
+
+        file_path = self.job_file_path
+        _, project_ext = os.path.splitext(os.path.basename(file_path))
+        project_folder = self.job_project_folder
+        local_path=self.job_local_path
 
         if local_path is None:
             local_path=file_path
@@ -509,22 +551,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             self.job_dialog.show()
             
         elif project_ext in HOUDINI_EXTENSIONS: 
-            if (os.path.exists(LOCAL_HYTHON_PATH)):
-                QApplication.setOverrideCursor(Qt.WaitCursor)
-                command = [LOCAL_HYTHON_PATH, join_path(RENDER_INFO_PATH, "houdini_render_info.py"), local_path]
-                output = subprocess.check_output(command, stderr=subprocess.STDOUT, universal_newlines=True).strip()
-                match = re.search(r'{\s*"NCCA_RENDERFARM":\s*{.*?}\s*}', output, re.DOTALL)
-
-                if match:
-                    json_data = match.group()
-                    # Load JSON data
-                    data = json.loads(json_data)
-                        
-                    QApplication.restoreOverrideCursor()
-                else:
-                    NCCA_QMessageBox.warning(None, text=output)
-
-            else:
+            if data is None:
                 NCCA_QMessageBox.warning(
                         self,
                         NO_HOUDINI_TITLE,
@@ -536,20 +563,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             self.job_dialog.show()
 
         elif project_ext in MAYA_EXTENSIONS:
-            if (os.path.exists(LOCAL_MAYAPY_PATH)):
-                QApplication.setOverrideCursor(Qt.WaitCursor)
-                command = [LOCAL_MAYAPY_PATH, join_path(RENDER_INFO_PATH, "maya_render_info.py"), local_path]
-                # Execute the command
-                output = subprocess.check_output(command, stderr=subprocess.STDOUT, universal_newlines=True).strip()
-                match = re.search(r'{\s*"NCCA_RENDERFARM":\s*{.*?}\s*}', output, re.DOTALL)
-
-                if match:
-                    json_data = match.group()
-                    # Load JSON data
-                    data = json.loads(json_data)
-
-                QApplication.restoreOverrideCursor()
-            else:
+            if data is None:
                 NCCA_QMessageBox.warning(
                     self,
                     NO_MAYA_TITLE,
@@ -561,22 +575,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             self.job_dialog.show()
 
         elif project_ext in NUKEX_EXTENSIONS:
-            if (os.path.exists(LOCAL_NUKEX_PATH)):
-                QApplication.setOverrideCursor(Qt.WaitCursor)
-                command = [LOCAL_NUKEX_PATH, "--nukex", "-t", join_path(RENDER_INFO_PATH, "nukex_render_info.py"), local_path]
-
-                # Execute the command
-                output = subprocess.check_output(command, stderr=subprocess.STDOUT, universal_newlines=True).strip()
-
-                match = re.search(r'{\s*"NCCA_RENDERFARM":\s*{.*?}\s*}', output, re.DOTALL)
-
-                if match:
-                    json_data = match.group()
-                    # Load JSON data
-                    data = json.loads(json_data)
-
-                QApplication.restoreOverrideCursor()
-            else:
+            if data is None:
                 NCCA_QMessageBox.warning(
                     self,
                     NO_NUKEX_TITLE,
@@ -588,19 +587,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             self.job_dialog.show()
 
         elif project_ext in KATANA_EXTENSIONS:
-            if (os.path.exists(LOCAL_KATANA_PATH)):
-                QApplication.setOverrideCursor(Qt.WaitCursor)
-                command = [LOCAL_KATANA_PATH, "--script", join_path(RENDER_INFO_PATH, "katana_render_info.py"), local_path]
-                output = subprocess.check_output(command, stderr=subprocess.STDOUT, universal_newlines=True).strip()
-                match = re.search(r'{\s*"NCCA_RENDERFARM":\s*{.*?}\s*}', output, re.DOTALL)
-
-                if match:
-                    json_data = match.group()
-                    # Load JSON data
-                    data = json.loads(json_data)
-
-                QApplication.restoreOverrideCursor()
-            else:
+            if data is None:
                 NCCA_QMessageBox.warning(
                     self,
                     NO_KATANA_TITLE,
@@ -617,8 +604,11 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                 UNSUPPORTED_SOFTWARE_LABEL.format(project_ext) + "\n"
             )
         
-    def run_submit_job_async(self, file_path, folder_path, local_path=None):
-        self.submit_job(file_path, folder_path, local_path)
+    def get_dcc_data_async(self, command):
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        self.get_data_thread = NCCA_DCCDataThread(command)
+        self.get_data_thread.data_ready.connect(self.load_job_submission)
+        self.get_data_thread.start()
 
     def submitSelectedIndex(self):
         """Opens a window for users to submit their project to the renderfarm"""
@@ -636,7 +626,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
 
         self.model().renderfarm.download(remote_path=file_path, local_path=local_path, show_info=False, show_progress=False)
 
-        self.run_submit_job_async(file_path=file_path, folder_path=None, local_path=local_path)
+        self.submit_job(file_path=file_path, folder_path=None, local_path=local_path)
 
     def remove_tmp(self):
         for tmp_dir in self.TMP_DIRS:
