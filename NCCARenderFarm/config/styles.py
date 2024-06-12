@@ -47,7 +47,7 @@ NCCA_QTREEVIEW_MENU_STYLESHEET=f"""
 NCCA_QMAINWINDOW_ROOT_STYLESHEET=f"""#NCCA_QRootWidget{{
                 background: {APP_BACKGROUND_COLOR};
                 border-radius: {APP_BORDER_RADIUS};
-                border: 2px solid {APP_BACKGROUND_COLOR};
+                border: 2px solid {APP_GREY_COLOR};
             }}
             """
 
@@ -55,8 +55,6 @@ NCCA_QMAINWINDOW_NAVBAR_STYLESHEET=f"""
             border-top-left-radius: {APP_BORDER_RADIUS};
             border-top-right-radius: {APP_BORDER_RADIUS};
             """
-
-
 
 NCCA_QMESSAGEBOX_SCROLL_AREA_STYLESHEET=f"""
                 QScrollArea {{

@@ -71,7 +71,11 @@ class NCCA_RenderFarmWindow(NCCA_QMainWindow):
         QDesktopServices.openUrl(QUrl(INFO_LINK))
 
     def submit_project(self):
-        self.browser.submit_project()
+        index = self.browser.currentIndex()
+        destination_folder=None
+        if index.isValid():
+            destination_folder = self.browser.model().get_file_path(index)
+        self.browser.submit_project(destination_folder)
 
     def closeEvent(self, event):
         self.browser.remove_tmp()

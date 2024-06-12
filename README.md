@@ -4,9 +4,15 @@ My attempt at improving the NCCA renderfarm. Ideally, once the standalone tool i
 Run `./launch.sh` to run the NCCA Renderfarm Tool.
 
 ## Current TODOs
-1. Fix the Renderfarm server
-3. Code Refactoring and Cleanup
-4. Documentation
+1. Fix QB_FRAME error
+2. Fix tabbed active buttons
+3. Fix menu UI
+4. Fix dialog sizes
+5. fix temporary file cleanup
+6. progress_bar loading for counting files
+7. Fix the Renderfarm server
+8. Code Refactoring and Cleanup
+9. Documentation
 
 ## TODOs
 1. VFX Reference Platform (update Qube)

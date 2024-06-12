@@ -513,7 +513,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
 
         _, project_ext = os.path.splitext(os.path.basename(file_path))
 
-        self.job_project_type = "unknown"
+        project_type = "unknown"
         command = ""
         if project_ext in BLENDER_EXTENSIONS:
             project_type = "blender"
