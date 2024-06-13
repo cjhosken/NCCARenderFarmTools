@@ -116,7 +116,6 @@ class NCCA_ImageWindow(NCCA_QMainWindow):
 
         self.image_layers.addItems(channels)
 
-
 class ZoomableImageView(QGraphicsView):
     def __init__(self, parent=None):
         super().__init__(parent)
