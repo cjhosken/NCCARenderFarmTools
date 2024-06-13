@@ -43,10 +43,6 @@ class NCCA_ImageWindow(NCCA_QMainWindow):
         # Get a list of all channel names in the EXR file
         channel_names = exr_data.channels
 
-        for name in channel_names:
-            if name == "A":
-                name = "Alpha"
-
         channel_names.insert(0, "Combined")
 
         return channel_names
@@ -55,13 +51,17 @@ class NCCA_ImageWindow(NCCA_QMainWindow):
         try:
             with Image.open(path) as img:
                 channels = img.getbands()  # Get all available bands (channels)
-                channels_list = [channel for channel in channels]
 
+                channels_list = []
+                for channel in channels:
+                    if channel == "A":
+                        channel = "Alpha"
+                    channels_list.append(channel)
                 # Add an option to view the full RGB or RGBA image
 
                 channels_list.insert(0, "Luminance")
 
-                if 'Alpha' in channels_list:
+                if "Alpha" in channels_list:
                     channels_list.insert(0, "RGBA")
                 else:
                     channels_list.insert(0, "RGB")
@@ -115,7 +115,7 @@ class NCCA_ImageWindow(NCCA_QMainWindow):
                     rgba_img = Image.merge("RGBA", (g, g, g, a))
                 elif channel == "B":
                     rgba_img = Image.merge("RGBA", (b, b, b, a))
-                elif channel == "A":
+                elif channel == "Alpha":
                     rgba_img = Image.merge("RGBA", (a, a, a, a))
                 else:
                     rgba_img = img
