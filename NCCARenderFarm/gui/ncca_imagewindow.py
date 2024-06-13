@@ -12,6 +12,11 @@ class NCCA_ImageWindow(NCCA_QMainWindow):
         self.image_path = image_path
         super().__init__(os.path.basename(self.image_path), size=IMAGE_WINDOW_SIZE)
 
+        channels = self.get_image_channels(self.image_path)
+        self.image_layers.addItems(channels)
+
+        self.loadImage()
+
     def init_ui(self):
         """Initialize the UI."""
         super().init_ui()
@@ -24,21 +29,25 @@ class NCCA_ImageWindow(NCCA_QMainWindow):
         self.image_name_label.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
         self.image_name_label.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         self.nav_and_title_layout.addWidget(self.image_name_label)
-        
+
+        self.image_layers = NCCA_QComboBox()
+        self.image_layers.currentIndexChanged.connect(self.loadImage)
+
+        self.nav_and_title_layout.addWidget(self.image_layers)
 
         self.image_view = ZoomableImageView(self)
         self.main_layout.addWidget(self.image_view)
 
-        self.loadImage()
-
     def loadImage(self):
         """Load and display the image."""
+        channel = self.image_layers.currentText()
+
         if os.path.splitext(self.image_path)[1] == ".exr":
             tmp_img_path = self.convert_exr_to_png(self.image_path)
             if tmp_img_path is not None:
-                self.image_view.setImage(tmp_img_path)
+                self.image_view.setImage(tmp_img_path, channel)
         else:
-            self.image_view.setImage(self.image_path)
+            self.image_view.setImage(self.image_path, channel)
 
     def convert_exr_to_png(self, path):
         """Convert EXR image to PNG."""
@@ -62,6 +71,25 @@ class NCCA_ImageWindow(NCCA_QMainWindow):
             )
             return None
 
+    def get_image_channels(self, path):
+        image = cv2.imread(path, cv2.IMREAD_ANYDEPTH | cv2.IMREAD_COLOR)
+
+        if image is None:
+            print(f"Error: Unable to read image from {path}")
+            return None
+
+        channels = image.shape[2] if len(image.shape) == 3 else 1
+
+        if channels == 1:
+            return ['Grayscale']
+        elif channels == 3:
+            return ['Blue', 'Green', 'Red']
+        elif channels == 4:
+            return ['Blue', 'Green', 'Red', 'Alpha']
+        else:
+            return [f'Channel {i+1}' for i in range(channels)]
+
+
 class ZoomableImageView(QGraphicsView):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -77,7 +105,6 @@ class ZoomableImageView(QGraphicsView):
         self._scene = QGraphicsScene(self)
         self.setScene(self._scene)
         self._image = None
-        self._background_color = QColor(Qt.GlobalColor.black)
 
         self.setStyleSheet(f"""
             QGraphicsView {{
@@ -90,6 +117,8 @@ class ZoomableImageView(QGraphicsView):
                 border-bottom-right-radius: {APP_BORDER_RADIUS};
             }}
         """)
+
+        self.fitInView()
 
     def hasImage(self):
         return not self._empty
@@ -108,30 +137,37 @@ class ZoomableImageView(QGraphicsView):
                 self.scale(factor, factor)
             self._zoom = 0
 
-    def setImage(self, path):
-        image = QPixmap(path)
-        if image.isNull():
+    def setImage(self, path, channel=None):
+        image = cv2.imread(path, cv2.IMREAD_ANYDEPTH | cv2.IMREAD_COLOR)
+
+        if image is None:
+            print(f"Error: Unable to read image from {path}")
             return
 
-        # Create a new QPixmap with the desired background color
-        background_color = QColor(self._background_color)  # White background color
-        result_image = QPixmap(image.size())
-        result_image.fill(background_color)
-        
-        # Copy the original image onto the result image, preserving transparency
-        painter = QPainter(result_image)
-        painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_SourceOver)
-        painter.drawPixmap(0, 0, image)
-        painter.end()
+        if channel is not None:
+            if channel == 'Blue':
+                channel_index = 0
+            elif channel == 'Green':
+                channel_index = 1
+            elif channel == 'Red':
+                channel_index = 2
+            elif channel == 'Alpha':
+                channel_index = 3 if image.shape[2] > 3 else None
+            else:
+                channel_index = None
 
-        # Set the processed image as QGraphicsPixmapItem
+            if channel_index is not None:
+                image = image[:, :, channel_index]
+                image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
+
+        qimage = QImage(image.data, image.shape[1], image.shape[0], image.strides[0], QImage.Format.Format_RGB888)
+        pixmap = QPixmap.fromImage(qimage)
+
         self._empty = False
-        self._image = QGraphicsPixmapItem(result_image)
+        self._image = QGraphicsPixmapItem(pixmap)
         self._scene.addItem(self._image)
 
-        self.fitInView(False)
-
-    def wheelEvent(self, event: QWheelEvent):
+    def wheelEvent(self, event):
         if self.hasImage():
             if event.angleDelta().y() > 0:
                 factor = 1.25
@@ -139,7 +175,6 @@ class ZoomableImageView(QGraphicsView):
             else:
                 factor = 0.8
                 self._zoom -= 1
-
             
             self.scale(factor, factor)
 
@@ -149,12 +184,12 @@ class ZoomableImageView(QGraphicsView):
         elif not self._image is None:
             self.setDragMode(QGraphicsView.DragMode.ScrollHandDrag)
 
-    def mousePressEvent(self, event: QMouseEvent):
+    def mousePressEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
             self.setDragMode(QGraphicsView.DragMode.ScrollHandDrag)
         super().mousePressEvent(event)
 
-    def mouseReleaseEvent(self, event: QMouseEvent):
+    def mouseReleaseEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
             self.setDragMode(QGraphicsView.DragMode.NoDrag)
         super().mouseReleaseEvent(event)
