@@ -5,7 +5,6 @@ Run `./launch.sh` to run the NCCA Renderfarm Tool.
 
 ## Current TODOs
 1. Fix QB_FRAME error
-2. Fix tabbed active buttons
 3. Fix menu UI
 6. progress_bar loading for counting files
 7. Fix the Renderfarm server

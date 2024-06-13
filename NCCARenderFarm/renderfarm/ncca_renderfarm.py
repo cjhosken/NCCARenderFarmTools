@@ -100,7 +100,7 @@ class NCCA_RenderFarm(paramiko.SSHClient):
         try:
             progress_dialog = None
             if (show_progress):
-                progress_dialog = NCCA_QProgressDialog(RENDERFARM_PROGRESS_UPLOAD_TITLE,RENDERFARM_COUNTING_FILES_LABEL, 0, 1, None)
+                progress_dialog = NCCA_QProgressDialog(RENDERFARM_PROGRESS_UPLOAD_TITLE,RENDERFARM_COUNTING_FILES_LABEL, 0, 0, None)
                 progress_dialog.show()
                 progress_dialog.setText(RENDERFARM_PROGRESS_UPLOAD_LABEL)
 
@@ -158,7 +158,7 @@ class NCCA_RenderFarm(paramiko.SSHClient):
         try:
             progress_dialog = None
             if (show_progress):
-                progress_dialog = NCCA_QProgressDialog(RENDERFARM_PROGRESS_DOWNLOAD_TITLE,RENDERFARM_COUNTING_FILES_LABEL, 0, 1, None)
+                progress_dialog = NCCA_QProgressDialog(RENDERFARM_PROGRESS_DOWNLOAD_TITLE,RENDERFARM_COUNTING_FILES_LABEL, 0, 0, None)
                 progress_dialog.show()
                 QApplication.processEvents()
                 total_files = self.count_files(remote_path)
@@ -202,7 +202,7 @@ class NCCA_RenderFarm(paramiko.SSHClient):
         try:
             progress_dialog = None
             if (show_progress):
-                progress_dialog = NCCA_QProgressDialog(RENDERFARM_PROGRESS_DELETE_TITLE,RENDERFARM_COUNTING_FILES_LABEL, 0, 1, None)
+                progress_dialog = NCCA_QProgressDialog(RENDERFARM_PROGRESS_DELETE_TITLE,RENDERFARM_COUNTING_FILES_LABEL, 0, 0, None)
                 progress_dialog.show()
                 total_files = 0
             

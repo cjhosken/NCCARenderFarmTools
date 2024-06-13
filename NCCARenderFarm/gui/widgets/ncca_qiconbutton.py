@@ -21,6 +21,8 @@ class NCCA_QIconButton(QPushButton):
         self.loadIcon()
         self.setFixedSize(ICON_BUTTON_SIZE)
         self.clicked.connect(self.clearFocus)
+
+        # If you wish to make buttons focusable, remove this line:
         self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
     def eventFilter(self, obj, event):
