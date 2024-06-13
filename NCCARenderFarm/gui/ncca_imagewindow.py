@@ -43,6 +43,10 @@ class NCCA_ImageWindow(NCCA_QMainWindow):
         # Get a list of all channel names in the EXR file
         channel_names = exr_data.channels
 
+        for name in channel_names:
+            if name == "A":
+                name = "Alpha"
+
         channel_names.insert(0, "Combined")
 
         return channel_names
@@ -57,7 +61,7 @@ class NCCA_ImageWindow(NCCA_QMainWindow):
 
                 channels_list.insert(0, "Luminance")
 
-                if 'A' in channels_list:
+                if 'Alpha' in channels_list:
                     channels_list.insert(0, "RGBA")
                 else:
                     channels_list.insert(0, "RGB")
