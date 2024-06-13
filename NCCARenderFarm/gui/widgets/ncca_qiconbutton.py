@@ -20,6 +20,8 @@ class NCCA_QIconButton(QPushButton):
         self.setIconSize(icon_size)
         self.loadIcon()
         self.setFixedSize(ICON_BUTTON_SIZE)
+        self.clicked.connect(self.clearFocus)
+        self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
     def eventFilter(self, obj, event):
         """Check for mouse events over the button and style accordingly."""
