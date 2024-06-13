@@ -55,7 +55,7 @@ class NCCA_ImageWindow(NCCA_QMainWindow):
         channels = self.image_layers.currentText()
         pixmap = None
 
-        if os.path.splitext(self.image_path)[1] in [".exr", ".EXR"]:
+        if os.path.splitext(self.image_path)[1].lower() in [".exr"]:
             pixmap = self.get_exr_channels(self.image_path, channels)
         else:
             pixmap = self.get_img_channels(self.image_path, channels)
