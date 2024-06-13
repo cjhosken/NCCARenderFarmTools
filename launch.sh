@@ -120,6 +120,8 @@ main() {
         source "$VENV_DIR/bin/activate"
     fi
 
+    python -m pip install --upgrade pip
+
     # Check if requirements are already installed
     if ! python -m pip freeze | grep -qF -f "$SCRIPT_DIR/requirements.txt"; then
         # Requirements not installed, install them
