@@ -147,8 +147,8 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
         self.main_layout.addWidget(self.button_box, alignment=Qt.AlignmentFlag.AlignCenter)
 
     def prepare_job(self):
-        
         """Prepare job for submission."""
+
         self.render_path = self.file_path.replace(join_path(RENDERFARM_ROOT, self.username),
                                                     join_path(RENDERFARM_RENDER_ROOT, self.username))
 

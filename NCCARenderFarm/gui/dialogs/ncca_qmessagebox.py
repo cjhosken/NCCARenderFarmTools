@@ -30,6 +30,8 @@ class NCCA_QMessageBox(NCCA_QDialog):
         self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.label.setFixedWidth(LARGE_MESSAGE_BOX_SIZE.width() - MARGIN_DEFAULT*2)
         self.label.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
+        self.label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        self.label.setOpenExternalLinks(True)
 
         if (self.size() == LARGE_MESSAGE_BOX_SIZE):
             # Scroll area for message label

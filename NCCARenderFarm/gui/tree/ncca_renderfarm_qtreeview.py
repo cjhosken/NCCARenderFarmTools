@@ -459,8 +459,13 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
 
         if file_ext.lower() in VIEWABLE_IMAGE_FILES:
             local_path = file_path
-            temp_dir = tempfile.TemporaryDirectory(dir=os.path.join(get_user_home(), LOCAL_TEMP_FOLDER))
-            local_path = join_path(temp_dir.name, file_name)
+            temp_dir = tempfile.TemporaryDirectory(dir=os.path.join(get_user_home(), LOCAL_TEMP_FOLDER)).name
+            if os.path.exists(temp_dir):
+                shutil.rmtree(temp_dir)
+            
+            os.mkdir(temp_dir)
+
+            local_path = join_path(temp_dir, file_name)
 
             self.model().renderfarm.download(remote_path=file_path, local_path=local_path, show_info=False, show_progress=False)
             self.image_dialog = NCCA_ImageWindow(image_path=local_path)
@@ -498,12 +503,17 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         self.model().renderfarm.upload(upload_items=[(folder_path, join_path(dest_folder, os.path.basename(folder_path)))], show_info=False)
         self.refresh()
 
-        self.submit_job(file_path=file_path, folder_path=folder_path)
+        local_path = file_path
+
+        if os.path.exists(file_path) and not (self.model().renderfarm.exists(file_path)):
+            file_path = file_path.replace(folder_path, join_path(dest_folder, os.path.basename(folder_path)))
+
+        self.submit_job(file_path=file_path, folder_path=folder_path, local_path=local_path)
 
     def submit_job(self, file_path, folder_path, local_path=None):
         self.job_project_folder = folder_path
         self.job_file_path = file_path
-        self.job_local_path=local_path
+
 
         _, project_ext = os.path.splitext(os.path.basename(file_path))
 
@@ -549,10 +559,8 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         file_path = self.job_file_path
         _, project_ext = os.path.splitext(os.path.basename(file_path))
         project_folder = self.job_project_folder
-        local_path=self.job_local_path
 
-        if local_path is None:
-            local_path=file_path
+        local_path=file_path
 
         if project_ext in BLENDER_EXTENSIONS:
             data = read_blend_rend_chunk(local_path)
@@ -629,9 +637,16 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         file_path = self.model().get_file_path(index)
         file_name = os.path.basename(file_path)
 
-        temp_dir = tempfile.TemporaryDirectory(dir=os.path.join(get_user_home(), LOCAL_TEMP_FOLDER))
+        temp_dir = tempfile.TemporaryDirectory(dir=os.path.join(get_user_home(), LOCAL_TEMP_FOLDER)).name
+
+        if os.path.exists(temp_dir):
+            shutil.rmtree(temp_dir)
         
-        local_path = join_path(temp_dir.name, file_name)
+        os.mkdir(temp_dir)
+        
+        local_path = join_path(temp_dir, file_name)
+
+        print(local_path)
 
         self.model().renderfarm.download(remote_path=file_path, local_path=local_path, show_info=False, show_progress=False)
 

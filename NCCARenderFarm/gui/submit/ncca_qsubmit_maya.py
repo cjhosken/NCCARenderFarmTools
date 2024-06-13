@@ -144,11 +144,10 @@ class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
         output_dir = os.path.dirname(output_path)
 
         output_path = join_path(output_dir, output_file)
-
-        output_path += "/"
         
         output_dir, image_name, output_file_extension, frame_number_format = self.convert_render_path(output_path)
 
+        output_dir += "/"
 
         override_extension = MAYA_FILE_EXTENSIONS.get(output_file_extension.lower(), "")
         render_options = ""

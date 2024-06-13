@@ -3,7 +3,7 @@
 # Set Environment Variables
 
 # Licenses
-export ADSKFLEX_LICENSE_FILE="@havant.bournemouth.ac.uk:@hook.bournemouth.ac.uk"
+export ADSKFLEX_LICENSE_FILE="@havant"
 export SESI_LMHOST="lepe.bournemouth.ac.uk"
 export PIXAR_LICENSE_FILE="9010@talavera.bournemouth.ac.uk"
 
@@ -46,7 +46,7 @@ export RMAN_PROCEDURALPATH="$RFMTREE/3.9/$HOUDINI_VERSION/openvdb"
 # General
 export PATH="$MAYA_BIN:$RMANTREE/bin:$VRAY_MAYA/bin:$VRAY_MAYA/bin/hostbin:$PATH"
 export PYTHONPATH="$RMANTREE/bin:$RFMTREE/scripts:$VRAY_MAYA/scripts:$ARNOLD_MAYA_PATH/scripts:$VRAY_APPSDK/scripts:$PYTHONPATH"
-export LD_LIBRARYPATH="$MAYA_PATH/lib:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="$MAYA_PATH/lib:$VRAY_MAYA/lib:$LD_LIBRARY_PATH"
 
 
 # Maya Plugins
