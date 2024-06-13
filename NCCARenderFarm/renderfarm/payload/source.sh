@@ -7,7 +7,7 @@ export ARNOLD_LICENSE_ORDER=""
 export ARNOLD_LICENSE_ORDER_MANAGER=""
 export solidangle_LICENSE=""
 export RLM_LICENSE=""
-export ADSKFLEX_LICENSE_FILE="2100@Hook.bournemouth.ac.uk" #2100@Havant.bournemouth.ac.uk
+export ADSKFLEX_LICENSE_FILE="@hook;@havant"
 export LM_LICENSE_FILE=""
 export SESI_LMHOST="lepe.bournemouth.ac.uk"
 export PIXAR_LICENSE_FILE="9010@talavera.bournemouth.ac.uk"
@@ -27,6 +27,7 @@ export VFH_HOME="$INSTALL_ROOT/vfh_home"
 # Vray for maya
 export VRAY_ROOT="/opt/software/ChaosGroup/V-Ray/Maya2023-x64"
 export VRAY_FOR_MAYA2023_MAIN="$VRAY_ROOT/maya_vray"
+export VRAY_PATH="$VRAY_FOR_MAYA2023_MAIN/bin"
 export VRAY_FOR_MAYA2023_PLUGINS="$VRAY_FOR_MAYA_2023_MAIN/vrayplugins"
 export VRAY_OSL_PATH_MAYA2023="$VRAY_ROOT/vray/opensl"
 export VRAY_APPSDK_PLUGINS="$VRAY_FOR_MAYA_2023_MAIN/vrayplugins"
@@ -37,6 +38,10 @@ export RMAN_VERSION="24.1"
 export RFMTREE="/opt/software/pixar/RenderManForMaya-$RMAN_VERSION"
 export RMANTREE="/opt/software/pixar/RenderManProServer-$RMAN_VERSION"
 export RFHTREE="/opt/software/RenderManForHoudini-$RMAN_VERSION"
+
+export RFM_VERSION="$RMAN_VERSION"
+export RFM_MAYA_VERSION="2023"
+
 export RMAN_PROCEDURALPATH="$RFMTREE/3.9/$HOUDINI_VERSION/openvdb"
 
 # Maya 2023
@@ -54,7 +59,7 @@ export MAYA_TOOLCLIPS_PATH="$VRAY_APPSDK/toolclips"
 export PXR_PLUGINPATH_NAME="$VRAY_APPSDK/usdplugins:$PXR_PLUGINPATH_NAME"
 
 # Update PATH
-export PATH="$VFH_HOME:$MAYA_BIN:$PATH"
+export PATH="$RMANTREE/bin:$MAYA_BIN:$PATH"
 
 # Maya Plugins
 export MAYA_MODULE_PATH="/opt/autodesk/maya$MAYA_VERSION/modules:$RFMTREE/etc:$VRAY_APPSDK/etc:$MAYA_MODULE_PATH"

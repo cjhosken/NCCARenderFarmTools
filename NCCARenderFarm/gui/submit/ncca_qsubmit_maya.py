@@ -134,6 +134,7 @@ class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
         if (not project_path.startswith(path_prefix)):
             project_path = join_path(path_prefix, project_path.lstrip("/"))
 
+        project_path += "/"
 
         output_file = os.path.basename(output_path)
 
@@ -143,6 +144,8 @@ class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
         output_dir = os.path.dirname(output_path)
 
         output_path = join_path(output_dir, output_file)
+
+        output_path += "/"
         
         output_dir, image_name, output_file_extension, frame_number_format = self.convert_render_path(output_path)
 

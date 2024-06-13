@@ -24,4 +24,11 @@ def load_plugins():
 if __name__ == "__main__":
     initialize_maya()
     load_plugins()
+
+    print("ENVIRONMENT VARIABLES")
+    import os
+    vars = os.environ
+    for key, value in vars.items():
+        print(f"{key}: {value}")
+
     uninitialize_maya()
