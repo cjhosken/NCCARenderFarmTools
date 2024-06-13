@@ -67,3 +67,5 @@ export XBMLANGPATH="/opt/autodesk/arnold/maya$MAYA_VERSION/icons:$VRAY_APPSDK/ic
 export MAYA_CUSTOM_TEMPLATE_PATH="$VRAY_APPSDK/scripts"
 export MAYA_TOOLCLIPS_PATH="$VRAY_APPSDK/toolclips"
 export PXR_PLUGINPATH_NAME="$VRAY_APPSDK/usdplugins:$PXR_PLUGINPATH_NAME"
+
+env
