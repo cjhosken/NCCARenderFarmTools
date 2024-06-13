@@ -11,7 +11,7 @@ class NCCA_DCCDataThread(QThread):
         self.command = command
 
     def run(self):
-        result = None
+        result = self.get_dcc_data(self.command)
         self.data_ready.emit(result)
 
     def get_dcc_data(self, command):
