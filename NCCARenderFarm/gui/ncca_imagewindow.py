@@ -43,7 +43,7 @@ class NCCA_ImageWindow(NCCA_QMainWindow):
         # Get a list of all channel names in the EXR file
         channel_names = exr_data.channels
 
-        print(channel_names)
+        channel_names.insert(0, "Combined")
 
         return channel_names
 
@@ -65,7 +65,28 @@ class NCCA_ImageWindow(NCCA_QMainWindow):
             return []
 
     def load_exr_image(self, path, channel):
-        return None
+        # Load the EXR file using OpenCV
+        exr_data = cv2.imread(path, cv2.IMREAD_ANYCOLOR | cv2.IMREAD_ANYDEPTH)
+
+        if channel == "Combined":
+            # For combined image, just convert to QImage
+            image = QImage(exr_data.data, exr_data.shape[1], exr_data.shape[0],
+                           exr_data.shape[1] * exr_data.shape[2], QImage.Format.Format_RGB888)
+        else:
+            # Retrieve the specified channel (assuming float32 format)
+            channel_data = exr_data[:, :, exr_data.channels.index(channel)]
+
+            # Normalize the channel data if needed (to [0, 255] range for display)
+            normalized_data = ((channel_data - channel_data.min()) / (channel_data.max() - channel_data.min()) * 255).astype('uint32')
+
+            # Convert numpy array to QImage
+            image = QImage(normalized_data.data, normalized_data.shape[1], normalized_data.shape[0],
+                           normalized_data.shape[1] * normalized_data.shape[2], QImage.Format.Format_Grayscale8)
+
+        # Convert QImage to QPixmap
+        pixmap = QPixmap.fromImage(image)
+
+        return pixmap
 
     def load_normal_image(self, path, channel):
         with Image.open(path) as img:
