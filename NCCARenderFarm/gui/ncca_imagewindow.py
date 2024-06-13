@@ -142,9 +142,6 @@ class ZoomableImageView(QGraphicsView):
             
             self.scale(factor, factor)
 
-        
-        print(self._zoom)
-
     def toggleDragMode(self):
         if self.dragMode() == QGraphicsView.DragMode.ScrollHandDrag:
             self.setDragMode(QGraphicsView.DragMode.NoDrag)
