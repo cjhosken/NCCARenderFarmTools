@@ -165,11 +165,11 @@ NCCA_QFLATBUTTON_STYLESHEET=f"""
 
 NCCA_QICONBUTTON_STYLESHEET=f"""
                     NCCA_QIconButton {{
-                        background: {APP_BACKGROUND_COLOR}; border: none; $COLOR_STYLE
+                        background: transparent; border: none; $COLOR_STYLE
                     }}
 
                     NCCA_QIconButton:hover, NCCA_QIconButton:focus {{
-                        background-color: {APP_BACKGROUND_COLOR}; color: {APP_PRIMARY_COLOR}; outline: none;
+                        background-color: transparent; color: {APP_PRIMARY_COLOR}; outline: none;
                     }}
                                 """
 
