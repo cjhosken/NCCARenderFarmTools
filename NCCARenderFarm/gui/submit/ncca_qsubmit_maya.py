@@ -165,6 +165,7 @@ class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
         else:
             render_options += f" -fnc {frame_number_format}" if frame_number_format else ""
             render_options += f" -pad {frame_padding}" if frame_padding else ""
+        
         render_options += f" -of {override_extension}" if override_extension else ""
         render_options += f" -cam {camera}" if camera else ""
         
