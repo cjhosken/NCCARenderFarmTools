@@ -405,6 +405,8 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             index = self.model().findIndex(path)
             if index.isValid():
                 self.expand(index)
+            
+            QApplication.processEvents()
 
         QApplication.restoreOverrideCursor()
 
@@ -426,6 +428,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         for child in item['children']:
             if child is not None:
                 self.collectExpandedPaths(child, expanded_paths)
+            QApplication.processEvents()
 
     def renameSelectedIndex(self):
         """Renames the currently selected index."""

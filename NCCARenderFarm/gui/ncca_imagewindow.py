@@ -54,6 +54,9 @@ class NCCA_ImageWindow(NCCA_QMainWindow):
                 channels_list = [channel for channel in channels]
 
                 # Add an option to view the full RGB or RGBA image
+
+                channels_list.insert(0, "Luminance")
+
                 if 'A' in channels_list:
                     channels_list.insert(0, "RGBA")
                 else:
@@ -93,9 +96,13 @@ class NCCA_ImageWindow(NCCA_QMainWindow):
             # Convert PIL.Image to QPixmap
             img = img.convert("RGBA")  # Ensure image has an alpha channel for transparency support
 
-            if channel in ["RGB", "RGBA"]:
+            if channel in ["RGB", "RGBA", "Luminance"]:
                 image_data = img.tobytes("raw", "RGBA")
                 q_image = QImage(image_data, img.size[0], img.size[1], QImage.Format.Format_RGBA8888)
+                
+                if channel == "Luminance":
+                    q_image = q_image.convertToFormat(QImage.Format.Format_Grayscale8)
+                
             else:
                 r, g, b, a = img.split()
                 if channel == "R":
@@ -106,6 +113,8 @@ class NCCA_ImageWindow(NCCA_QMainWindow):
                     rgba_img = Image.merge("RGBA", (b, b, b, a))
                 elif channel == "A":
                     rgba_img = Image.merge("RGBA", (a, a, a, a))
+                else:
+                    rgba_img = img
 
                 image_data = rgba_img.tobytes("raw", "RGBA")
                 q_image = QImage(image_data, img.size[0], img.size[1], QImage.Format.Format_RGBA8888)
