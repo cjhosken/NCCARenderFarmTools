@@ -11,8 +11,6 @@ from .ncca_renderfarm_threads import NCCA_DCCDataThread
 class NCCA_RenderFarm_QTreeView(QTreeView):
     """A custom QTreeView class that shows the files in the render farm"""
 
-    TMP_DIRS = []
-
     def __init__(self, home_path, username, password, parent=None):
         """Initialize the UI and variables"""
         super().__init__(parent=parent)
@@ -115,11 +113,11 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         super().dropEvent(event)
         """ Handles the drop event in the tree view."""
         if event.mimeData().hasUrls():
-            event.setDropAction(Qt.MoveAction)
+            event.setDropAction(Qt.DropAction.MoveAction)
             event.accept()
             urls = event.mimeData().urls()
 
-            destination_path = self.model().get_file_path(self.indexAt(event.pos()))
+            destination_path = self.model().get_file_path(self.indexAt(event.position().toPoint()))
 
             if self.model().renderfarm.isdir(destination_path):
                 if len(urls) > 1:
@@ -134,7 +132,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                             file_path = url.toLocalFile()
                             if (os.path.exists(file_path)):
                                 if not self.model().renderfarm.exists(join_path(destination_path, os.path.basename(file_path))):
-                                    self.model().renderfarm.upload(file_path, join_path(destination_path, os.path.basename(file_path)))
+                                    self.model().renderfarm.upload([(file_path, join_path(destination_path, os.path.basename(file_path)))], show_info=False)
                             else:
                                 file_path = url.toString()
                                 if self.model().renderfarm.exists(file_path):
@@ -153,7 +151,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                                     MOVE_CONFIRM_LABEL.format(file_path, destination_path),
                                 )
                                 if reply == QDialog.DialogCode.Accepted:
-                                    self.model().renderfarm.upload(file_path, join_path(destination_path, os.path.basename(file_path)))
+                                    self.model().renderfarm.upload([(file_path, join_path(destination_path, os.path.basename(file_path)))], show_info=False)
                                     self.refresh()
                                     
                     else:
@@ -461,7 +459,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
 
         if file_ext.lower() in VIEWABLE_IMAGE_FILES:
             local_path = file_path
-            temp_dir = tempfile.TemporaryDirectory(os.path.join(get_user_home(), LOCAL_TEMP_FOLDER))
+            temp_dir = tempfile.TemporaryDirectory(dir=os.path.join(get_user_home(), LOCAL_TEMP_FOLDER))
             local_path = join_path(temp_dir.name, file_name)
 
             self.model().renderfarm.download(remote_path=file_path, local_path=local_path, show_info=False, show_progress=False)
@@ -632,16 +630,9 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         file_name = os.path.basename(file_path)
 
         temp_dir = tempfile.TemporaryDirectory(dir=os.path.join(get_user_home(), LOCAL_TEMP_FOLDER))
-        self.TMP_DIRS.append(temp_dir)
         
         local_path = join_path(temp_dir.name, file_name)
 
         self.model().renderfarm.download(remote_path=file_path, local_path=local_path, show_info=False, show_progress=False)
 
         self.submit_job(file_path=file_path, folder_path=None, local_path=local_path)
-
-    def remove_tmp(self):
-        for tmp_dir in self.TMP_DIRS:
-            shutil.rmtree(tmp_dir.name)
-        
-        self.TMP_DIRS = []

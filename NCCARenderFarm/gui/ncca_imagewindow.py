@@ -59,11 +59,11 @@ class ZoomableImageView(QGraphicsView):
     def __init__(self, parent=None):
         """Initialize the zoomable image view."""
         super().__init__(parent)
-        self.setRenderHints(QPainter.Antialiasing | QPainter.SmoothPixmapTransform)
+        self.setRenderHints(QPainter.RenderHint.Antialiasing | QPainter.RenderHint.SmoothPixmapTransform)
         self.setScene(QGraphicsScene(self))
-        self.setAlignment(Qt.AlignCenter)
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.setMinimumSize(IMAGE_WINDOW_DISPLAY_IMAGE_SIZE)
         self.setBaseSize(IMAGE_WINDOW_DISPLAY_IMAGE_SIZE)
         self._zoom = 0
@@ -71,59 +71,79 @@ class ZoomableImageView(QGraphicsView):
         self._start_pos = QPoint()
         self.pixmap_item = None
 
+        # Infinite scene size
+        self.scene().setSceneRect(QRectF(-10000, -10000, 20000, 20000))
+
     def setImage(self, image_path):
         """Load and display the image."""
         pixmap = QPixmap(image_path)
         if not pixmap.isNull():
             self.pixmap_item = QGraphicsPixmapItem(pixmap)
+            self.pixmap_item.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
             self.scene().clear()
             self.scene().addItem(self.pixmap_item)
             self._zoom = 0
+
             self.resetTransform()
+            view_rect = self.viewport().rect()
+            scene_rect = self.pixmap_item.boundingRect()
+            initial_horizontal_value = (scene_rect.width() - view_rect.width()) / 2
+            initial_vertical_value = (scene_rect.height() - view_rect.height()) / 2
+
+            # Adjust scroll bar values to center the image
+            self.horizontalScrollBar().setValue(initial_horizontal_value)
+            self.verticalScrollBar().setValue(initial_vertical_value)
+
+            # Set the scene rect to match the pixmap item rect plus padding
+            self.setSceneRect(self.pixmap_item.boundingRect().adjusted(-10000, -10000, 10000, 10000))
 
     def wheelEvent(self, event):
         """Handle zooming using the mouse wheel."""
         zoom_in_factor = IMAGE_WINDOW_ZOOM_IN_FACTOR
         zoom_out_factor = IMAGE_WINDOW_ZOOM_OUT_FACTOR
-        mouse_point = self.mapToScene(event.position().toPoint())
+
+        # Calculate the center of the view
+        view_center = self.viewport().rect().center()
+        scene_center = self.mapToScene(view_center)
 
         if event.angleDelta().y() > 0:
             zoom_factor = zoom_in_factor
             self._zoom += 1
         else:
-            if self._zoom > 0:
-                zoom_factor = zoom_out_factor
-                self._zoom -= 1
-            else:
-                zoom_factor = 1.0
+            zoom_factor = zoom_out_factor
+            self._zoom -= 1
 
-        if self._zoom > 0:
-            self.scale(zoom_factor, zoom_factor)
-            delta = self.mapToScene(event.position().toPoint()) - mouse_point
-            self.translate(delta.x(), delta.y())
-        elif self._zoom == 0:
-            self.resetTransform()
+        # Scale the view
+        self.scale(zoom_factor, zoom_factor)
+
+        # Adjust the scene rect to fit the scaled image
+        self.setSceneRect(self.pixmap_item.boundingRect().adjusted(-10000, -10000, 10000, 10000))
+
+        # Translate to keep the scene centered on the view
+        delta = self.mapToScene(view_center) - scene_center
+        self.translate(delta.x(), delta.y())
 
     def mousePressEvent(self, event):
         """Handle mouse press event for panning."""
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.MouseButton.LeftButton:
             self._pan = True
-            self._start_pos = event.pos()
-            self.setCursor(Qt.ClosedHandCursor)
+            self._start_pos = event.position()
+            self.setCursor(Qt.CursorShape.ClosedHandCursor)
         super().mousePressEvent(event)
 
     def mouseMoveEvent(self, event):
         """Handle mouse move event for panning."""
         if self._pan:
-            delta = event.pos() - self._start_pos
-            self._start_pos = event.pos()
+            delta = event.position() - self._start_pos
+            self._start_pos = event.position()
             self.horizontalScrollBar().setValue(self.horizontalScrollBar().value() - delta.x())
             self.verticalScrollBar().setValue(self.verticalScrollBar().value() - delta.y())
         super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event):
         """Handle mouse release event."""
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.MouseButton.LeftButton:
             self._pan = False
-            self.setCursor(Qt.ArrowCursor)
+            self.setCursor(Qt.CursorShape.ArrowCursor)
         super().mouseReleaseEvent(event)
+
