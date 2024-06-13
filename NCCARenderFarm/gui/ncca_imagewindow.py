@@ -71,6 +71,16 @@ class ZoomableImageView(QGraphicsView):
         self._start_pos = QPoint()
         self.pixmap_item = None
 
+        self.setStyleSheet("""
+            ZoomableImageView {
+                background-color: transparent;
+                border: 2px solid grey;
+                border-top: none;
+                border-bottom-left-radius: 8px;
+                border-bottom-right-radius: 8px;
+            }
+        """)
+
         # Infinite scene size
         self.scene().setSceneRect(QRectF(-10000, -10000, 20000, 20000))
 

@@ -207,3 +207,13 @@ NCCA_QINPUT_ERROR_STYLESHEET=f"""
                 background-color: {APP_BACKGROUND_COLOR};
             }}
         """
+
+
+NCCA_IMAGE_WINDOW_ZOOMABLEIMAGE_VIEW_STYLESHEET=f"""
+            ZoomableImageView {{
+                background-color: transparent;
+                border: none;
+                border-bottom-left-radius: {APP_BORDER_RADIUS};
+                border-bottom-right-radius: {APP_BORDER_RADIUS};
+            }}
+        """
