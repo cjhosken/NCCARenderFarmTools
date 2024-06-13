@@ -20,6 +20,8 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         self.password = password
 
         self.setupUI()
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.refresh()
 
         # Create a QTimer instance

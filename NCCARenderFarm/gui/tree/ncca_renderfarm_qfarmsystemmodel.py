@@ -258,7 +258,7 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
         for index in indexes:
             if index.isValid():
                 file_path = self.get_file_path(index)
-                urls.append(file_path)
+                urls.append(QUrl(file_path))
 
         mime_data.setUrls(urls)
         return mime_data
