@@ -3,7 +3,7 @@
 # Set Environment Variables
 
 # Licenses
-export ADSKFLEX_LICENSE_FILE="@havant"
+export ADSKFLEX_LICENSE_FILE="@havant.bournemouth.ac.uk"
 export SESI_LMHOST="lepe.bournemouth.ac.uk"
 export PIXAR_LICENSE_FILE="9010@talavera.bournemouth.ac.uk"
 
