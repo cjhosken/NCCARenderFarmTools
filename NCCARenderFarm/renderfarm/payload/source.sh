@@ -14,39 +14,56 @@ export PIXAR_LICENSE_FILE="9010@talavera.bournemouth.ac.uk"
 export ARNOLD_LICENSE_HOST=""
 export ARNOLD_LICENSE_PORT=""
 
-# Vray
+# Common Install Root
 export INSTALL_ROOT=""
+
+# Vray
 export VRAY_APPSDK="$INSTALL_ROOT/appsdk"
 export VRAY_SDK="$INSTALL_ROOT/appsdk"
-export VRAY_OSL_PATH="$INSTALL_ROOT/appsdk/bin"
+export VRAY_OSL_PATH="$VRAY_APPSDK/bin"
 export VRAY_UI_DS_PATH="$INSTALL_ROOT/ui"
 export VFH_HOME="$INSTALL_ROOT/vfh_home"
+
+# Vray for maya
+export VRAY_ROOT="/opt/software/ChaosGroup/V-Ray/Maya2023-x64"
+export VRAY_FOR_MAYA2023_MAIN="$VRAY_ROOT/maya_vray"
+export VRAY_FOR_MAYA2023_PLUGINS="$VRAY_FOR_MAYA_2023_MAIN/vrayplugins"
+export VRAY_OSL_PATH_MAYA2023="$VRAY_ROOT/vray/opensl"
+export VRAY_APPSDK_PLUGINS="$VRAY_FOR_MAYA_2023_MAIN/vrayplugins"
+export VRAY_AUTH_CLIENT_FILE_PATH=""
 
 # Renderman
 export RMAN_VERSION="24.1"
 export RFMTREE="/opt/software/pixar/RenderManForMaya-$RMAN_VERSION"
 export RMANTREE="/opt/software/pixar/RenderManProServer-$RMAN_VERSION"
-
-export VRAY_FOR_MAYA2023_MAIN="/opt/software/ChaosGroup/V-Ray/Maya2023-x64/maya_vray"
-export VRAY_FOR_MAYA2023_PLUGINS="/opt/software/ChaosGroup/V-Ray/Maya2023-x64/maya_vray/vrayplugins"
-export VRAY_OSL_PATH_MAYA2023="/opt/software/ChaosGroup/V-Ray/Maya2023-x64/vray/opensl"
-export VRAY_APPSDK_PLUGINS="/opt/software/ChaosGroup/V-Ray/Maya2023-x64/maya_vray/vrayplugins"
-export VRAY_AUTH_CLIENT_FILE_PATH=""
-
 export RFHTREE="/opt/software/RenderManForHoudini-$RMAN_VERSION"
-export HOUDINI_DEFAULT_RIB_RENDER=""
-export RMAN_PROCEDURALPATH="/opt/software/RenderManForHoudini-$RMAN_VERSION/3.9/$HOUDINI_VERSION/openvdb"
+export RMAN_PROCEDURALPATH="$RFMTREE/3.9/$HOUDINI_VERSION/openvdb"
 
-export PATH="$INSTALL_ROOT/vfh_home:$HFS/bin:$VRAY_APPSDK/bin:/opt/autodesk/maya2023/bin:/opt/software/ChaosGroup/V-Ray/Maya2023-x64/maya_vray/bin:/opt/software/ChaosGroup/V-Ray/Maya2023-x64/vray/lib:$PATH"
+# Maya 2023
+export MAYA_VERSION="2023"
+export MAYA_BIN="/opt/autodesk/maya$MAYA_VERSION/bin"
+export MAYA_MODULE_PATH="/opt/autodesk/maya$MAYA_VERSION/modules:$RFMTREE/etc:$VRAY_FOR_MAYA2023_MAIN/etc:$MAYA_MODULE_PATH"
+export MAYA_PLUG_IN_PATH="/opt/autodesk/maya$MAYA_VERSION/plug-ins:/opt/autodesk/arnold/maya$MAYA_VERSION/plug-ins:$VRAY_APPSDK_PLUGINS:$VRAY_FOR_MAYA_2023_MAIN/plug-ins:$MAYA_PLUG_IN_PATH"
+export MAYA_SCRIPT_PATH="/opt/autodesk/maya$MAYA_VERSION/scripts:/opt/autodesk/arnold/maya$MAYA_VERSION/scripts:$RFMTREE/scripts:$VRAY_APPSDK/scripts:$MAYA_SCRIPT_PATH"
+export MAYA_RENDER_DESC_PATH="/opt/autodesk/arnold/maya$MAYA_VERSION:$RFMTREE/etc:$VRAY_APPSDK/rendererDesc:$MAYA_RENDER_DESC_PATH"
+export MAYA_PRESET_PATH="$VRAY_APPSDK/presets:$MAYA_PRESET_PATH"
+export PYTHONPATH="/opt/autodesk/arnold/maya$MAYA_VERSION/scripts:$VRAY_APPSDK/scripts:$PYTHONPATH"
+export XBMLANGPATH="/opt/autodesk/arnold/maya$MAYA_VERSION/icons:$VRAY_APPSDK/icons:$XBMLANGPATH"
+export MAYA_CUSTOM_TEMPLATE_PATH="$VRAY_APPSDK/scripts"
+export MAYA_TOOLCLIPS_PATH="$VRAY_APPSDK/toolclips"
+export PXR_PLUGINPATH_NAME="$VRAY_APPSDK/usdplugins:$PXR_PLUGINPATH_NAME"
+
+# Update PATH
+export PATH="$VFH_HOME:$MAYA_BIN:$PATH"
 
 # Maya Plugins
-export MAYA_MODULE_PATH="/opt/autodesk/maya2023/modules:$RFMTREE/etc:/opt/software/ChaosGroup/V-Ray/Maya2023-x64/maya_vray/etc:$MAYA_MODULE_PATH"
-export MAYA_PLUG_IN_PATH="/opt/autodesk/maya2023/plug-ins:/opt/autodesk/arnold/maya2023/plug-ins:/opt/software/ChaosGroup/V-Ray/Maya2023-x64/maya_vray/plug-ins:$MAYA_PLUG_IN_PATH"
-export MAYA_SCRIPT_PATH="/opt/autodesk/maya2023/scripts:/opt/autodesk/arnold/maya2023/scripts:/opt/software/pixar/RenderManForMaya-24.1/scripts:/opt/software/ChaosGroup/V-Ray/Maya2023-x64/maya_vray/scripts:$MAYA_SCRIPT_PATH"
-export MAYA_RENDER_DESC_PATH="/opt/autodesk/arnold/maya2023:$RFMTREE/etc:/opt/software/ChaosGroup/V-Ray/Maya2023-x64/maya_vray/rendererDesc:$MAYA_RENDER_DESC_PATH"
-export MAYA_PRESET_PATH="/opt/software/ChaosGroup/V-Ray/Maya2023-x64/maya_vray/presets:$MAYA_PRESET_PATH"
-export PYTHONPATH="/opt/autodesk/arnold/maya2023/scripts:/opt/software/ChaosGroup/V-Ray/Maya2023-x64/maya_vray/scripts:$PYTHONPATH"
-export XBMLANGPATH="/opt/autodesk/arnold/maya2023/icons:/opt/software/ChaosGroup/V-Ray/Maya2023-x64/maya_vray/icons:$XBMLANGPATH"
-export MAYA_CUSTOM_TEMPLATE_PATH="/opt/software/ChaosGroup/V-Ray/Maya2023-x64/maya_vray/scripts"
-export MAYA_TOOLCLIPS_PATH="/opt/software/ChaosGroup/V-Ray/Maya2023-x64/maya_vray/toolclips"
-export PXR_PLUGINPATH_NAME="/opt/software/ChaosGroup/V-Ray/Maya2023-x64/maya_vray/usdplugins:$PXR_PLUGINPATH_NAME"
+export MAYA_MODULE_PATH="/opt/autodesk/maya$MAYA_VERSION/modules:$RFMTREE/etc:$VRAY_APPSDK/etc:$MAYA_MODULE_PATH"
+export MAYA_PLUG_IN_PATH="/opt/autodesk/maya$MAYA_VERSION/plug-ins:/opt/autodesk/arnold/maya$MAYA_VERSION/plug-ins:$VRAY_APPSDK_PLUGINS:$MAYA_PLUG_IN_PATH"
+export MAYA_SCRIPT_PATH="/opt/autodesk/maya$MAYA_VERSION/scripts:/opt/autodesk/arnold/maya$MAYA_VERSION/scripts:$RFMTREE/scripts:$VRAY_APPSDK/scripts:$MAYA_SCRIPT_PATH"
+export MAYA_RENDER_DESC_PATH="/opt/autodesk/arnold/maya$MAYA_VERSION:$RFMTREE/etc:$VRAY_APPSDK/rendererDesc:$MAYA_RENDER_DESC_PATH"
+export MAYA_PRESET_PATH="$VRAY_APPSDK/presets:$MAYA_PRESET_PATH"
+export PYTHONPATH="/opt/autodesk/arnold/maya$MAYA_VERSION/scripts:$VRAY_APPSDK/scripts:$PYTHONPATH"
+export XBMLANGPATH="/opt/autodesk/arnold/maya$MAYA_VERSION/icons:$VRAY_APPSDK/icons:$XBMLANGPATH"
+export MAYA_CUSTOM_TEMPLATE_PATH="$VRAY_APPSDK/scripts"
+export MAYA_TOOLCLIPS_PATH="$VRAY_APPSDK/toolclips"
+export PXR_PLUGINPATH_NAME="$VRAY_APPSDK/usdplugins:$PXR_PLUGINPATH_NAME"

@@ -134,7 +134,6 @@ class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
         if (not project_path.startswith(path_prefix)):
             project_path = join_path(path_prefix, project_path.lstrip("/"))
 
-        #project_path += "/"
 
         output_file = os.path.basename(output_path)
 
@@ -147,7 +146,6 @@ class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
         
         output_dir, image_name, output_file_extension, frame_number_format = self.convert_render_path(output_path)
 
-        #output_dir += "/"
 
         override_extension = MAYA_FILE_EXTENSIONS.get(output_file_extension.lower(), "")
         render_options = ""
@@ -167,6 +165,10 @@ class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
         render_options += f" -of {override_extension}" if override_extension else ""
         render_options += f" -cam {camera}" if camera else ""
         
+        # https://help.autodesk.com/view/MAYAUL/2024/ENU/?guid=GUID-EB558BC0-5C2B-439C-9B00-F97BCB9688E4
+        # https://help.autodesk.com/view/ARNOL/ENU/?guid=arnold_for_maya_rendering_am_Batch_Rendering_html
+        # https://docs.chaos.com/display/VMAYA/Batch+Rendering
+        # https://renderman.pixar.com/resources/RenderMan_20/batchRendering.html
 
         job = self.build_job()
 
