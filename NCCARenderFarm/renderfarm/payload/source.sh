@@ -3,16 +3,9 @@
 # Set Environment Variables
 
 # Licenses
-export ARNOLD_LICENSE_ORDER=""
-export ARNOLD_LICENSE_ORDER_MANAGER=""
-export solidangle_LICENSE=""
-export RLM_LICENSE=""
-export ADSKFLEX_LICENSE_FILE="@hook;@havant"
-export LM_LICENSE_FILE=""
+export ADSKFLEX_LICENSE_FILE="@havant"
 export SESI_LMHOST="lepe.bournemouth.ac.uk"
 export PIXAR_LICENSE_FILE="9010@talavera.bournemouth.ac.uk"
-export ARNOLD_LICENSE_HOST=""
-export ARNOLD_LICENSE_PORT=""
 
 # Common Install Root
 export INSTALL_ROOT=""
