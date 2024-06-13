@@ -4,6 +4,9 @@ from .widgets import *
 from .ncca_qmainwindow import NCCA_QMainWindow
 from .dialogs import *
 
+from PIL import ImageQt
+import OpenEXR, Imath
+
 class NCCA_ImageWindow(NCCA_QMainWindow):
     """Interface for viewing images."""
 
@@ -12,10 +15,8 @@ class NCCA_ImageWindow(NCCA_QMainWindow):
         self.image_path = image_path
         super().__init__(os.path.basename(self.image_path), size=IMAGE_WINDOW_SIZE)
 
-        channels = self.get_image_channels(self.image_path)
-        self.image_layers.addItems(channels)
-
-        self.loadImage()
+        self.setup_image()
+        self.load_image()
 
     def init_ui(self):
         """Initialize the UI."""
@@ -31,63 +32,48 @@ class NCCA_ImageWindow(NCCA_QMainWindow):
         self.nav_and_title_layout.addWidget(self.image_name_label)
 
         self.image_layers = NCCA_QComboBox()
-        self.image_layers.currentIndexChanged.connect(self.loadImage)
+        self.image_layers.currentIndexChanged.connect(self.load_image)
 
         self.nav_and_title_layout.addWidget(self.image_layers)
 
         self.image_view = ZoomableImageView(self)
         self.main_layout.addWidget(self.image_view)
 
-    def loadImage(self):
+    def get_exr_channels(self, path):
+        return []
+
+    def get_img_channels(self, path):
+        return []
+
+    def load_exr_image(self, path, channel):
+        return None
+
+    def load_normal_image(self, path, channel):
+        return None
+
+    def load_image(self):
+        channels = self.image_layers.currentText()
+        pixmap = None
+
+        if os.path.splitext(self.image_path)[1] in [".exr", ".EXR"]:
+            pixmap = self.get_exr_channels(self.image_path, channels)
+        else:
+            pixmap = self.get_img_channels(self.image_path, channels)
+
+        if pixmap is not None:
+            self.image_view.setPixmap()
+
+    def setup_image(self):
         """Load and display the image."""
-        channel = self.image_layers.currentText()
 
-        if os.path.splitext(self.image_path)[1] == ".exr":
-            tmp_img_path = self.convert_exr_to_png(self.image_path)
-            if tmp_img_path is not None:
-                self.image_view.setImage(tmp_img_path, channel)
+        channels = []
+
+        if os.path.splitext(self.image_path)[1] in [".exr", ".EXR"]:
+            channels = self.get_exr_channels(self.image_path)
         else:
-            self.image_view.setImage(self.image_path, channel)
+            channels = self.get_img_channels(self.image_path)
 
-    def convert_exr_to_png(self, path):
-        """Convert EXR image to PNG."""
-        image_name, _ = os.path.splitext(os.path.basename(self.image_path))
-        exr_image = cv2.imread(path, cv2.IMREAD_ANYDEPTH | cv2.IMREAD_COLOR)
-
-        if exr_image is not None:
-            exr_image_rgb = cv2.cvtColor(exr_image, cv2.COLOR_BGR2RGB)
-            exr_array = np.array(exr_image_rgb)
-            normalized_array = cv2.normalize(exr_array, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8U)
-            png_image = Image.fromarray(normalized_array)
-
-            image_path = join_path(os.path.dirname(path), image_name + ".png")
-            png_image.save(image_path)
-            return image_path
-        else:
-            NCCA_QMessageBox.warning(
-                self,
-                title=RENDERFARM_DIALOG_TITLE,
-                text="Failed to read the EXR file." + "\n",
-            )
-            return None
-
-    def get_image_channels(self, path):
-        image = cv2.imread(path, cv2.IMREAD_ANYDEPTH | cv2.IMREAD_COLOR)
-
-        if image is None:
-            print(f"Error: Unable to read image from {path}")
-            return None
-
-        channels = image.shape[2] if len(image.shape) == 3 else 1
-
-        if channels == 1:
-            return ['Grayscale']
-        elif channels == 3:
-            return ['Blue', 'Green', 'Red']
-        elif channels == 4:
-            return ['Blue', 'Green', 'Red', 'Alpha']
-        else:
-            return [f'Channel {i+1}' for i in range(channels)]
+        self.image_layers.addItems(channels)
 
 
 class ZoomableImageView(QGraphicsView):
@@ -137,33 +123,11 @@ class ZoomableImageView(QGraphicsView):
                 self.scale(factor, factor)
             self._zoom = 0
 
-    def setImage(self, path, channel=None):
-        image = cv2.imread(path, cv2.IMREAD_ANYDEPTH | cv2.IMREAD_COLOR)
-
-        if image is None:
-            print(f"Error: Unable to read image from {path}")
-            return
-
-        if channel is not None:
-            if channel == 'Blue':
-                channel_index = 0
-            elif channel == 'Green':
-                channel_index = 1
-            elif channel == 'Red':
-                channel_index = 2
-            elif channel == 'Alpha':
-                channel_index = 3 if image.shape[2] > 3 else None
-            else:
-                channel_index = None
-
-            if channel_index is not None:
-                image = image[:, :, channel_index]
-                image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
-
-        qimage = QImage(image.data, image.shape[1], image.shape[0], image.strides[0], QImage.Format.Format_RGB888)
-        pixmap = QPixmap.fromImage(qimage)
-
+    def setPixmap(self, pixmap):
         self._empty = False
+        if self._image:
+            self._scene.removeItem(self._image)
+            self._image = None
         self._image = QGraphicsPixmapItem(pixmap)
         self._scene.addItem(self._image)
 
