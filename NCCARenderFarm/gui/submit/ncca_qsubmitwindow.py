@@ -181,9 +181,9 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
         job['name'] = self.job_name.text()
         job['cpus'] = self.num_cpus.currentText()
         package={}
-        package['shell']=RENDERFARM_SHELL
+        package['shell']="/bin/bash"
         job['package'] = package
-        job['prototype'] = "cmdline"
+        job['prototype'] = "cmdrange"
         job['cwd'] = join_path(RENDERFARM_RENDER_ROOT, self.username)
         job['env'] = {"HOME": join_path(RENDERFARM_RENDER_ROOT, self.username)}
 
