@@ -43,25 +43,61 @@ class NCCA_ImageWindow(NCCA_QMainWindow):
         return []
 
     def get_img_channels(self, path):
-        return []
+        try:
+            with Image.open(path) as img:
+                channels = img.getbands()  # Get all available bands (channels)
+                channels_list = [channel for channel in channels]
+
+                # Add an option to view the full RGB or RGBA image
+                if 'A' in channels_list:
+                    channels_list.insert(0, "RGBA")
+                else:
+                    channels_list.insert(0, "RGB")
+
+                return channels_list
+        except Exception as e:
+            print(f"Error getting image channels: {e}")
+            return []
 
     def load_exr_image(self, path, channel):
         return None
 
     def load_normal_image(self, path, channel):
-        return None
+        with Image.open(path) as img:
+            # Convert PIL.Image to QPixmap
+            img = img.convert("RGBA")  # Ensure image has an alpha channel for transparency support
+
+            if channel in ["RGB", "RGBA"]:
+                image_data = img.tobytes("raw", "RGBA")
+                q_image = QImage(image_data, img.size[0], img.size[1], QImage.Format.Format_RGBA8888)
+            else:
+                r, g, b, a = img.split()
+                if channel == "R":
+                    rgba_img = Image.merge("RGBA", (r, r, r, a))
+                elif channel == "G":
+                    rgba_img = Image.merge("RGBA", (g, g, g, a))
+                elif channel == "B":
+                    rgba_img = Image.merge("RGBA", (b, b, b, a))
+                elif channel == "A":
+                    rgba_img = Image.merge("RGBA", (a, a, a, a))
+
+                image_data = rgba_img.tobytes("raw", "RGBA")
+                q_image = QImage(image_data, img.size[0], img.size[1], QImage.Format.Format_RGBA8888)
+
+            pixmap = QPixmap.fromImage(q_image)
+            return pixmap
 
     def load_image(self):
         channels = self.image_layers.currentText()
         pixmap = None
 
         if os.path.splitext(self.image_path)[1].lower() in [".exr"]:
-            pixmap = self.get_exr_channels(self.image_path, channels)
+            pixmap = self.load_exr_image(self.image_path, channels)
         else:
-            pixmap = self.get_img_channels(self.image_path, channels)
+            pixmap = self.load_normal_image(self.image_path, channels)
 
         if pixmap is not None:
-            self.image_view.setPixmap()
+            self.image_view.setPixmap(pixmap)
 
     def setup_image(self):
         """Load and display the image."""
@@ -91,6 +127,7 @@ class ZoomableImageView(QGraphicsView):
         self._scene = QGraphicsScene(self)
         self.setScene(self._scene)
         self._image = None
+        self._background_color = QColor(Qt.GlobalColor.black)
 
         self.setStyleSheet(f"""
             QGraphicsView {{
@@ -124,12 +161,22 @@ class ZoomableImageView(QGraphicsView):
             self._zoom = 0
 
     def setPixmap(self, pixmap):
+        background_color = QColor(self._background_color)  # White background color
+        result_image = QPixmap(pixmap.size())
+        result_image.fill(background_color)
+        
+        # Copy the original image onto the result image, preserving transparency
+        painter = QPainter(result_image)
+        painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_SourceOver)
+        painter.drawPixmap(0, 0, pixmap)
+        painter.end()
+
+        # Set the processed image as QGraphicsPixmapItem
         self._empty = False
-        if self._image:
-            self._scene.removeItem(self._image)
-            self._image = None
-        self._image = QGraphicsPixmapItem(pixmap)
+        self._image = QGraphicsPixmapItem(result_image)
         self._scene.addItem(self._image)
+
+        self.fitInView(False)
 
     def wheelEvent(self, event):
         if self.hasImage():
