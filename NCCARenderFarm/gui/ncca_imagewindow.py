@@ -41,11 +41,16 @@ class NCCA_ImageWindow(NCCA_QMainWindow):
         exr_data = pyexr.open(path)
 
         # Get a list of all channel names in the EXR file
-        channel_names = exr_data.channels
+        channels_list = []
+        for channel in exr_data.channels:
+            if channel == "A":
+                channel = "Alpha"
+            channels_list.append(channel)
 
-        channel_names.insert(0, "Combined")
+        channels_list.insert(0, "Luminance")
+        channels_list.insert(0, "Combined")
 
-        return channel_names
+        return channels_list
 
     def get_img_channels(self, path):
         try:
@@ -72,28 +77,32 @@ class NCCA_ImageWindow(NCCA_QMainWindow):
             return []
 
     def load_exr_image(self, path, channel):
-        # Load the EXR file using OpenCV
-        exr_data = cv2.imread(path, cv2.IMREAD_ANYCOLOR | cv2.IMREAD_ANYDEPTH)
+        print(channel)
+        # Step 1: Read the EXR file using OpenCV
+        exr_image = cv2.imread(path, cv2.IMREAD_UNCHANGED)
+        
+        # Step 2: Convert the image to 8-bit format if it's not already
+        if exr_image.dtype == np.float32:
+            exr_image = (255.0 * np.clip(exr_image, 0.0, 1.0)).astype(np.uint8)
 
-        if channel == "Combined":
-            # For combined image, just convert to QImage
-            image = QImage(exr_data.data, exr_data.shape[1], exr_data.shape[0],
-                           exr_data.shape[1] * exr_data.shape[2], QImage.Format.Format_RGB888)
+        # OpenCV loads images in BGR format by default, convert to RGB
+        exr_image = cv2.cvtColor(exr_image, cv2.COLOR_BGR2RGB)
+
+        if channel in ["Combined", "Luminance"]:
+                # Step 3: Convert the image to QImage
+                height, width, chan = exr_image.shape
+                bytes_per_line = chan * width
+                q_image = QImage(exr_image.data, width, height, bytes_per_line, QImage.Format.Format_RGB888)
+                
+                if channel == "Luminance":
+                    q_image = q_image.convertToFormat(QImage.Format.Format_Grayscale8)
         else:
-            # Retrieve the specified channel (assuming float32 format)
-            channel_data = exr_data[:, :, exr_data.channels.index(channel)]
-
-            # Normalize the channel data if needed (to [0, 255] range for display)
-            normalized_data = ((channel_data - channel_data.min()) / (channel_data.max() - channel_data.min()) * 255).astype('uint32')
-
-            # Convert numpy array to QImage
-            image = QImage(normalized_data.data, normalized_data.shape[1], normalized_data.shape[0],
-                           normalized_data.shape[1] * normalized_data.shape[2], QImage.Format.Format_Grayscale8)
-
-        # Convert QImage to QPixmap
-        pixmap = QPixmap.fromImage(image)
-
-        return pixmap
+            return None
+        
+        # Step 4: Convert QImage to QPixmap
+        q_pixmap = QPixmap.fromImage(q_image)
+        
+        return q_pixmap
 
     def load_normal_image(self, path, channel):
         with Image.open(path) as img:
@@ -147,6 +156,8 @@ class NCCA_ImageWindow(NCCA_QMainWindow):
             channels = self.get_exr_channels(self.image_path)
         else:
             channels = self.get_img_channels(self.image_path)
+
+        print(channels)
 
         self.image_layers.addItems(channels)
 
