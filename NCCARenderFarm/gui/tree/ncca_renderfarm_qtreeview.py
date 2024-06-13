@@ -364,23 +364,17 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
     def deleteSelectedIndexes(self):
         """Deletes the selected indexes."""
         selected_indexes = self.selectedIndexes()
+        file_paths=[]
+        for index in selected_indexes:
+            if (self.model().get_file_path(index)) ==self.home_path:
+                return
+    
+            file_paths.append(self.model().get_file_path(index))
+    
         reply = NCCA_QMessageBox.question(self, DELETE_CONFIRM_TITLE, DELETE_CONFIRM_GENERAL_LABEL)
         if reply == QDialog.DialogCode.Accepted:
-            file_paths = []
-            for index in selected_indexes:
-                file_paths.append(self.model().get_file_path(index))
-            
             self.model().renderfarm.delete(file_paths)
             self.refresh()
-
-
-    def deleteIndex(self, index):
-        """Deletes the specified index."""
-        file_path = [self.model().get_file_path(index)]
-        if file_path != self.home_path:
-            self.model().renderfarm.delete(file_path)
-            self.refresh()
-
 
     def wipeSelectedIndex(self):
         """Wipes the currently selected index."""

@@ -8,7 +8,6 @@ Run `./launch.sh` to run the NCCA Renderfarm Tool.
 2. Fix tabbed active buttons
 3. Fix menu UI
 4. Fix dialog sizes
-5. fix temporary file cleanup
 6. progress_bar loading for counting files
 7. Fix the Renderfarm server
 8. Code Refactoring and Cleanup
