@@ -9,7 +9,7 @@ import paramiko, socket, subprocess, threading, zipfile, stat, queue, multiproce
 os.environ["OPENCV_IO_ENABLE_OPENEXR"] = "1" 
 from PIL import Image, ImageTk
 import cv2, numpy as np
-import traceback
+import traceback, pyexr
 
 def get_os():
     if os.name == 'posix':

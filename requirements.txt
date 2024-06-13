@@ -4,5 +4,4 @@ Pillow
 opencv-python
 numpy
 PyQt6
-OpenEXR
-Imath
+pyexr

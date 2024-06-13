@@ -4,9 +4,6 @@ from .widgets import *
 from .ncca_qmainwindow import NCCA_QMainWindow
 from .dialogs import *
 
-from PIL import ImageQt
-import OpenEXR, Imath
-
 class NCCA_ImageWindow(NCCA_QMainWindow):
     """Interface for viewing images."""
 
@@ -40,7 +37,15 @@ class NCCA_ImageWindow(NCCA_QMainWindow):
         self.main_layout.addWidget(self.image_view)
 
     def get_exr_channels(self, path):
-        return []
+        # Load the EXR file
+        exr_data = pyexr.open(path)
+
+        # Get a list of all channel names in the EXR file
+        channel_names = exr_data.channels
+
+        print(channel_names)
+
+        return channel_names
 
     def get_img_channels(self, path):
         try:
