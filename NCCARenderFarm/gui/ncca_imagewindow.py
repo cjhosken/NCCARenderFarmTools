@@ -1,3 +1,4 @@
+from PyQt6.QtGui import QPaintEvent
 from config import *
 from .widgets import *
 from .ncca_qmainwindow import NCCA_QMainWindow
@@ -112,23 +113,13 @@ class ZoomableImageView(QGraphicsView):
         if image.isNull():
             return
 
-        # Create a new QPixmap with the desired background color
-        background_color = QColor(self._background_color)  # White background color
-        result_image = QPixmap(image.size())
-        result_image.fill(background_color)
-        
-        # Copy the original image onto the result image, preserving transparency
-        painter = QPainter(result_image)
-        painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_SourceOver)
-        painter.drawPixmap(0, 0, image)
-        painter.end()
-
         # Set the processed image as QGraphicsPixmapItem
         self._empty = False
-        self._image = QGraphicsPixmapItem(result_image)
+        self._image = QGraphicsPixmapItem(image)
         self._scene.addItem(self._image)
 
-        self.fitInView(False)
+        # Fit the image in view without scaling further
+        self.fitInView(scale=False)
 
     def wheelEvent(self, event: QWheelEvent):
         if self.hasImage():
