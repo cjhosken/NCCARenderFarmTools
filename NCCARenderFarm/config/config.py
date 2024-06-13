@@ -120,7 +120,7 @@ except Exception as e:
     QB_IMPORT_ERROR = f"{str(e)}\n\nTraceback:\n{traceback_info}"
 
 
-LOCAL_HYTHON_PATH = "/opt/hfs20.0.506/bin/hython"
+LOCAL_HYTHON_PATH = "/opt/hfs19.5.605/bin/hython"
 LOCAL_MAYAPY_PATH = "/opt/autodesk/maya2023/bin/mayapy"
 MAYA_EXTENSIONS=[".ma", ".mb"]
 
@@ -128,11 +128,11 @@ HOUDINI_PATH="/opt/software/hfs20.0.506"
 HOUDINI_EXTENSIONS=[".hip", ".hipnc"]
 
 NUKEX_PATH="nuke"
-LOCAL_NUKEX_PATH = ""
+LOCAL_NUKEX_PATH = "/opt/Nuke14.0v5/Nuke14.0"
 NUKEX_EXTENSIONS=[".nk", ".nknc"]
 
 KATANA_PATH="katana"
-LOCAL_KATANA_PATH=""
+LOCAL_KATANA_PATH="/opt/Katana6.0v2/katana"
 KATANA_EXTENSIONS=[".katana"]
 
 BLENDER_PATH = "blender"
