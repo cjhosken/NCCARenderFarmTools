@@ -3,7 +3,7 @@ import maya.cmds as cmds
 
 # List of plugins to be enabled
 PLUGINS = [
-    "vrayformaya", "vrayvolumegrid", "xgenVRay", "mota"
+    "vrayformaya", "vrayvolumegrid", "xgenVRay", "mtoa", "RenderMan_for_Maya", "OpenVDB", "rfm", "rfm_manipulators", "rfm_volume_aggregate_set"
 ]
 
 def initialize_maya():
@@ -24,11 +24,4 @@ def load_plugins():
 if __name__ == "__main__":
     initialize_maya()
     load_plugins()
-
-    print("ENVIRONMENT VARIABLES")
-    import os
-    vars = os.environ
-    for key, value in vars.items():
-        print(f"{key}: {value}")
-
     uninitialize_maya()
