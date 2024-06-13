@@ -209,9 +209,11 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
 
         self.context_menu = QMenu(self)
         self.context_menu.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.context_menu.setToolTipsVisible(True)
 
         if file_path == self.home_path:
             self.action_qube = self.context_menu.addAction(LAUNCH_QUBE_ACTION_LABEL)
+            self.action_qube.setToolTip(LAUNCH_QUBE_TOOLTIP)
             self.action_qube.triggered.connect(launch_qube)
         
         if self.model().renderfarm.isdir(file_path):
@@ -264,7 +266,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             self.action_wipe.setToolTip(ACTION_WIPE_TOOLTIP)
             self.action_wipe.triggered.connect(self.wipeSelectedIndex)
 
-        self.context_menu.setStyleSheet(NCCA_QTREEVIEW_STYLESHEET)
+        self.context_menu.setStyleSheet(NCCA_QTREEVIEW_MENU_STYLESHEET)
 
         self.context_menu.exec(event.globalPos())
 
