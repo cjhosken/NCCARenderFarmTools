@@ -76,6 +76,7 @@ class ZoomableImageView(QGraphicsView):
         self._scene = QGraphicsScene(self)
         self.setScene(self._scene)
         self._image = None
+        self._background_color = QColor(Qt.GlobalColor.black)
 
         self.setStyleSheet(f"""
             QGraphicsView {{
@@ -93,10 +94,10 @@ class ZoomableImageView(QGraphicsView):
         return not self._empty
 
     def fitInView(self, scale=True):
-        rect = QRectF(self._image.pixmap().rect())
-        if not rect.isNull():
+        if self.hasImage():
+            rect = QRectF(self._image.pixmap().rect())
             self.setSceneRect(rect)
-            if self.hasImage():
+            if scale:
                 unity = self.transform().mapRect(QRectF(0, 0, 1, 1))
                 self.scale(1 / unity.width(), 1 / unity.height())
                 viewrect = self.viewport().rect()
@@ -112,7 +113,7 @@ class ZoomableImageView(QGraphicsView):
             return
 
         # Create a new QPixmap with the desired background color
-        background_color = QColor("#000000")  # White background color
+        background_color = QColor(self._background_color)  # White background color
         result_image = QPixmap(image.size())
         result_image.fill(background_color)
         
@@ -127,26 +128,22 @@ class ZoomableImageView(QGraphicsView):
         self._image = QGraphicsPixmapItem(result_image)
         self._scene.addItem(self._image)
 
-        # Calculate scene rect to ensure the whole image fits
-        scene_rect = self._image.boundingRect()
-        self.setSceneRect(scene_rect)
-
-        self.fitInView()
+        self.fitInView(False)
 
     def wheelEvent(self, event: QWheelEvent):
         if self.hasImage():
             if event.angleDelta().y() > 0:
                 factor = 1.25
-                self._zoom += factor
+                self._zoom += 1
             else:
                 factor = 0.8
-                if (self._zoom - factor < 0):
-                    self._zoom -= factor
+                self._zoom -= 1
 
-            if self._zoom > 0:
-                self.scale(factor, factor)
-            else:
-                self._zoom = 0
+            
+            self.scale(factor, factor)
+
+        
+        print(self._zoom)
 
     def toggleDragMode(self):
         if self.dragMode() == QGraphicsView.DragMode.ScrollHandDrag:
@@ -163,22 +160,3 @@ class ZoomableImageView(QGraphicsView):
         if event.button() == Qt.MouseButton.LeftButton:
             self.setDragMode(QGraphicsView.DragMode.NoDrag)
         super().mouseReleaseEvent(event)
-
-    """def paintEvent(self, event):
-        super().paintEvent(event)
-
-        if self._image:
-            painter = QPainter(self.viewport())
-            painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-
-            # Define the shape you want to clip to (rounded rectangle)
-            clip_path = QPainterPath()
-            clip_path.addRoundedRect(QRectF(self.viewport().rect()), 15, 15)
-
-            # Clip the painter to the defined shape
-            painter.setClipPath(clip_path)
-
-            # Paint the scene
-            self.scene().render(painter)
-
-            painter.end()"""
