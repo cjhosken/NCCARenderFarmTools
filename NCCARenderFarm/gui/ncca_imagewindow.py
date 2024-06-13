@@ -1,6 +1,7 @@
 from config import *
 from .widgets import *
 from .ncca_qmainwindow import NCCA_QMainWindow
+from .dialogs import *
 
 class NCCA_ImageWindow(NCCA_QMainWindow):
     """Interface for viewing images."""
@@ -30,7 +31,7 @@ class NCCA_ImageWindow(NCCA_QMainWindow):
         """Load and display the image."""
         if os.path.splitext(self.image_path)[1] == ".exr":
             tmp_img_path = self.convert_exr_to_png(self.image_path)
-            if tmp_img_path:
+            if tmp_img_path is not None:
                 self.image_view.setImage(tmp_img_path)
         else:
             self.image_view.setImage(self.image_path)
@@ -50,7 +51,11 @@ class NCCA_ImageWindow(NCCA_QMainWindow):
             png_image.save(image_path)
             return image_path
         else:
-            print("Failed to read the EXR file.")
+            NCCA_QMessageBox.warning(
+                self,
+                title=RENDERFARM_DIALOG_TITLE,
+                text="Failed to read the EXR file." + "\n",
+            )
             return None
 
 class ZoomableImageView(QGraphicsView):

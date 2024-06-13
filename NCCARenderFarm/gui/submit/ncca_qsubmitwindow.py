@@ -60,7 +60,7 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
         self.job_row_layout.addWidget(self.cpu_label)
         self.num_cpus = NCCA_QComboBox()
         self.num_cpus.setToolTip(SUBMIT_CPUS_TOOLTIP)
-        self.num_cpus.addItems([str(i) for i in range(1, FARM_CPUS)])
+        self.num_cpus.addItems([str(i) for i in range(1, FARM_CPUS+1)])
         self.num_cpus.setCurrentText(str(DEFAULT_CPU_USAGE))
         self.job_row_layout.addWidget(self.num_cpus)
 

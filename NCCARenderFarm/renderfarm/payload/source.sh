@@ -3,7 +3,8 @@
 # Set Environment Variables
 
 # Licenses
-export ADSKFLEX_LICENSE_FILE="@havant"
+export ADSKFLEX_LICENSE_FILE="@havant.bournemouth.ac.uk"
+export VRAY_AUTH_CLIENT_FILE_PATH="/render/chroot/.ChaosGroup/vrlclient.xml"
 export SESI_LMHOST="lepe.bournemouth.ac.uk"
 export PIXAR_LICENSE_FILE="9010@talavera.bournemouth.ac.uk"
 
@@ -22,13 +23,14 @@ export HOUDINI_VERSION="20"
 export VRAY_ROOT="/opt/software/ChaosGroup/V-Ray/Maya2023-x64"
 export VRAY_MAYA="$VRAY_ROOT/maya_vray"
 export VRAY_PATH="$VRAY_MAYA/bin"
-
+export VRAY_PLUGINS="$VRAY_MAYA/vrayplugins"
 export VRAY_FOR_MAYA2023_MAIN="$VRAY_MAYA/."
 export VRAY_TOOLS_MAYA2023="$VRAY_ROOT/vray/bin"
 
-export VRAY_FOR_MAYA2023_PLUGINS="$VRAY_FOR_MAYA_2023_MAIN/vrayplugins"
-export VRAY_APPSDK_PLUGINS="$VRAY_FOR_MAYA_2023_MAIN/vrayplugins"
+export VRAY_FOR_MAYA2023_PLUGINS="$VRAY_PLUGINS"
+export VRAY_APPSDK_PLUGINS="$VRAY_PLUGINS"
 export PXR_PLUGINPATH_NAME="$VRAY_MAYA/usdplugins:$PXR_PLUGINPATH_NAME"
+export VRAY_OSL_PATH_MAYA2023="$VRAY_ROOT/vray/opensl"
 
 # Renderman
 export RMAN_VERSION="24.1"
@@ -46,7 +48,7 @@ export RMAN_PROCEDURALPATH="$RFMTREE/3.9/$HOUDINI_VERSION/openvdb"
 # General
 export PATH="$MAYA_BIN:$RMANTREE/bin:$VRAY_MAYA/bin:$VRAY_MAYA/bin/hostbin:$PATH"
 export PYTHONPATH="$RMANTREE/bin:$RFMTREE/scripts:$VRAY_MAYA/scripts:$ARNOLD_MAYA_PATH/scripts:$VRAY_APPSDK/scripts:$PYTHONPATH"
-export LD_LIBRARY_PATH="$MAYA_PATH/lib:$VRAY_MAYA/lib:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="$MAYA_PATH/lib:/usr/lib:/usr/lib64:/lib:/lib64:$LD_LIBRARY_PATH"
 
 
 # Maya Plugins
@@ -56,8 +58,8 @@ export MAYA_SCRIPT_PATH="$MAYA_PATH/scripts:$ARNOLD_MAYA_PATH/scripts:$RFMTREE/s
 export MAYA_RENDER_DESC_PATH="$ARNOLD_MAYA_PATH:$RFMTREE/etc:$VRAY_MAYA/rendererDesc:$MAYA_RENDER_DESC_PATH"
 export MAYA_CUSTOM_TEMPLATE_PATH="$RFMTREE/scripts/NETemplates:$VRAY_MAYA/scripts:$ARNOLD_MAYA_PATH/scripts/mtoa/ui/templates:$MAYA_CUSTOM_TEMPLATE_PATH"
 export XBMLANGPATH="$RFMTREE/icons:$VRAY_MAYA/icons/%B:$ARNOLD_MAYA_PATH/icons/%B:"
-
 export MAYA_PLUG_IN_RESOURCE_PATH="$RFMTREE/resources:$VRAY_MAYA/resources:$ARNOLD_MAYA_PATH/resources"
 export MAYA_PRESET_PATH="$RFMTREE/presets:$VRAY_MAYA/presets:$ARNOLD_MAYA_PATH/presets"
+export MAYA_TOOLCLIPS_PATH="$VRAY_MAYA/toolclips:$MAYA_TOOLCLIPS_PATH"
 
 env

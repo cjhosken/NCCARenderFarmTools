@@ -646,8 +646,6 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         
         local_path = join_path(temp_dir, file_name)
 
-        print(local_path)
-
         self.model().renderfarm.download(remote_path=file_path, local_path=local_path, show_info=False, show_progress=False)
 
         self.submit_job(file_path=file_path, folder_path=None, local_path=local_path)
