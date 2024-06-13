@@ -20,7 +20,10 @@ class NCCA_ImageWindow(NCCA_QMainWindow):
         """Set up the user interface."""
         self.image_name_label = QLabel(text=os.path.basename(self.image_path))
         self.image_name_label.setContentsMargins(MARGIN_DEFAULT, 0, 0, 0)
+        self.image_name_label.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
+        self.image_name_label.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         self.nav_and_title_layout.addWidget(self.image_name_label)
+        
 
         self.image_view = ZoomableImageView(self)
         self.main_layout.addWidget(self.image_view)
@@ -59,106 +62,123 @@ class NCCA_ImageWindow(NCCA_QMainWindow):
             return None
 
 class ZoomableImageView(QGraphicsView):
-    """A QGraphicsView widget for displaying images with zoom and pan functionality."""
-
     def __init__(self, parent=None):
-        """Initialize the zoomable image view."""
         super().__init__(parent)
-        self.setRenderHints(QPainter.RenderHint.Antialiasing | QPainter.RenderHint.SmoothPixmapTransform)
         self.setScene(QGraphicsScene(self))
-        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.setRenderHint(QPainter.RenderHint.Antialiasing)
+        self.setDragMode(QGraphicsView.DragMode.ScrollHandDrag)
+        self.setTransformationAnchor(QGraphicsView.ViewportAnchor.AnchorUnderMouse)
+        self.setResizeAnchor(QGraphicsView.ViewportAnchor.AnchorUnderMouse)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.setMinimumSize(IMAGE_WINDOW_DISPLAY_IMAGE_SIZE)
-        self.setBaseSize(IMAGE_WINDOW_DISPLAY_IMAGE_SIZE)
         self._zoom = 0
-        self._pan = False
-        self._start_pos = QPoint()
-        self.pixmap_item = None
+        self._empty = True
+        self._scene = QGraphicsScene(self)
+        self.setScene(self._scene)
+        self._image = None
 
-        self.setStyleSheet("""
-            ZoomableImageView {
-                background-color: transparent;
-                border: 2px solid grey;
+        self.setStyleSheet(f"""
+            QGraphicsView {{
+                background-color: {APP_BACKGROUND_COLOR};
+                border: 2px solid {APP_GREY_COLOR};
                 border-top: none;
-                border-bottom-left-radius: 8px;
-                border-bottom-right-radius: 8px;
-            }
+                border-top-left-radius: 0px;
+                border-top-right-radius: 0px;
+                border-bottom-left-radius: {APP_BORDER_RADIUS};
+                border-bottom-right-radius: {APP_BORDER_RADIUS};
+            }}
         """)
 
-        # Infinite scene size
-        self.scene().setSceneRect(QRectF(-10000, -10000, 20000, 20000))
+    def hasImage(self):
+        return not self._empty
 
-    def setImage(self, image_path):
-        """Load and display the image."""
-        pixmap = QPixmap(image_path)
-        if not pixmap.isNull():
-            self.pixmap_item = QGraphicsPixmapItem(pixmap)
-            self.pixmap_item.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
-            self.scene().clear()
-            self.scene().addItem(self.pixmap_item)
+    def fitInView(self, scale=True):
+        rect = QRectF(self._image.pixmap().rect())
+        if not rect.isNull():
+            self.setSceneRect(rect)
+            if self.hasImage():
+                unity = self.transform().mapRect(QRectF(0, 0, 1, 1))
+                self.scale(1 / unity.width(), 1 / unity.height())
+                viewrect = self.viewport().rect()
+                scenerect = self.transform().mapRect(rect)
+                factor = min(viewrect.width() / scenerect.width(),
+                             viewrect.height() / scenerect.height())
+                self.scale(factor, factor)
             self._zoom = 0
 
-            self.resetTransform()
-            view_rect = self.viewport().rect()
-            scene_rect = self.pixmap_item.boundingRect()
-            initial_horizontal_value = (scene_rect.width() - view_rect.width()) / 2
-            initial_vertical_value = (scene_rect.height() - view_rect.height()) / 2
+    def setImage(self, path):
+        image = QPixmap(path)
+        if image.isNull():
+            return
 
-            # Adjust scroll bar values to center the image
-            self.horizontalScrollBar().setValue(initial_horizontal_value)
-            self.verticalScrollBar().setValue(initial_vertical_value)
+        # Create a new QPixmap with the desired background color
+        background_color = QColor("#000000")  # White background color
+        result_image = QPixmap(image.size())
+        result_image.fill(background_color)
+        
+        # Copy the original image onto the result image, preserving transparency
+        painter = QPainter(result_image)
+        painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_SourceOver)
+        painter.drawPixmap(0, 0, image)
+        painter.end()
 
-            # Set the scene rect to match the pixmap item rect plus padding
-            self.setSceneRect(self.pixmap_item.boundingRect().adjusted(-10000, -10000, 10000, 10000))
+        # Set the processed image as QGraphicsPixmapItem
+        self._empty = False
+        self._image = QGraphicsPixmapItem(result_image)
+        self._scene.addItem(self._image)
 
-    def wheelEvent(self, event):
-        """Handle zooming using the mouse wheel."""
-        zoom_in_factor = IMAGE_WINDOW_ZOOM_IN_FACTOR
-        zoom_out_factor = IMAGE_WINDOW_ZOOM_OUT_FACTOR
+        # Calculate scene rect to ensure the whole image fits
+        scene_rect = self._image.boundingRect()
+        self.setSceneRect(scene_rect)
 
-        # Calculate the center of the view
-        view_center = self.viewport().rect().center()
-        scene_center = self.mapToScene(view_center)
+        self.fitInView()
 
-        if event.angleDelta().y() > 0:
-            zoom_factor = zoom_in_factor
-            self._zoom += 1
-        else:
-            zoom_factor = zoom_out_factor
-            self._zoom -= 1
+    def wheelEvent(self, event: QWheelEvent):
+        if self.hasImage():
+            if event.angleDelta().y() > 0:
+                factor = 1.25
+                self._zoom += factor
+            else:
+                factor = 0.8
+                if (self._zoom - factor < 0):
+                    self._zoom -= factor
 
-        # Scale the view
-        self.scale(zoom_factor, zoom_factor)
+            if self._zoom > 0:
+                self.scale(factor, factor)
+            else:
+                self._zoom = 0
 
-        # Adjust the scene rect to fit the scaled image
-        self.setSceneRect(self.pixmap_item.boundingRect().adjusted(-10000, -10000, 10000, 10000))
+    def toggleDragMode(self):
+        if self.dragMode() == QGraphicsView.DragMode.ScrollHandDrag:
+            self.setDragMode(QGraphicsView.DragMode.NoDrag)
+        elif not self._image is None:
+            self.setDragMode(QGraphicsView.DragMode.ScrollHandDrag)
 
-        # Translate to keep the scene centered on the view
-        delta = self.mapToScene(view_center) - scene_center
-        self.translate(delta.x(), delta.y())
-
-    def mousePressEvent(self, event):
-        """Handle mouse press event for panning."""
+    def mousePressEvent(self, event: QMouseEvent):
         if event.button() == Qt.MouseButton.LeftButton:
-            self._pan = True
-            self._start_pos = event.position()
-            self.setCursor(Qt.CursorShape.ClosedHandCursor)
+            self.setDragMode(QGraphicsView.DragMode.ScrollHandDrag)
         super().mousePressEvent(event)
 
-    def mouseMoveEvent(self, event):
-        """Handle mouse move event for panning."""
-        if self._pan:
-            delta = event.position() - self._start_pos
-            self._start_pos = event.position()
-            self.horizontalScrollBar().setValue(self.horizontalScrollBar().value() - delta.x())
-            self.verticalScrollBar().setValue(self.verticalScrollBar().value() - delta.y())
-        super().mouseMoveEvent(event)
-
-    def mouseReleaseEvent(self, event):
-        """Handle mouse release event."""
+    def mouseReleaseEvent(self, event: QMouseEvent):
         if event.button() == Qt.MouseButton.LeftButton:
-            self._pan = False
-            self.setCursor(Qt.CursorShape.ArrowCursor)
+            self.setDragMode(QGraphicsView.DragMode.NoDrag)
         super().mouseReleaseEvent(event)
 
+    """def paintEvent(self, event):
+        super().paintEvent(event)
+
+        if self._image:
+            painter = QPainter(self.viewport())
+            painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+
+            # Define the shape you want to clip to (rounded rectangle)
+            clip_path = QPainterPath()
+            clip_path.addRoundedRect(QRectF(self.viewport().rect()), 15, 15)
+
+            # Clip the painter to the defined shape
+            painter.setClipPath(clip_path)
+
+            # Paint the scene
+            self.scene().render(painter)
+
+            painter.end()"""
