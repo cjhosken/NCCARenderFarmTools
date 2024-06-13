@@ -465,7 +465,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
 
         if file_ext.lower() in VIEWABLE_IMAGE_FILES:
             local_path = file_path
-            temp_dir = tempfile.TemporaryDirectory(dir=get_user_home())
+            temp_dir = tempfile.TemporaryDirectory(os.path.join(get_user_home(), LOCAL_TEMP_FOLDER))
             local_path = join_path(temp_dir.name, file_name)
 
             self.model().renderfarm.download(remote_path=file_path, local_path=local_path, show_info=False, show_progress=False)
@@ -635,7 +635,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         file_path = self.model().get_file_path(index)
         file_name = os.path.basename(file_path)
 
-        temp_dir = tempfile.TemporaryDirectory(dir=get_user_home())
+        temp_dir = tempfile.TemporaryDirectory(dir=os.path.join(get_user_home(), LOCAL_TEMP_FOLDER))
         self.TMP_DIRS.append(temp_dir)
         
         local_path = join_path(temp_dir.name, file_name)

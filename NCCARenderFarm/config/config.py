@@ -35,6 +35,8 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 ASSET_DIR = join_path(SCRIPT_DIR, "assets")
 NCCA_ENVIRONMENT_PATH = os.path.expanduser('~/.ncca')
 
+LOCAL_TEMP_FOLDER = "tmp"
+
 ICON_SIZE = QSize(24, 24)
 ICON_BUTTON_SIZE = QSize(48, 48)
 BROWSER_ICON_SIZE = QSize(32, 32)

@@ -20,6 +20,7 @@ class NCCA_RenderFarmWindow(NCCA_QMainWindow):
         self.home_path = join_path(RENDERFARM_ROOT, self.username, RENDERFARM_FARM_DIR)
 
         super().__init__(name, MAIN_WINDOW_SIZE)
+        self.create_temp()
 
     def init_ui(self):
         super().init_ui()
@@ -77,6 +78,18 @@ class NCCA_RenderFarmWindow(NCCA_QMainWindow):
             destination_folder = self.browser.model().get_file_path(index)
         self.browser.submit_project(destination_folder)
 
+
+    def create_temp(self):
+        tmp_path = os.path.join(get_user_home(), LOCAL_TEMP_FOLDER)
+        if os.path.exists(tmp_path):
+            shutil.rmtree(tmp_path)
+        os.mkdir(tmp_path)
+
+    def clear_temp(self):
+        tmp_path = os.path.join(get_user_home(), LOCAL_TEMP_FOLDER)
+        if os.path.exists(tmp_path):
+            shutil.rmtree(tmp_path)
+
     def closeEvent(self, event):
-        self.browser.remove_tmp()
+        self.clear_temp()
         

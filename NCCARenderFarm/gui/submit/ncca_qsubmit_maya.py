@@ -116,7 +116,10 @@ class NCCA_QSubmit_Maya(NCCA_QSubmitWindow):
         frame_step = self.frame_step.text()
         # Get values of all UI elements
         renderer = MAYA_RENDER_ENGINES.get(self.active_renderer.currentText())
-        camera = self.render_cam.currentText()
+        if (self.sourced):
+            camera = self.render_cam.currentText()
+        else:
+            camera = self.render_cam.text()
         project_path = self.job_path.text()
         extra_commands = self.command.text()
         output_path = self.output_path.text()
