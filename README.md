@@ -8,7 +8,7 @@ The NCCA Renderfarm currently only supports:
  - ~~Maya 2023 Arnold~~ (no license)
  - ~~Maya 2023 VRay~~ (no license)
  - ~~Maya 2023 Renderman~~ (outdated)
- - Maya 2023 Software
+ - Maya 2023 Software Render
 
 <br>
 
