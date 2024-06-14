@@ -63,7 +63,12 @@ if %errorlevel% neq 0 (
 
 
 REM Set the installed Python version globally
+
+
 call pyenv local %PYTHON_VERSION%
+
+REM need this line as 3.8 and 3.8.10 are different
+set PYTHON_VERSION=%PYTHON_VERSION%.10
 
 call pyenv rehash
 set PATH=%USERPROFILE%\.pyenv\pyenv-win\versions\%PYTHON_VERSION%\;%USERPROFILE%\.pyenv\pyenv-win\versions\%PYTHON_VERSION%\Scripts;%PATH%
@@ -77,8 +82,8 @@ call python -m pip install -r requirements.txt
 
 REM Build the Python project
 echo Building the executable...
-REM call pyinstaller nccarenderfarm.spec --noconfirm
-call pyinstaller --path NCCARenderFarm NCCARenderFarm/main.py
+call pyinstaller nccarenderfarm.spec --noconfirm
+
 
 set SOURCE_LAUNCH=%PROJECT_DIR%NCCARenderFarm\launchers\launch.bat
 set DEST_LAUNCH=%PROJECT_DIR%launch.bat
