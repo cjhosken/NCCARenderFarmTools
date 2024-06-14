@@ -5,3 +5,5 @@ opencv-python
 numpy
 PyQt6
 pyexr
+pyinstaller
+tk

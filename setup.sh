@@ -41,13 +41,8 @@ install_pyenv_windows() {
         # Add pyenv-win paths to the environment
         export PYENV="$INSTALL_DIR/pyenv-win"
         export PATH="$PYENV/bin:$PYENV/shims:$PATH"
-        echo "export PATH=\"$PYENV/bin:$PYENV/libexec/shims:\$PATH\"" >> $HOME/.bashrc  
+        echo 'export PATH="$PYENV/bin:$PYENV/libexec/shims:$PATH"' >> $HOME/.bashrc
         source $HOME/.bashrc
-
-        # Source pyenv init scripts
-        #eval "$("$PYENV/bin/pyenv" init --path)"
-        #eval "$("$PYENV/bin/pyenv" init -)"
-        #eval "$("$PYENV/bin/pyenv" virtualenv-init -)"
 
         echo "NCCA | pyenv-win installed successfully."
     else
@@ -55,6 +50,7 @@ install_pyenv_windows() {
     fi
 }
 
+# Function to install pyenv on Linux
 install_pyenv_linux() {
     if ! command -v pyenv &> /dev/null; then
         echo "NCCA | pyenv not found. Installing pyenv..."
@@ -75,12 +71,7 @@ install_pyenv_linux() {
         # Add pyenv paths to the environment
         export PYENV="$INSTALL_DIR"
         export PATH="$PYENV/bin:$PYENV/shims:$PATH"
-        echo "export PATH=\"$PYENV/bin:$PYENV/libexec/shims:\$PATH\"" >> ~/.bashrc  
-        echo 'export PATH="$HOME/.pyenv/bin:$PATH"'>> ~/.bashrc  
-        
-        echo 'eval "$(pyenv init --path)"' >> ~/.bashrc  
-        echo 'eval "$(pyenv init -)"' >> ~/.bashrc  
-        echo 'eval "$(pyenv virtualenv-init -)"' >> ~/.bashrc  
+        echo 'export PATH="$PYENV/bin:$PYENV/libexec/shims:$PATH"' >> $HOME/.bashrc
         source $HOME/.bashrc
 
         echo "NCCA | pyenv installed successfully."
@@ -88,9 +79,6 @@ install_pyenv_linux() {
         echo "NCCA | pyenv already installed."
     fi
 }
-
-# Call the function to install pyenv
-install_pyenv_linux
 
 # Function to verify pyenv installation
 verify_pyenv() {
@@ -114,12 +102,11 @@ main() {
 
     if [ "$OS" == "Windows" ]; then
         install_pyenv_windows
-
-    else
+    elif [ "$OS" == "Linux" ]; then
         install_pyenv_linux
     fi
-    
-    # Verify pyenv after initialization
+
+    # Verify pyenv after installation
     verify_pyenv
 
     # Define the script directory
@@ -141,9 +128,10 @@ main() {
         }
     fi
 
-    pyenv local $PYTHON_VERSION
-
-    echo "NCCA | Setting up virtual environment"
+    # Activate the Python version
+    eval "$(pyenv init --path)"
+    eval "$(pyenv init -)"
+    eval "$(pyenv virtualenv-init -)"
 
     # Set up virtual environment
     VENV_DIR="$SCRIPT_DIR/.venv"
@@ -152,11 +140,7 @@ main() {
     fi
 
     # Activate virtual environment
-    if [ "$OS" == "Windows" ]; then
-        source "$VENV_DIR/Scripts/activate"
-    else
-        source "$VENV_DIR/bin/activate"
-    fi
+    source "$VENV_DIR/bin/activate"
 
     python -m pip install --upgrade pip
 
@@ -176,13 +160,11 @@ main() {
         echo "NCCA | Requirements already installed."
     fi
 
-    if [ "$OS" == "Windows" ]; then
-        echo "NCCA | NCCARenderFarmTools Setup complete! Run ./launch.bat to start."
-    else
-        echo "NCCA | NCCARenderFarmTools Setup complete! Run ./launch.sh to start."
-    fi
+    # Create the standalone executable with PyInstaller
+    pyinstaller --onefile "$SCRIPT_DIR/main.py"
+
+    # Deactivate the virtual environment
     deactivate
-    exit 1
 }
 
 main
