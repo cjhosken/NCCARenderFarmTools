@@ -7,7 +7,8 @@ a = Analysis(
     binaries=[],
     datas=[
         ("NCCARenderFarm/resources/images/*", "resources/images/"),
-        ("NCCARenderFarm/renderfarm/payload/*", "renderfarm/payload/")
+        ("NCCARenderFarm/renderfarm/payload/*", "renderfarm/payload/"),
+        ("NCCARenderFarm/render_info/*", "renderfarm/render_info/")
     ],
     hiddenimports=["tkinter"],
     hookspath=[],
