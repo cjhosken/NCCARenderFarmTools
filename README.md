@@ -45,7 +45,8 @@ Once complete, you wont need to run the setup file again. You can also move the 
 
 On linux, storing it somewhere like `home/s5605094/ncca/NCCARenderFarmTools` is a good place.
 
-On windows, storing it in your `H://` drive is recommended, as then you wont need to rebuilt it for each lab machine you sign into.
+On windows, storing it in your `H://` drive is recommended, as then you wont need to rebuilt it for each lab machine you sign into. 
+*Dont setup the project in the H:// drive, as it takes MUCH longer.*
 
 
 ## Contact
