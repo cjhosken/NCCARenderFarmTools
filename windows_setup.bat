@@ -57,9 +57,13 @@ call python -m pip install -r requirements.txt
 
 REM Build the Python project
 echo "Building the executable..."
-
 call pyinstaller nccarenderfarm.spec --noconfirm
 
-echo "Build complete. Executable is located in: %OUTPUT_DIR%"
+set SOURCE_LAUNCH=%PROJECT_DIR%NCCARenderFarm\launchers\launch.bat
+set DEST_LAUNCH=%PROJECT_DIR%launch.bat
 
+if exist "%DEST_LAUNCH%" del "%DEST_LAUNCH%"
+copy "%SOURCE_LAUNCH%" "%DEST_LAUNCH%"
+
+echo "Build completed! You can now run ./launch.bat"
 endlocal

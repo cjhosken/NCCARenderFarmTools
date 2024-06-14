@@ -21,4 +21,9 @@ def main():
     sys.exit(app.exec())
 
 if __name__ == '__main__':
+    print(f"""{APPLICATION_NAME}
+{APPLICATION_VERSION}
+Written by: {APPLICATION_AUTHORS}
+    """)
+
     main()
