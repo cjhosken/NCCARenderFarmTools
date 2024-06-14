@@ -77,7 +77,7 @@ call python -m pip install -r requirements.txt
 
 REM Build the Python project
 echo Building the executable...
-call pyinstaller nccarenderfarm.spec --noconfirm --tmpdir=%USERPROFILE%/nccabuild
+call pyinstaller nccarenderfarm.spec --noconfirm
 
 set SOURCE_LAUNCH=%PROJECT_DIR%NCCARenderFarm\launchers\launch.bat
 set DEST_LAUNCH=%PROJECT_DIR%launch.bat
