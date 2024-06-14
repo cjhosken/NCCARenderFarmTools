@@ -6,28 +6,33 @@ Before running the app, you'll need to install it. The first step is downloading
 
 Go to https://github.com/cjhosken/NCCARenderFarmTools, click `Code > Download ZIP`.
 
-![Downloading](docs/images/download_app.png)
+![Downloading](docs/images/download.png)
 
 Choose a path to store the script, then extract it and dive inside.
 
-### Windows
+<br>
 
-Installing on windows is a bit tricky. You'll first need to install Git from AppsAnywhere.
+### Building the Application
 
-![Installation](docs/images/git.png)
+Run the setup script (either `windows_setup.bat`, `linux_setup.sh`). This will build the tools for you. It takes a couple minutes, so sit tight.
 
-Then, navigate over to the NCCARenderFarm folder.
+One the script is a complete, you'll see a `launch` executable appear. Running that should run the NCCRenderFarm.
 
-Double click on the setup.sh, this should open up a terminal and begin installing dependencies. Once finished, it will automatically close.
+<br>
 
-You can double click on `launch.sh`
+Once complete, you wont need to run the setup file again. You can also move the NCCARenderFarmTools folder wherever you like.
 
-If double clicking opens the file, you can right click and `Git bash here`.
+On linux, storing it somewhere like `home/s5605094/ncca/NCCARenderFarmTools` is a good place.
 
-### Linux
+On windows, storing it in your `H://` drive is recommended, as then you wont need to rebuilt it for each lab machine you sign into.
 
-Setup for linux is much simpler. Navigate to the app folder, open a terminal, and run `./setup.sh` to setup the NCCA Renderfarm Tool. This may take a couple minutes, but once done, you'll never have to run setup.sh again.
-
-Then, run `launch.sh` to start the program. You can do so from the terminal or by right clicking and choosing `Open > Run` or `Run in Terminal`
 
 ## Contact
+
+This software was developed by me, Christopher Hosken.
+
+[Email]()
+
+[Linkedin]()
+
+[Artstation]()
