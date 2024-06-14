@@ -1,3 +1,8 @@
+# This script heads the maya file info.
+# It's run through mayapy. 
+
+# see render_info/__init__.py for more information.
+
 import sys
 import maya.standalone
 from maya import cmds

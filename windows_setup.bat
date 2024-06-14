@@ -1,6 +1,10 @@
 @echo off
 setlocal
 
+REM As not alot of students have strong technical knowledge, It's ideal to make installation as simple as possible.
+REM This is the windows bat script that users can run, which will install .pyenv, install python, and build the application.
+REM When this script is finished, users can then run launch.bat to start the application.
+
 REM Determine the project directory where this script resides
 set PROJECT_DIR=%~dp0
 
@@ -39,7 +43,7 @@ if not exist "%USERPROFILE%\.pyenv" (
 REM Add pyenv to the PATH temporarily
 set PATH=%USERPROFILE%\.pyenv\pyenv-win\bin;%PATH%
 
-
+REM Get the application python version from .python-version. Ideally, this should be kept up to date with the vfx reference platform.
 set PYTHON_VERSION=
 setlocal enabledelayedexpansion
 for /f "tokens=*" %%i in (%PROJECT_DIR%.python-version) do (
@@ -56,36 +60,24 @@ if not defined PYTHON_VERSION (
 REM Check if Python is already installed
 call pyenv versions | findstr %PYTHON_VERSION% > nul
 if %errorlevel% neq 0 (
-    REM Python 3.8 is not installed, install Python using pyenv
+    REM Python is not installed, install Python using pyenv
     echo Installing Python...
     call pyenv install %PYTHON_VERSION%
 )
 
-REM Set the installed Python version globally
-
+REM Set the pyenv to use the installed python version.
 call pyenv local %PYTHON_VERSION%
-
 call pyenv rehash
 set PATH=%USERPROFILE%\.pyenv\pyenv-win\versions\%PYTHON_VERSION%\;%USERPROFILE%\.pyenv\pyenv-win\versions\%PYTHON_VERSION%\Scripts;%PATH%
 
-REM Install pip if not already installed
+REM Install pip and requirements.txt
 call python -m ensurepip
-
-REM Install pyinstaller if not already installed
 call python -m pip install --upgrade pip
 call python -m pip install -r requirements.txt
 
 REM Build the Python project
 echo Building the executable...
 call pyinstaller nccarenderfarm.spec --noconfirm
-
-set SOURCE_LAUNCH=%PROJECT_DIR%NCCARenderFarm\launchers\launch.bat
-set DEST_LAUNCH=%PROJECT_DIR%launch.bat
-
-if exist "%USERPROFILE%/nccabuild" del "%USERPROFILE%/nccabuild"
-
-if exist "%DEST_LAUNCH%" del "%DEST_LAUNCH%"
-copy "%SOURCE_LAUNCH%" "%DEST_LAUNCH%"
 
 echo Build completed! You can now run ./launch.bat
 endlocal

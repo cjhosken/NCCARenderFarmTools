@@ -1,6 +1,11 @@
 @echo off
 setlocal
 
+REM Very simple script to run the executable file in the built project.
+REM If there is a way to build the project so that this isnt needed, that would be epic.
+
+REM Users can add the args --debug or --verbose to the .bat (eg: ./launch.bat --debug), a console should remain open.
+
 REM Change directory to where the script is located
 cd /d "%~dp0"
 

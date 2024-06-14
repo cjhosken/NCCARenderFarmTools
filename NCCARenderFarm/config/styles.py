@@ -1,3 +1,6 @@
+# This file contains the general configuration variables for the app styling.
+# Almost all styling for widgets is done in this file.
+# Although the code works fine, a way to improve would be to make all constants (font-size: 16px) to reference global variables (font-size: APP_FONT_SIZE, APP_FONT_SIZE="16px") 
 from .app import *
 from .config import *
 from resources import *
@@ -215,5 +218,23 @@ NCCA_IMAGE_WINDOW_ZOOMABLEIMAGE_VIEW_STYLESHEET=f"""
                 border: none;
                 border-bottom-left-radius: {APP_BORDER_RADIUS};
                 border-bottom-right-radius: {APP_BORDER_RADIUS};
+            }}
+        """
+
+NCCA_QPROGRESSDIALOG_QPROGRESS_STYLESHEET=f"""
+            QProgressDialog {{
+                background-color: {APP_BACKGROUND_COLOR};
+                border-radius: {APP_BORDER_RADIUS};
+                font-size: 18px;
+            }}
+
+            QProgressDialog QProgressBar {{
+                background-color: {APP_HOVER_BACKGROUND};
+                border: 1px solid {APP_GREY_COLOR};
+                color: transparent;
+            }}
+
+            QProgressDialog QProgressBar::chunk {{
+                background-color: {APP_PRIMARY_COLOR};
             }}
         """

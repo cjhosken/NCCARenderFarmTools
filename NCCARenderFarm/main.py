@@ -21,9 +21,5 @@ def main():
     sys.exit(app.exec())
 
 if __name__ == '__main__':
-    print(f"""{APPLICATION_NAME}
-{APPLICATION_VERSION}
-Written by: {APPLICATION_AUTHORS}
-    """)
-
+    print(APPLICATION_CLI_HEADER) # So that users running from CLI know that the application has started.
     main()

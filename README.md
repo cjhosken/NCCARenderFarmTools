@@ -51,12 +51,14 @@ On windows, storing it in your `H://` drive is recommended, as then you wont nee
 
 ## Contact
 
-This software was developed by me, Christopher Hosken.
+This software was initially developed by me, Christopher Hosken, in June 2024.
 
-[Email]()
+If you have any concerns or inquiries, contact me here:
 
-[Linkedin]()
+[Website](https://cjhosken.github.io/)
+
+[Email](mailto:hoskenchristopher@gmail.com)
+
+[Linkedin](https://www.linkedin.com/in/christopher-hosken/)
 
 [GitHub](https://github.com/cjhosken)
-
-[Artstation]()

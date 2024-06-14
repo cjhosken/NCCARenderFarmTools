@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# As not alot of students have strong technical knowledge, It's ideal to make installation as simple as possible.
+# This is the linux shell script that users can run, which will install .pyenv, install python, and build the application.
+# When this script is finished, users can then run launch.sh to start the application.
+
 set -e
 
 # Determine the project directory where this script resides
@@ -23,7 +27,7 @@ eval "$(pyenv init --path)"
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
 
-# Read the Python version from the .python-version file
+# Read the Python version from the .python-version file. Ideally, this should be kept up to date with the vfx reference platform.
 if [ -f "$PROJECT_DIR/.python-version" ]; then
     PYTHON_VERSION=$(cat "$PROJECT_DIR/.python-version")
 else
@@ -49,13 +53,5 @@ pip install -r "$PROJECT_DIR/requirements.txt"
 # Build the Python project
 echo "Building the executable..."
 pyinstaller "$PROJECT_DIR/nccarenderfarm.spec" --noconfirm
-
-SOURCE_LAUNCH="$PROJECT_DIR/NCCARenderFarm/launchers/launch.sh"
-DEST_LAUNCH="$PROJECT_DIR/launch.sh"
-
-if [ -f "$DEST_LAUNCH" ]; then
-    rm "$DEST_LAUNCH"
-fi
-cp "$SOURCE_LAUNCH" "$DEST_LAUNCH"
 
 echo "Build completed! You can now run ./launch.sh"

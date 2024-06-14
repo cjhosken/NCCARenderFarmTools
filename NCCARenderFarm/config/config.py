@@ -1,3 +1,4 @@
+# This file contains the general imports as well as functions needed for other config files.
 from PyQt6.QtCore import *
 from PyQt6.QtGui import *
 from PyQt6.QtWidgets import *
@@ -11,6 +12,8 @@ from PIL import Image, ImageTk
 import cv2, numpy as np
 import traceback, pyexr
 
+# Get the machine's operating system.
+# it's either "macos", "linux", "windows", or "unkown"
 def get_os():
     if os.name == 'posix':
         uname = os.uname()
@@ -25,17 +28,13 @@ def get_os():
     else:
         return 'unknown'
 
+# Due to being cross platform, the application default is to use / for all paths, even on linux. \ will cause issues on the renderfarm, as well as in Qt styling.
+# os.path.join() is valid when youre doing os only operations.
 def join_path(*paths):
     return os.path.join(*paths).replace("\\", "/")
 
+# A global for the machine's operating system.
 OPERATING_SYSTEM = get_os()
-
-# GLOBAL
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-ASSET_DIR = join_path(SCRIPT_DIR, "assets")
-NCCA_ENVIRONMENT_PATH = os.path.expanduser('~/.ncca')
-
-LOCAL_TEMP_FOLDER = "tmp"
 
 ICON_SIZE = QSize(24, 24)
 ICON_BUTTON_SIZE = QSize(48, 48)
@@ -44,21 +43,6 @@ BROWSER_ICON_SIZE = QSize(32, 32)
 NO_CONNECTION_IMAGE_SIZE = QSize(256, 256)
 
 # RENDERFARM AND FILESYSTEMS
-RENDERFARM_ADDRESS = "tete.bournemouth.ac.uk"
-RENDERFARM_PORT = 22
-MAX_CONNECTION_ATTEMPTS = 3
-RENDERFARM_FARM_DIR = "farm"
-RENDERFARM_PROJECT_DIR="projects"
-RENDERFARM_OUTPUT_DIR="output"
-NCCA_PACKAGE_DIR = ".ncca"
-
-FARM_CPUS = 8
-DEFAULT_CPU_USAGE = 2
-LOAD_BATCH_SIZE = 5
-
-USE_LOCAL_FILESYSTEM = True
-USE_DOT = True
-
 VIEWABLE_IMAGE_FILES = [".png", ".jpg", ".jpeg", ".tiff", ".svg", ".exr"]
 OPENABLE_FILES = [] + VIEWABLE_IMAGE_FILES
 
@@ -102,96 +86,6 @@ NCCA_CONNECTION_ERROR_MESSAGE= "Unable to connect to the NCCA Renderfarm. Try ag
 
 SCROLL_MARGIN = 50
 
-# EXTERNAL APPLICATIONS
-QUBE_LAUNCHER_PATH = "/public/bin/2023/goQube"
-QUBE_PYTHON_BIN = "/public/devel/2022/pfx/qube/api/python/"
-
-if OPERATING_SYSTEM == "windows":
-    QUBE_LAUNCHER_PATH = "C:/Program Files (x86)/pfx/qube/bin/qube.exe"
-    QUBE_PYTHON_BIN = "C:/Program Files/pfx/qube/api/python"
-
-QB_IMPORT_ERROR = ""
-
-try:
-    sys.path.append(QUBE_PYTHON_BIN)
-    import qb
-except Exception as e:
-    traceback_info = traceback.format_exc()
-    QB_IMPORT_ERROR = f"{str(e)}\n\nTraceback:\n{traceback_info}"
-    qb = None
-
-
-LOCAL_HYTHON_PATH = "/opt/hfs19.5.605/bin/hython"
-LOCAL_MAYAPY_PATH = "/opt/autodesk/maya2023/bin/mayapy"
-MAYA_EXTENSIONS=[".ma", ".mb"]
-
-HOUDINI_PATH="/opt/software/hfs20.0.506"
-HOUDINI_EXTENSIONS=[".hip", ".hipnc"]
-
-NUKEX_PATH="nuke"
-LOCAL_NUKEX_PATH = "/opt/Nuke14.0v5/Nuke14.0"
-NUKEX_EXTENSIONS=[".nk", ".nknc"]
-
-KATANA_PATH="katana"
-LOCAL_KATANA_PATH="/opt/Katana6.0v2/katana"
-KATANA_EXTENSIONS=[".katana"]
-
-BLENDER_PATH = "blender"
-BLENDER_EXTENSIONS=[".blend"]
-
-ARCHIVE_EXTENSIONS=[".zip", ".rar"]
-
-SUPPORTED_DCC_EXTENSIONS=BLENDER_EXTENSIONS+HOUDINI_EXTENSIONS+MAYA_EXTENSIONS+NUKEX_EXTENSIONS+KATANA_EXTENSIONS
-
-if OPERATING_SYSTEM == "windows":
-    LOCAL_NUKEX_PATH="C:/Program Files/Nuke14.0v4/Nuke14.0.exe"
-    LOCAL_KATANA_PATH = "C:/Program Files/Katana3.1v5/bin/katanaBin.exe"
-    LOCAL_HYTHON_PATH = "C:/Program Files/Side Effects Software/Houdini 20.0.506/bin/hython.exe"
-    LOCAL_MAYAPY_PATH = "C:/Program Files/Autodesk/Maya2023/bin/mayapy.exe"
-
-MAYA_RENDER_ENGINES = {
-    "Set by file": "file",
-    "Arnold": "arnold",
-    "RenderMan": "renderman",
-    "VRay": "vray",
-    "Maya Software": "sw"
-}
-
-MAYA_FILE_EXTENSIONS= {
-    ".exr": "exr",
-    ".png": "png",
-    ".tif": "tif",
-    ".jpg": "jpeg",
-    ".jpeg": "jpeg",
-    ".deepexr": "deepexr",
-    ".maya": "maya"
-}
-
-BLENDER_RENDER_ENGINES = {
-    "Set by file": "",
-    "Cycles": "CYCLES",
-    "EEVEE": "BLENDER_EEVEE",
-    "Workbench": "BLENDER_WORKBENCH"
-}
-
-BLENDER_FILE_EXTENSIONS = {
-    ".bmp": "BMP",
-    ".sgi": "IRIS",
-    ".png": "PNG",
-    ".jpg": "JPEG",
-    ".jpeg": "JPEG",
-    ".jp2": "JPEG2000",
-    ".j2k": "JPEG2000",
-    ".tga": "TARGA",
-    ".cin": "CINEON",
-    ".dpx": "DPX",
-    ".exr": "OPEN_EXR",
-    ".hdr": "HDR",
-    ".tif": "TIFF",
-    ".tiff": "TIFF"
-    }
-
-
 
 # STRINGS
 
@@ -216,7 +110,3 @@ QDIALOG_BUTTON_DEFAULT_SIZE=QSize(125, 35)
 SUBMIT_FRAME_START_DEFAULT=1
 SUBMIT_FRAME_END_DEFAULT=120
 SUBMIT_FRAME_STEP_DEFAULT=1
-
-
-
-RENDERFARM_REFRESH_INTERVAL=30000

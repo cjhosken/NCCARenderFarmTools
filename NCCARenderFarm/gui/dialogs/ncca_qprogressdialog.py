@@ -9,6 +9,7 @@ class NCCA_QProgressDialog(NCCA_QDialog):
     def __init__(self, title="", text="", min=0, max=100, parent=None):
         """Initialize the progress bar and UI."""
         super().__init__(parent=parent, size=SMALL_MESSAGE_BOX_SIZE, title=title)
+        self.setObjectName("NCCA_QProgressDialog")
         self.setMaximum(max)
         self.setMinimum(min)
         self.progress_dialog.setLabelText(text)
@@ -24,23 +25,7 @@ class NCCA_QProgressDialog(NCCA_QDialog):
         self.progress_dialog.setCancelButton(None)
 
         # Customize progress dialog appearance
-        self.progress_dialog.setStyleSheet(f"""
-            QProgressDialog {{
-                background-color: {APP_BACKGROUND_COLOR};
-                border-radius: {APP_BORDER_RADIUS};
-                font-size: 18px;
-            }}
-
-            QProgressDialog QProgressBar {{
-                background-color: {APP_HOVER_BACKGROUND};
-                border: 1px solid {APP_GREY_COLOR};
-                color: transparent;
-            }}
-
-            QProgressDialog QProgressBar::chunk {{
-                background-color: {APP_PRIMARY_COLOR};
-            }}
-        """)
+        self.progress_dialog.setStyleSheet(NCCA_QPROGRESSDIALOG_QPROGRESS_STYLESHEET)
 
         self.main_layout.addWidget(self.progress_dialog)
         self.main_layout.addStretch()
@@ -74,4 +59,4 @@ class NCCA_QProgressDialog(NCCA_QDialog):
     
     def show(self):
         super().show()
-        QApplication.processEvents()
+        QApplication.processEvents() # To avoid a black dialog

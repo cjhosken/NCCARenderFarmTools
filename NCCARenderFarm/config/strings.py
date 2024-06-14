@@ -1,6 +1,18 @@
+# This file contains the general configuration variables for the app strings.
+# This includes default error messages, buttons, labels, etc.
+#
+# some files look like "{} is very cool". This because they're used with format() elsewhere in the script.
+#
+# eg: FACT="{} is so great!".format("Bournemouth")
+#
 
+# Message Boxes
 
-# Message Info
+MESSAGEBOX_DEFAULT_TITLE="NCCA Message Box"
+MESSAGEBOX_OK_DEFAULT_TEXT="Ok"
+MESSAGEBOX_YES_DEFAULT_TEXT="Yes"
+MESSAGEBOX_NO_DEFAULT_TEXT="No"
+MESSAGEBOX_CANCEL_DEFAULT_TEXT="Cancel"
 
 MESSAGE_INFO_HEADER="NCCA Info | "
 MESSAGE_INFO_CONFIRM_TEXT="Ok"
@@ -21,9 +33,10 @@ MESSAGE_OVERRIDE_NO_TEXT="No"
 MESSAGE_OVERRIDE_CANCEL_TEXT="Cancel"
 
 # Custom Labels
-
 MESSAGE_QUBE_LABEL = "Qube"
 QB_IMPORT_ERROR_MESSAGE = "Make sure that you have installed Qube 7.5.2 (Client Only) from Apps Anywhere before starting the application." 
+
+# Local DCC Errors:
 
 NO_HOUDINI_TITLE="Houdini"
 NO_HOUDINI_LABEL="Hython could not be found on this machine. Proceeding without Houdini scene info."
@@ -42,6 +55,10 @@ UNSUPPORTED_SOFTWARE_LABEL="{} is not supported. Please choose a supported softw
 
 MESSAGE_CONTACT_LABEL = "If this issue persists, please report a bug at https://github.com/cjhosken/NCCARenderFarmTools/issues, or contact a member of the NCCA."
 
+
+
+
+# Dialog Labels
 
 RENAME_PLACEHOLDER = "Rename"
 RENAME_EXISTING_TITLE = "Rename"
@@ -120,13 +137,7 @@ LOGIN_WINDOW_LOGIN_BUTTON_TEXT="Login"
 INVALID_CREDENTIALS_WARNING_TEXT="Invalid username or password."
 
 
-# MEssagebox
-
-MESSAGEBOX_DEFAULT_TITLE="NCCA Message Box"
-MESSAGEBOX_OK_DEFAULT_TEXT="Ok"
-MESSAGEBOX_YES_DEFAULT_TEXT="Yes"
-MESSAGEBOX_NO_DEFAULT_TEXT="No"
-MESSAGEBOX_CANCEL_DEFAULT_TEXT="Cancel"
+# Widgets
 
 
 QFLATBUTTON_DEFAULT_TEXT="Button"
@@ -135,6 +146,8 @@ QINPUT_PLACEHOLDER=INPUT_DIALOG_PLACEHOLDER
 QINPUT_DEFAULT_TEXT=INPUT_DIALOG_DEFAULT
 
 
+
+# Submit
 
 QSUBMIT_DEFAULT_NAME="Submit Job"
 
@@ -152,6 +165,35 @@ SUBMIT_FRAME_STEP_LABEL="Frame Step"
 SUBMIT_EXTRA_COMMANDS_LABEL="Extra Commands"
 SUBMIT_EXTRA_COMMANDS_PLACEHOLDER="Enter extra commands."
 
+# DCC Jobs
+
+BLENDER_JOB_TITLE="Submit Blender Job"
+HOUDINI_JOB_TITLE="Submit Houdini Job"
+MAYA_JOB_TITLE="Submit Maya Job"
+NUKEX_JOB_TITLE="Submit NukeX Job"
+KATANA_JOB_TITLE="Submit Katana Job"
+
+# Renderer and output
+
+JOB_RENDERER_LABEL="Renderer"
+JOB_OUTPUT_LABEL="Output Path"
+JOB_OUTPUT_PLACEHOLDER="Output Path"
+JOB_OUTPUT_DEFAULT="/output/frame_####.exr"
+
+# Custom DCC Widgets
+
+HOUDINI_JOB_ROP_LABEL="ROP Node Path"
+HOUDINI_JOB_ROP_PLACEHOLDER="Rop Node Path"
+HODUINI_JOB_ROP_DEFAULT="/stage/usdrender_rop1"
+
+MAYA_JOB_CAMERA_LABEL="Render Camera"
+MAYA_JOB_CAMERA_PLACEHOLDER="Camera Name"
+MAYA_JOB_CAMERA_DEFAULT="perspShape"
+
+NUKEX_JOB_WRITE_LABEL="Write Node"
+NUKEX_JOB_WRITE_PLACEHOLDER="Write Node Name"
+NUKEX_JOB_WRITE_DEFAULT="Write1"
+
 SUBMIT_BUTTON_SUBMIT_TEXT="Submit"
 SUBMIT_BUTTON_CANCEL_TEXT="Cancel"
 
@@ -160,7 +202,7 @@ RENDERFARM_SUBMITTED_LABEL="Job Submitted! {}"
 RENDERFARM_ERROR_LABEL=f"Unable to submit job."
 
 
-
+# Renderfarm Dialogs
 
 RENDERFARM_COUNTING_FILES_LABEL="Counting files..."
 
@@ -178,30 +220,3 @@ RENDERFARM_PROGRESS_DELETE_TITLE="Delete"
 RENDERFARM_PROGRESS_DELETE_LABEL="Deleting files..."
 RENDERFARM_PROGRESS_DELETE_COMPLETE_TEXT="Files have been deleted!"
 RENDERFARM_PROGRESS_DELETE_ERROR_TEXT="Something went wrong in delete."
-
-
-
-
-
-BLENDER_JOB_TITLE="Submit Blender Job"
-HOUDINI_JOB_TITLE="Submit Houdini Job"
-MAYA_JOB_TITLE="Submit Maya Job"
-NUKEX_JOB_TITLE="Submit NukeX Job"
-KATANA_JOB_TITLE="Submit Katana Job"
-
-JOB_RENDERER_LABEL="Renderer"
-JOB_OUTPUT_LABEL="Output Path"
-JOB_OUTPUT_PLACEHOLDER="Output Path"
-JOB_OUTPUT_DEFAULT="/output/frame_####.exr"
-
-HOUDINI_JOB_ROP_LABEL="ROP Node Path"
-HOUDINI_JOB_ROP_PLACEHOLDER="Rop Node Path"
-HODUINI_JOB_ROP_DEFAULT="/stage/usdrender_rop1"
-
-MAYA_JOB_CAMERA_LABEL="Render Camera"
-MAYA_JOB_CAMERA_PLACEHOLDER="Camera Name"
-MAYA_JOB_CAMERA_DEFAULT="perspShape"
-
-NUKEX_JOB_WRITE_LABEL="Write Node"
-NUKEX_JOB_WRITE_PLACEHOLDER="Write Node Name"
-NUKEX_JOB_WRITE_DEFAULT="Write1"

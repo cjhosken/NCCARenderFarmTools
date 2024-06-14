@@ -14,6 +14,17 @@
 #     int SDNAnr, nr;
 # } BHead;
 
+# Note from Christopher Hosken for the NCCA application:
+# Although the code doesn't aim to change. It might.
+# This script was taken from Blender 4.1
+# If in the future, the script changes, replace it.
+# Ideally it would be nice to download it from the supported blender dist. But that's a low priorty future job. 
+# 
+# If someone wants to take it on so that the script is futureproof, that would be awesome.
+
+
+# see render_info/__init__.py for more information.
+
 __all__ = (
     "read_blend_rend_chunk",
 )

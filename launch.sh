@@ -1,4 +1,8 @@
 #!/bin/bash
+
+# Very simple script to run the executable file in the built project.
+# If there is a way to build the project so that this isnt needed, that would be epic.
+
 set -e
 
 # Change directory to where the script is located

@@ -1,5 +1,6 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+# The build settings for the app. This has been set up in a rush so there might be ways to polish up the way the code builds.
 
 a = Analysis(
     ['NCCARenderFarm/main.py'],

@@ -1,7 +1,13 @@
+# This script heads the houdini file info.
+# It's run through hython. 
+
+# see render_info/__init__.py for more information.
+
 import sys
 import hou
 import json
-import traceback
+
+
 
 if __name__ == "__main__":
     # Check if the script is being run directly

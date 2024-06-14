@@ -5,5 +5,4 @@ opencv-python
 numpy
 PyQt6
 pyexr
-pyinstaller
-tk
+pyinstaller # pyinstaller should always remain in requirements.txt, otherwise the application will not build.

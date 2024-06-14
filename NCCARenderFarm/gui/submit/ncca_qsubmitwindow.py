@@ -3,6 +3,12 @@ from gui.widgets import *
 from gui.dialogs import *
 from gui.ncca_qmainwindow import NCCA_QMainWindow
 
+# All DCC job submissions derive from the NCCA_QSubmitWindow
+# If you plan on writing your own job submitters, make it a child of this class.
+#
+
+
+
 class NCCA_QSubmitWindow(NCCA_QMainWindow):
     """Interface for the user to submit renderfarm jobs"""
 
@@ -14,13 +20,14 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
         if folder_path is not None:
             self.folder_path = folder_path
 
-        self.job_id = 0
         self.name = name
         self.username = username
         self.renderfarm = renderfarm
 
         super().__init__(self.name, size=SUBMIT_WINDOW_SIZE)
 
+
+        # if the user sets their job_path.text() to /, expand it to /home/username/farm.
         if (self.job_path.text() == "/"):
             self.job_path.setText(os.path.dirname(file_path).replace(join_path(RENDERFARM_ROOT, username, RENDERFARM_FARM_DIR), ""))
 
@@ -149,6 +156,9 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
     def prepare_job(self):
         """Prepare job for submission."""
 
+        # This code is very messy, if someone wants to try and clean it up, be my guest.
+        # its main intent is to convert the RENDERFARM_ROOT paths into RENDERFARM_RENDER_ROOT paths. see config/farm.py for more info.
+
         self.render_path = self.file_path.replace(join_path(RENDERFARM_ROOT, self.username),
                                                     join_path(RENDERFARM_RENDER_ROOT, self.username))
 
@@ -174,35 +184,56 @@ class NCCA_QSubmitWindow(NCCA_QMainWindow):
                 self.render_path = join_path(remote_render_path, render_file_path)
             
             else:
+                # not entirely sure this quits the process properly, it may continue to submit a job. This may need fixing.
                 self.render_path = None
 
     def build_job(self):
+        """prepare a job for the renderfarm
+        
+        This is where the job is prepared for qube. 
+        It's fairly simple, but if you wish tofurther develop this, look at the Qube documentation.
+        """
+
         job = {}
+
+        # name is name of the job on the renderfarm
         job['name'] = self.job_name.text()
+
+        # cpus is the max-number of cpus that can render at the same time
         job['cpus'] = self.num_cpus.currentText()
+
+        # package is the main linux shell script that is sent to qube
         package={}
-        package['shell']="/bin/bash"
-        job['package'] = package
-        job['prototype'] = "cmdrange"
-        job['cwd'] = join_path(RENDERFARM_RENDER_ROOT, self.username)
-        job['env'] = {"HOME": join_path(RENDERFARM_RENDER_ROOT, self.username)}
+        package['shell']="/bin/bash" # set the shell for qube
+        job['package'] = package 
+        job['prototype'] = "cmdrange" # the type of qube project
+        job['cwd'] = join_path(RENDERFARM_RENDER_ROOT, self.username) # cwd (Current Working Directory) is the starting directory for the shell script. It's been set to /render/user
+        job['env'] = {"HOME": join_path(RENDERFARM_RENDER_ROOT, self.username)} # HOME environment variable. It's not put in renderfarm/payload/souce.sh as it requires the username.
 
         return job
 
     def submit_job(self, job):
-        """Submit the job to the renderfarm."""
+        """Submit the job to the renderfarm.
+        This takes in a job, and adds a couple extra (more dcc specific) settings.
+        """
 
+        # This where renderfarm/payload/source.sh is sourced. As it's copied over through the payload during login, it can be found at /render/user/.ncca/source.sh
         shell_script_path=join_path(RENDERFARM_RENDER_ROOT, self.username, NCCA_PACKAGE_DIR, "source.sh")
-        sed_command = f"sed -i 's/\r//' {shell_script_path};" # Due to developing the shell script on windows
+        sed_command = f"sed -i 's/\r//' {shell_script_path};" # Due to developing the shell script on windows, sometimes characters are misread. This makes sure that the script can be run in shell.
 
-        source_command = f"{sed_command} source {shell_script_path};"
+        source_command = f"{sed_command} source {shell_script_path};" # This runs the character fix, then the environment sourcing.
 
-        job['package']['cmdline'] = f"{source_command} {job['package']['cmdline']}"
+        # job['package']['cmidline'] is the main command for rendering. It's set in the DCC submit classes and than passed through.
+        # source_command is prepended to it so that the environment variables are setup before the script starts.
+        job['package']['cmdline'] = f"{source_command} {job['package']['cmdline']}" 
 
+        # The render frame range. Qube requires it to be in the string format "start-endxstep", (eg: "1-100x1") 
         frame_range = f"{int(self.frame_start.text())}-{int(self.frame_end.text())}x{int(self.frame_step.text())}"
-
+        # all the frame jobs are then generated.
         job['agenda'] = qb.genframes(frame_range)
 
+
+        # The job is then sent to the renderfarm.
         listOfJobsToSubmit = [job]
         try:
             listOfSubmittedJobs = qb.submit(listOfJobsToSubmit)

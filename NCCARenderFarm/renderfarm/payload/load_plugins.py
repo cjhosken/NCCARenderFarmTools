@@ -1,9 +1,12 @@
 import maya.standalone
 import maya.cmds as cmds
 
+# This script was implemented early on in getting MtoA to work properly. It's remained in the code as a way to interact with maya on the renderfarm before it renders.
+# This script is run by mayapy, so it behaves like a script in the maya script editor.
+
 # List of plugins to be enabled
 PLUGINS = [
-    #"vrayformaya", "vrayvolumegrid", "xgenVRay", "mtoa"
+    
 ]
 
 def initialize_maya():

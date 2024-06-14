@@ -1,7 +1,14 @@
+# This script heads the nuke file info.
+# It's run through nuke. 
+
+# see render_info/__init__.py for more information.
+
 import nuke
 import sys
 import json
 import traceback
+
+
 
 if __name__ == "__main__":
     # Check if the script is being run directly

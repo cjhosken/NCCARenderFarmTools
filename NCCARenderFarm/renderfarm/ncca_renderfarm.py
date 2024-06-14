@@ -25,6 +25,7 @@ class NCCA_RenderFarm(paramiko.SSHClient):
     connection failures and invalid login attempts.
 
     Attributes:
+        home_path (str): The home path for the SFTP sever. This should be RENDERFARM_ROOT/username/RENDERFARM_FARM_DIR
         username (str): The username for the SFTP server.
         password (str): The password for the SFTP server.
         sftp (paramiko.SFTPClient): The SFTP client used for file operations.

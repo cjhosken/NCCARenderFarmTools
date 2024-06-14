@@ -33,21 +33,17 @@ class NCCA_QMessageBox(NCCA_QDialog):
         self.label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         self.label.setOpenExternalLinks(True)
 
-        if (self.size() == LARGE_MESSAGE_BOX_SIZE):
-            # Scroll area for message label
-            self.scroll_area = QScrollArea()
-            self.scroll_area.setFixedWidth(LARGE_MESSAGE_BOX_SIZE.width() - MARGIN_DEFAULT*2)
-            self.scroll_area.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
-            self.scroll_area.setContentsMargins(MARGIN_DEFAULT, MARGIN_DEFAULT, MARGIN_DEFAULT, MARGIN_DEFAULT)
-            self.scroll_area.setWidgetResizable(True)
-            self.scroll_area.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-            self.scroll_area.setWidget(self.label)
-            self.scroll_area.setStyleSheet(NCCA_QMESSAGEBOX_SCROLL_AREA_STYLESHEET)
-            self.main_layout.addWidget(self.scroll_area)
-        else:
-            self.label.setContentsMargins(MARGIN_DEFAULT, MARGIN_DEFAULT, MARGIN_DEFAULT, MARGIN_DEFAULT)
-            self.main_layout.addWidget(self.label)
+
+        self.scroll_area = QScrollArea()
+        self.scroll_area.setFixedWidth(LARGE_MESSAGE_BOX_SIZE.width() - MARGIN_DEFAULT*2)
+        self.scroll_area.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
+        self.scroll_area.setContentsMargins(MARGIN_DEFAULT, MARGIN_DEFAULT, MARGIN_DEFAULT, MARGIN_DEFAULT)
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.scroll_area.setWidget(self.label)
+        self.scroll_area.setStyleSheet(NCCA_QMESSAGEBOX_SCROLL_AREA_STYLESHEET)
+        self.main_layout.addWidget(self.scroll_area)
 
         # Button box for buttons
         self.button_box = QDialogButtonBox(Qt.Orientation.Horizontal)
@@ -55,7 +51,7 @@ class NCCA_QMessageBox(NCCA_QDialog):
 
     @staticmethod
     def _create_popup(parent, title, text, icon_path=INFO_ICON_PATH, confirm_text=MESSAGEBOX_OK_DEFAULT_TEXT, size=SMALL_MESSAGE_BOX_SIZE):
-        """Creates a popup dialog"""
+        """Creates a popup dialog with a confirm button"""
         msg_box = NCCA_QMessageBox(parent, icon_path, title=title, size=size)
         msg_box.label.setText(text)
 
@@ -70,7 +66,7 @@ class NCCA_QMessageBox(NCCA_QDialog):
 
     @staticmethod
     def _create_yes_no_popup(parent, title, text, icon_path=QUESTION_ICON_PATH, yes_text=MESSAGEBOX_YES_DEFAULT_TEXT, no_text=MESSAGEBOX_NO_DEFAULT_TEXT, size=SMALL_MESSAGE_BOX_SIZE):
-        """Creates a confirmation popup dialog"""
+        """Creates a popup dialog with the options [yes, no]"""
         msg_box = NCCA_QMessageBox._create_popup(parent, title, text, icon_path, confirm_text=yes_text, size=size)
 
         no_button = NCCA_QFlatButton(no_text)
@@ -82,7 +78,7 @@ class NCCA_QMessageBox(NCCA_QDialog):
 
     @staticmethod
     def _create_yes_no_cancel_popup(parent, title, text, icon_path=QUESTION_ICON_PATH, yes_text=MESSAGEBOX_YES_DEFAULT_TEXT, no_text=MESSAGEBOX_NO_DEFAULT_TEXT, cancel_text=MESSAGEBOX_CANCEL_DEFAULT_TEXT, size=SMALL_MESSAGE_BOX_SIZE):
-        """Creates an override popup dialog"""
+        """Creates an popup dialog with the options [yes, no, cancel]"""
         msg_box = NCCA_QMessageBox._create_popup(parent, title, text, icon_path, size=size)
         override_button = NCCA_QFlatButton(yes_text)
         override_button.clicked.connect(msg_box.accept)
