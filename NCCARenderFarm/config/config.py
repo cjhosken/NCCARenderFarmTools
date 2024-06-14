@@ -118,6 +118,7 @@ try:
 except Exception as e:
     traceback_info = traceback.format_exc()
     QB_IMPORT_ERROR = f"{str(e)}\n\nTraceback:\n{traceback_info}"
+    qb = None
 
 
 LOCAL_HYTHON_PATH = "/opt/hfs19.5.605/bin/hython"

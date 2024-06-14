@@ -122,4 +122,6 @@ class NCCA_QMessageBox(NCCA_QDialog):
     @staticmethod
     def fatal(parent, title="Fatal", text="", confirm_text=MESSAGE_FATAL_CONFIRM_TEXT, size=LARGE_MESSAGE_BOX_SIZE):
         """Creates a fatal popup dialog"""
-        return NCCA_QMessageBox._create_popup(parent, MESSAGE_FATAL_HEADER+title, text + "\n" + MESSAGE_CONTACT_LABEL, WARNING_ICON_PATH, confirm_text, size=size).exec()
+        popup = NCCA_QMessageBox._create_popup(parent, MESSAGE_FATAL_HEADER+title, text + "\n" + MESSAGE_CONTACT_LABEL, WARNING_ICON_PATH, confirm_text, size=size)
+        popup.setWindowFlags(Qt.WindowType.WindowStaysOnTopHint)
+        return popup.exec()
