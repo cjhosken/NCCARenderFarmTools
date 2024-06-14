@@ -1,170 +1,61 @@
 #!/bin/bash
 
-# Function to detect the home directory
-detect_home_dir() {
-    case "$(uname -s)" in
-        Linux*|Darwin*) CHOME="$HOME";;
-        CYGWIN*|MINGW*|MSYS*|MINGW32*|MINGW64*) CHOME="/c/Users/$(whoami)";;
-        *) CHOME="UNKNOWN"
-    esac
-}
+set -e
 
-# Function to detect the operating system
-detect_os() {
-    case "$(uname -s)" in
-        Linux*)     OS=Linux;;
-        Darwin*)    OS=Mac;;
-        CYGWIN*|MINGW*|MSYS*|MINGW32*|MINGW64*) OS=Windows;;
-        *)          OS="UNKNOWN"
-    esac
-    echo "NCCA | Detected OS: $OS"
-}
+# Determine the project directory where this script resides
+PROJECT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-# Function to install pyenv-win on Windows
-install_pyenv_windows() {
-    if ! command -v pyenv &> /dev/null; then
-        echo "NCCA | pyenv-win not found. Installing pyenv-win..."
+# Check if pyenv is installed
+if [ ! -d "$HOME/.pyenv" ]; then
+    echo "Installing pyenv..."
 
-        # Set pyenv installation directory on the local drive
-        PYENV_ROOT="$CHOME/.pyenv"
-        INSTALL_DIR="$PYENV_ROOT"
-
-        # Clone pyenv-win repository
-        if [ ! -d "$INSTALL_DIR" ]; then
-            git clone https://github.com/pyenv-win/pyenv-win.git "$INSTALL_DIR"
-        else
-            echo "NCCA | Removing existing $INSTALL_DIR directory..."
-            rm -rf "$INSTALL_DIR"
-            git clone https://github.com/pyenv-win/pyenv-win.git "$INSTALL_DIR"
-        fi
-
-        # Add pyenv-win paths to the environment
-        export PYENV="$INSTALL_DIR/pyenv-win"
-        export PATH="$PYENV/bin:$PYENV/shims:$PATH"
-        echo 'export PATH="$PYENV/bin:$PYENV/libexec/shims:$PATH"' >> $HOME/.bashrc
-        source $HOME/.bashrc
-
-        echo "NCCA | pyenv-win installed successfully."
-    else
-        echo "NCCA | pyenv-win already installed."
-    fi
-}
-
-# Function to install pyenv on Linux
-install_pyenv_linux() {
-    if ! command -v pyenv &> /dev/null; then
-        echo "NCCA | pyenv not found. Installing pyenv..."
-
-        # Set pyenv installation directory on the local drive
-        PYENV_ROOT="$HOME/.pyenv"
-        INSTALL_DIR="$PYENV_ROOT"
-
-        # Clone pyenv repository
-        if [ ! -d "$INSTALL_DIR" ]; then
-            git clone https://github.com/pyenv/pyenv.git "$INSTALL_DIR"
-        else
-            echo "NCCA | Removing existing $INSTALL_DIR directory..."
-            rm -rf "$INSTALL_DIR"
-            git clone https://github.com/pyenv/pyenv.git "$INSTALL_DIR"
-        fi
-
-        # Add pyenv paths to the environment
-        export PYENV="$INSTALL_DIR"
-        export PATH="$PYENV/bin:$PYENV/shims:$PATH"
-        echo 'export PATH="$PYENV/bin:$PYENV/libexec/shims:$PATH"' >> $HOME/.bashrc
-        source $HOME/.bashrc
-
-        echo "NCCA | pyenv installed successfully."
-    else
-        echo "NCCA | pyenv already installed."
-    fi
-}
-
-# Function to verify pyenv installation
-verify_pyenv() {
-    if ! command -v pyenv &> /dev/null; then
-        echo "NCCA | Error: pyenv command not found. Exiting."
-        exit 1
-    else
-        echo "NCCA | pyenv command found."
-    fi
-}
-
-# Main script execution
-main() {
-    detect_os
-    detect_home_dir
-
-    if [ "$OS" == "UNKNOWN" ]; then
-        echo "NCCA | Unsupported OS. Exiting."
+    # Download the pyenv installer
+    curl https://pyenv.run | bash
+    if [ $? -ne 0 ]; then
+        echo "Error: Failed to download pyenv installer. Please check your internet connection or retry."
         exit 1
     fi
+fi
 
-    if [ "$OS" == "Windows" ]; then
-        install_pyenv_windows
-    elif [ "$OS" == "Linux" ]; then
-        install_pyenv_linux
-    fi
+# Add pyenv to the PATH and initialize it
+export PATH="$HOME/.pyenv/bin:$PATH"
+eval "$(pyenv init --path)"
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
 
-    # Verify pyenv after installation
-    verify_pyenv
+# Read the Python version from the .python-version file
+if [ -f "$PROJECT_DIR/.python-version" ]; then
+    PYTHON_VERSION=$(cat "$PROJECT_DIR/.python-version")
+else
+    echo "Error: .python-version file not found or is empty."
+    exit 1
+fi
 
-    # Define the script directory
-    SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-    cd "$SCRIPT_DIR" || exit
+# Check if Python is already installed
+if ! pyenv versions --bare | grep -q "^$PYTHON_VERSION\$"; then
+    echo "Installing Python $PYTHON_VERSION..."
+    pyenv install $PYTHON_VERSION
+fi
 
-    # Read the Python version from the .python-version file
-    PYTHON_VERSION=$(<.python-version)
-    echo "NCCA | Using Python version: $PYTHON_VERSION"
+# Set the installed Python version locally for this project
+pyenv local $PYTHON_VERSION
 
-    # Install or activate the specified Python version using PyEnv
-    if pyenv versions | grep -q "$PYTHON_VERSION"; then
-        echo "NCCA | Python $PYTHON_VERSION is already installed."
-    else
-        echo "NCCA | Python $PYTHON_VERSION is not installed. Installing..."
-        pyenv install "$PYTHON_VERSION" || {
-            echo "NCCA | Error: Failed to install Python $PYTHON_VERSION."
-            exit 1
-        }
-    fi
+# Install pip if not already installed
+pip install --upgrade pip
 
-    # Activate the Python version
-    eval "$(pyenv init --path)"
-    eval "$(pyenv init -)"
-    eval "$(pyenv virtualenv-init -)"
+# Install dependencies from requirements.txt
+pip install -r "$PROJECT_DIR/requirements.txt"
 
-    # Set up virtual environment
-    VENV_DIR="$SCRIPT_DIR/.venv"
-    if [ ! -d "$VENV_DIR" ]; then
-        python -m venv "$VENV_DIR"
-    fi
+# Build the Python project
+echo "Building the executable..."
+pyinstaller "$PROJECT_DIR/nccarenderfarm.spec" --noconfirm
 
-    # Activate virtual environment
-    source "$VENV_DIR/bin/activate"
+SOURCE_LAUNCH="$PROJECT_DIR/NCCARenderFarm/launchers/launch.sh"
+DEST_LAUNCH="$PROJECT_DIR/launch.sh"
 
-    python -m pip install --upgrade pip
+if [ -f "$DEST_LAUNCH" ]; then
+    rm "$DEST_LAUNCH"
+fi
+cp "$SOURCE_LAUNCH" "$DEST_LAUNCH"
 
-    # Check if requirements are already installed
-    if ! python -m pip freeze | grep -qF -f "$SCRIPT_DIR/requirements.txt"; then
-        # Requirements not installed, install them
-        requirements_file="$SCRIPT_DIR/requirements.txt"
-        if [ -f "$requirements_file" ]; then
-            echo "NCCA | Installing Requirements"
-            python -m pip install -r "$requirements_file"
-        else
-            echo "NCCA | Requirements file not found: $requirements_file"
-            deactivate
-            exit 1
-        fi
-    else
-        echo "NCCA | Requirements already installed."
-    fi
-
-    # Create the standalone executable with PyInstaller
-    pyinstaller --onefile "$SCRIPT_DIR/main.py"
-
-    # Deactivate the virtual environment
-    deactivate
-}
-
-main
+echo "Build completed! You can now run ./launch.sh"

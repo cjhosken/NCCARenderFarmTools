@@ -2,7 +2,7 @@
 
 
 a = Analysis(
-    ['NCCARenderFarm\\main.py'],
+    ['NCCARenderFarm/main.py'],
     pathex=['NCCARenderFarm'],
     binaries=[],
     datas=[
