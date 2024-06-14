@@ -28,6 +28,9 @@ Go to https://github.com/cjhosken/NCCARenderFarmTools, click `Code > Download ZI
 
 Choose a path to store the script, then extract it and dive inside.
 
+
+NCCARenderFarm requires qube to run. On linux, you dont need to do anything. However on windows you need to install `Qube 7.5.2 Client Only` before running NCCARenderFarm.
+
 <br>
 
 ### Building the Application
