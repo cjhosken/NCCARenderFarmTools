@@ -1,6 +1,24 @@
 # NCCARenderFarmTools
 A standalone application that interacts with the NCCA Renderfarm.
 
+## Supported Software
+
+The NCCA Renderfarm currently only supports:
+
+ - ~~Maya 2023 Arnold~~ (no license)
+ - ~~Maya 2023 VRay~~ (no license)
+ - ~~Maya 2023 Renderman~~ (outdated)
+ - Maya 2023 Software
+
+<br>
+
+ - Houdini 20.0.506 Mantra
+ - Houdini 20.0.506 Karma CPU (XPU unspported)
+
+
+
+
+
 ## Installation
 Before running the app, you'll need to install it. The first step is downloading the app from GitHub. 
 
@@ -34,5 +52,7 @@ This software was developed by me, Christopher Hosken.
 [Email]()
 
 [Linkedin]()
+
+[GitHub](https://github.com/cjhosken)
 
 [Artstation]()
