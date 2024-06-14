@@ -1,4 +1,3 @@
-from PyQt6.QtGui import QPaintEvent
 from config import *
 from .widgets import *
 from .ncca_qmainwindow import NCCA_QMainWindow
@@ -77,7 +76,7 @@ class NCCA_ImageWindow(NCCA_QMainWindow):
             return []
 
     def load_exr_image(self, path, channel):
-        print(channel)
+        exr_data = pyexr.open(path)
         # Step 1: Read the EXR file using OpenCV
         exr_image = cv2.imread(path, cv2.IMREAD_UNCHANGED)
         
@@ -96,6 +95,21 @@ class NCCA_ImageWindow(NCCA_QMainWindow):
                 
                 if channel == "Luminance":
                     q_image = q_image.convertToFormat(QImage.Format.Format_Grayscale8)
+
+        elif channel in ["R", "G", "B", "Alpha"]:
+                # Extract individual channels
+                if (channel == "Alpha"):
+                    channel = "A"
+
+                channel_data = exr_data.get(channel)
+                if channel_data is None:
+                    return None
+
+                # Normalize and convert to QImage
+                normalized_data = (255.0 * np.clip(channel_data, 0.0, 1.0)).astype(np.uint8)
+                q_image = QImage(normalized_data.data, normalized_data.shape[1], normalized_data.shape[0],
+                                 QImage.Format.Format_Grayscale8)
+
         else:
             return None
         
