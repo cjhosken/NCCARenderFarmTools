@@ -23,7 +23,7 @@ MESSAGE_OVERRIDE_CANCEL_TEXT="Cancel"
 # Custom Labels
 
 MESSAGE_QUBE_LABEL = "Qube"
-QB_IMPORT_ERROR_MESSAGE = "Make sure that you have installed Qube from Apps Anywhere before starting the application." 
+QB_IMPORT_ERROR_MESSAGE = "Make sure that you have installed Qube 7.5.2 (Client Only) from Apps Anywhere before starting the application." 
 
 NO_HOUDINI_TITLE="Houdini"
 NO_HOUDINI_LABEL="Hython could not be found on this machine. Proceeding without Houdini scene info."

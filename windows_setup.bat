@@ -61,14 +61,9 @@ if %errorlevel% neq 0 (
     call pyenv install %PYTHON_VERSION%
 )
 
-
 REM Set the installed Python version globally
 
-
 call pyenv local %PYTHON_VERSION%
-
-REM need this line as 3.8 and 3.8.10 are different
-set PYTHON_VERSION=%PYTHON_VERSION%.10
 
 call pyenv rehash
 set PATH=%USERPROFILE%\.pyenv\pyenv-win\versions\%PYTHON_VERSION%\;%USERPROFILE%\.pyenv\pyenv-win\versions\%PYTHON_VERSION%\Scripts;%PATH%
