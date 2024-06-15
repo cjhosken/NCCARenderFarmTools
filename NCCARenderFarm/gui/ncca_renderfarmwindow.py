@@ -72,24 +72,33 @@ class NCCA_RenderFarmWindow(NCCA_QMainWindow):
         QDesktopServices.openUrl(QUrl(INFO_LINK))
 
     def submit_project(self):
+        """Submits a project folder and job to the renderfarm"""
         index = self.browser.currentIndex()
         destination_folder=None
+
+        # Check if there is a selected index, otherwise pass in 'None', which will get turned into /home/username/farm/projects
         if index.isValid():
             destination_folder = self.browser.model().get_file_path(index)
         self.browser.submit_project(destination_folder)
 
-
     def create_temp(self):
+        """creates the application temp folder"""
+        # This creates the temp folder in the user home.
+        # /home/username/temp_folder
+        # C:/Users/username/temp_folder
+
         tmp_path = os.path.join(get_user_home(), LOCAL_TEMP_FOLDER)
-        if os.path.exists(tmp_path):
-            shutil.rmtree(tmp_path)
+        self.clear_temp(tmp_path) #it wipes the temp folder on start to clear out any old data
         os.mkdir(tmp_path)
 
-    def clear_temp(self):
-        tmp_path = os.path.join(get_user_home(), LOCAL_TEMP_FOLDER)
+    def clear_temp(self, tmp_path=os.path.join(get_user_home(), LOCAL_TEMP_FOLDER)):
+        """clears the application temp folder"""
+        # Removes the temp folder to clear out any existing local data
         if os.path.exists(tmp_path):
             shutil.rmtree(tmp_path)
 
     def closeEvent(self, event):
+        """Handles the application close event"""
+        # This function does not run on crash.
         self.clear_temp()
         

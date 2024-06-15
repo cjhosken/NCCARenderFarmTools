@@ -7,12 +7,13 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
 
     def __init__(self, home_path, username, password, parent=None):
         """Initializes the farmsystemmodel and connects to the renderfarm"""
-
         super().__init__(parent)
         self.username = username
         self.password = password
         self.home_path = home_path
         self.renderfarm = NCCA_RenderFarm(self.home_path, self.username, self.password)
+
+        # We set the rootItem to /home/username (which is the parent dir of /home/username/farm). This is so we can show the /home/username/farm folder in the view.
         self.rootItem = self.create_item(os.path.dirname(self.home_path), None)
 
     def populateChildren(self, parent_item):
@@ -62,7 +63,7 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
             if child_item is None:
                 return QModelIndex()
 
-            # Only show files that exist within /home/username/farm
+            # Only show files that exist within /home/username/farm. This hide all the extra junk in the /home/username folder as it wont be shown.
             if child_item['path'].startswith(self.home_path):
                 return self.createIndex(row, column, child_item)
 
