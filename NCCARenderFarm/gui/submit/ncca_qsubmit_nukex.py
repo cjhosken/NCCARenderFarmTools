@@ -2,13 +2,15 @@ from config import *
 from gui.widgets import *
 from .ncca_qsubmitwindow import NCCA_QSubmitWindow
 
+# also look at the guide in gui/submit/__init__.py to write your own submitwindow class
+
 class NCCA_QSubmit_NukeX(NCCA_QSubmitWindow):
-    def __init__(self, renderfarm=None,file_path="", folder_path="", username="", file_data=None, sourced=True, parent=None):
-        self.sourced=sourced
+    def __init__(self, renderfarm=None,file_path="", folder_path="", username="", file_data=None, parent=None):
         super().__init__(renderfarm, file_path, folder_path, name="Submit NukeX Job", username=username, parent=parent)
         self.file_data = file_data
 
-        # Extract write node paths from file_data
+        # if the file_data contains information, extract it. file_data is in json format. 
+        # see render_info/__init__.py for more info. (as well as render_info/nukex_render_info.py)
         if file_data is not None:
             
             farm = file_data["NCCA_RENDERFARM"]
@@ -28,7 +30,7 @@ class NCCA_QSubmit_NukeX(NCCA_QSubmitWindow):
         self.write_label = QLabel(NUKEX_JOB_WRITE_LABEL)
         self.write_row_layout.addWidget(self.write_label)
 
-        if (self.sourced):
+        if (self.file_data is not None):
             self.write = NCCA_QComboBox()
             self.write.currentIndexChanged.connect(self.update_frame_labels)
         else:
@@ -58,7 +60,7 @@ class NCCA_QSubmit_NukeX(NCCA_QSubmitWindow):
         frame_step = self.frame_step.text()
         external_commands = self.command.text()
 
-        if (self.sourced):
+        if (self.file_data is not None):
             write_node = self.write.currentText()
         else:
             write_node = self.write.text()
@@ -68,7 +70,7 @@ class NCCA_QSubmit_NukeX(NCCA_QSubmitWindow):
         job['prototype'] = 'cmdrange'
         package = {}
         package['shell']="/bin/bash"
-        pre_render=""
+        pre_render="" # For some DCCs, pre_render is required for unique setup.
 
         # https://learn.foundry.com/nuke/content/comp_environment/configuring_nuke/command_line_operations.html
 
@@ -76,11 +78,13 @@ class NCCA_QSubmit_NukeX(NCCA_QSubmitWindow):
         if (write_node):
             file_command = f"-X {write_node} {self.render_path}"
 
-
+        # The way that qube renders animations is that it splits a sequence into a bunch of individual frames, and then renders out each frame.
+        # QB_FRAME_NUMBER is the frame that qube render does.
         render_command=f"{NUKEX_PATH} -F QB_FRAME_NUMBER {file_command}"
 
         print(render_command)
 
+        # job['package']['cmdline'] will be run by each qube render cpu. its the main rendering command.
         job['package']['cmdline']=f"{pre_render} {render_command}"
 
         self.submit_job(job)

@@ -139,13 +139,15 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
 
     def data(self, index, role=Qt.ItemDataRole.DisplayRole):
         """Edits the data to fit nicely into the application"""
-        if not index.isValid():
+        if not index.isValid(): # dont add invalid indexes
             return None
 
         item = index.internalPointer()
 
         if role == Qt.ItemDataRole.DisplayRole:
-            if (item['path'] == self.home_path):
+            if (item['path'] == self.home_path): 
+                # If the path is the RENDERFARM_FARM_DIR, /home/username/farm, change it to /render/username/farm 
+                # (we dont want the user to know about the difference between /home and /rendder)
                 return join_path(RENDERFARM_RENDER_ROOT, self.username, RENDERFARM_FARM_DIR)
 
             return os.path.basename(item['path'])  # Return the name of other items
@@ -252,6 +254,7 @@ class NCCA_RenderFarm_QFarmSystemModel(QAbstractItemModel):
 
     def mimeData(self, indexes):
         """Create a QMimeData object with the URLs of the selected items"""
+        # This  to support drag dropping files
         mime_data = QMimeData()
         urls = []
 

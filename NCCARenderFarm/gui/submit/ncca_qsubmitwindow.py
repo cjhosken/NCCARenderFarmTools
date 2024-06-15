@@ -5,7 +5,7 @@ from gui.ncca_qmainwindow import NCCA_QMainWindow
 
 # All DCC job submissions derive from the NCCA_QSubmitWindow
 # If you plan on writing your own job submitters, make it a child of this class.
-#
+# also look at the guide in gui/submit/__init__.py to write your own submitwindow class
 
 
 

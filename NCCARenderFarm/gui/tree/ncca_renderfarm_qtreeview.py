@@ -44,6 +44,7 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         for column in range(1, self.model().columnCount()):
             self.setColumnHidden(column, True)
 
+        # Allow the qtreeview to support drag-dropping
         self.setDragEnabled(True)
         self.setAcceptDrops(True)
         self.setDropIndicatorShown(True)
@@ -54,6 +55,8 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         self.setIconSize(BROWSER_ICON_SIZE)  
         self.setStyleSheet(NCCA_QTREEVIEW_STYLESHEET)
 
+        # Add a scroll timer to test for drag scrolling
+        # This to fix the issue when the user wants to move a file, but they cant because the filebrowser wont scroll up or down to see all the extended items.
         self.scroll_timer = QTimer(self)
         self.scroll_timer.setInterval(10) 
         self.scroll_timer.timeout.connect(self.autoScroll)
@@ -121,7 +124,10 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
 
             destination_path = self.model().get_file_path(self.indexAt(event.position().toPoint()))
 
+            # Check if destination path exists on the renderfarm
             if self.model().renderfarm.isdir(destination_path):
+
+                # Only deal with multiple url files
                 if len(urls) > 1:
                     reply = NCCA_QMessageBox.question(
                         self,
@@ -131,11 +137,15 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                     
                     if reply == QDialog.DialogCode.Accepted:
                         for url in urls:
+                        
                             file_path = url.toLocalFile()
+                            # Check if the source files are local
                             if (os.path.exists(file_path)):
+                                # Upload the files to the renderfarm
                                 if not self.model().renderfarm.exists(join_path(destination_path, os.path.basename(file_path))):
                                     self.model().renderfarm.upload([(file_path, join_path(destination_path, os.path.basename(file_path)))], show_info=False)
                             else:
+                                # Move the files on the renderfarm (by renaming)
                                 file_path = url.toString()
                                 if self.model().renderfarm.exists(file_path):
                                     if destination_path != file_path and not self.model().renderfarm.exists(join_path(destination_path, os.path.basename(file_path))):
@@ -143,9 +153,13 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
 
                         
                         self.refresh()
+                # Deal with single url files
                 else:
                     file_path = urls[0].toLocalFile()
+
+                    # Check if the source file is local
                     if (os.path.exists(file_path)):
+                            # Upload the file to the renderfarm
                             if not self.model().renderfarm.exists(join_path(destination_path, os.path.basename(file_path))):
                                 reply = NCCA_QMessageBox.question(
                                     self,
@@ -156,7 +170,9 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                                     self.model().renderfarm.upload([(file_path, join_path(destination_path, os.path.basename(file_path)))], show_info=False)
                                     self.refresh()
                                     
+                                    
                     else:
+                        # move the file on the renderfarm (by renaming it)
                         file_path = urls[0].toString()
                         if self.model().renderfarm.exists(file_path):
                             if destination_path != file_path and not self.model().renderfarm.exists(join_path(destination_path, os.path.basename(file_path))):
@@ -169,20 +185,17 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                                 if reply == QDialog.DialogCode.Accepted:
                                     self.model().renderfarm.move(file_path=file_path, destination_folder=destination_path)
                                     self.refresh()
-
-                        
-
         event.ignore()
 
     def keyPressEvent(self, event):
         """Actions to perform when a key is pressed"""        
-        if event.key() == Qt.Key.Key_Delete:
+        if event.key() == Qt.Key.Key_Delete: #deleting when delete pressed
             self.deleteSelectedIndexes()
-        elif event.key() == Qt.Key.Key_F2:
+        elif event.key() == Qt.Key.Key_F2: #renaming when f2 pressed
             self.renameSelectedIndex()
-        elif event.key() == Qt.Key.Key_R:
+        elif event.key() == Qt.Key.Key_R: #refreshing when R is pressed
             self.refresh()
-        elif event.key() == Qt.Key.Key_P:
+        elif event.key() == Qt.Key.Key_P: # submitting project when P is pressed
             self.submit_project()
         else:
             super().keyPressEvent(event)
