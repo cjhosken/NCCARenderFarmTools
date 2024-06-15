@@ -7,7 +7,7 @@ APPLICATION_VERSION = "1.0.0"
 
 # In terms of contributing to the code, anyone is free to. Just try not to break anything.
 # If you feel that you've contributed large amounts to the project, feel free to add yourself to APPLICATION_AUTHORS.
-# This is done on a trust basis. Please don't remove other people's names without permission.
+# This is done on a trust basis. Please don't remove other people's names without their permission.
 
 APPLICATION_AUTHORS = ["Christopher Hosken"]
 # Description of the application.

@@ -15,10 +15,6 @@ The NCCA Renderfarm currently only supports:
  - Houdini 20.0.506 Mantra
  - Houdini 20.0.506 Karma CPU (XPU unspported)
 
-
-
-
-
 ## Installation
 Before running the app, you'll need to install it. The first step is downloading the app from GitHub. 
 
@@ -29,24 +25,38 @@ Go to https://github.com/cjhosken/NCCARenderFarmTools, click `Code > Download ZI
 Choose a path to store the script, then extract it and dive inside.
 
 
-NCCARenderFarm requires qube to run. On linux, you dont need to do anything. However on windows you need to install `Qube 7.5.2 Client Only` before running NCCARenderFarm.
-
-<br>
+NCCARenderFarm requires Qube to run. On linux, you dont need to do anything. However on Windows you need to install `Qube 7.5.2 Client Only` before running NCCARenderFarm.
 
 ### Building the Application
 
 Run the setup script (either `windows_setup.bat`, `linux_setup.sh`). This will build the tools for you. It takes a couple minutes, so sit tight.
 
-One the script is a complete, you'll see a `launch` executable appear. Running that should run the NCCRenderFarm.
+Once building is complete, you can then move the `NCCARenderFarmTools` folder to wherever you want. You won't need to run the setup script again.
 
-<br>
+### Storing the Application
 
-Once complete, you wont need to run the setup file again. You can also move the NCCARenderFarmTools folder wherever you like.
+When moving the `NCCARenderFarmTools` folder, there are recommended folders to store it in.
 
-On linux, storing it somewhere like `home/s5605094/ncca/NCCARenderFarmTools` is a good place.
+On Linux, storing it somewhere like `~/ncca/NCCARenderFarmTools` is a good place.
 
-On windows, storing it in your `H://` drive is recommended, as then you wont need to rebuilt it for each lab machine you sign into. 
-*Dont setup the project in the H:// drive, as it takes MUCH longer.*
+On Windows, storing it in your `H://` drive is recommended, as then you wont need to rebuild the tool for each lab machine you sign into. <br>
+*Don't build the project in the H:// drive, as it takes MUCH longer. Build it in the C:// drive first and then move it acrros.*
+
+### Running the Application
+
+To the start the application, run either `launch.bat` (for windows) or `launch.sh` (for linux). The NCCARenderFarm application should then launch.
+
+Be aware that this tool will only work on NCCA Lab machines, if you try and install and run it on your home machine, you will get Qube errors (and if you solve those, the renderfarm will not connect)
+
+
+## Using NCCARenderFarmToools
+
+
+## Development
+
+This project is open source, which means anyone can participate in development! I hope that this tool will be passed along by students, and maintained by them while they're at University.
+
+If you wish to get involved with development, read [DEVEL.md](DEVEL.md)
 
 
 ## Contact
