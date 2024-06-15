@@ -572,8 +572,6 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         renderfarm = self.model().renderfarm
         username = self.username
 
-        sourced = True
-
         file_path = self.job_file_path
         _, project_ext = os.path.splitext(os.path.basename(file_path))
         project_folder = self.job_project_folder
@@ -593,9 +591,8 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                         NO_HOUDINI_TITLE,
                         NO_HOUDINI_LABEL + "\n"
                 )
-                sourced = False
 
-            self.job_dialog = NCCA_QSubmit_Houdini(renderfarm=renderfarm, username=username, file_path=file_path, folder_path=project_folder, file_data=data, sourced=sourced)
+            self.job_dialog = NCCA_QSubmit_Houdini(renderfarm=renderfarm, username=username, file_path=file_path, folder_path=project_folder, file_data=data)
             self.job_dialog.show()
 
         elif project_ext in MAYA_EXTENSIONS:
@@ -605,9 +602,8 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                     NO_MAYA_TITLE,
                     NO_MAYA_LABEL + "\n"
                 )
-                sourced = False
 
-            self.job_dialog = NCCA_QSubmit_Maya(renderfarm=renderfarm, username=username, file_path=file_path, folder_path=project_folder, file_data=data, sourced=sourced)
+            self.job_dialog = NCCA_QSubmit_Maya(renderfarm=renderfarm, username=username, file_path=file_path, folder_path=project_folder, file_data=data)
             self.job_dialog.show()
 
         elif project_ext in NUKEX_EXTENSIONS:
@@ -617,9 +613,8 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                     NO_NUKEX_TITLE,
                     NO_NUKEX_LABEL + "\n"
                 )
-                sourced = False
 
-            self.job_dialog = NCCA_QSubmit_NukeX(renderfarm=renderfarm, username=username, file_path=file_path, folder_path=project_folder, file_data=data, sourced=sourced)
+            self.job_dialog = NCCA_QSubmit_NukeX(renderfarm=renderfarm, username=username, file_path=file_path, folder_path=project_folder, file_data=data)
             self.job_dialog.show()
 
         elif project_ext in KATANA_EXTENSIONS:
@@ -629,9 +624,8 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
                     NO_KATANA_TITLE,
                     NO_KATANA_LABEL + "\n"
                 )
-                sourced = False
 
-            self.job_dialog = NCCA_QSubmit_Katana(renderfarm=renderfarm, username=username, file_path=file_path, folder_path=project_folder, file_data=data, sourced=sourced)
+            self.job_dialog = NCCA_QSubmit_Katana(renderfarm=renderfarm, username=username, file_path=file_path, folder_path=project_folder, file_data=data)
             self.job_dialog.show()
         else:
             NCCA_QMessageBox.warning(
