@@ -51,13 +51,48 @@ Be aware that this tool will only work on NCCA Lab machines, if you try and inst
 
 ## Using NCCARenderFarmToools
 
+The tool should be relatively straightforward to use.
+
+### User Interface
+
+//TODO
+
+### Your "Farm"
+
+//TODO
+
+### Projects and Jobs
+
+//TODO
+
+#### Preparing your Projects
+
+//TODO
+
+#### Submitting Projects and Jobs
+
+// TODO
+
+### Issues
+
+The app can be buggy at times, so do be patient. If you feel that It's slowing down or something unusual is happening. Try restarting. If it keeps happening, report a bug either through the UI or at https://github.com/cjhosken/NCCARenderFarmTools/issues.
+
+
+### Acessing the real farm
+
+If everything has fallen apart, and you need to access your farm. You can do so in linux.
+
+//TODO
+
+#### Reporting Bugs
+
+It's very important you report any bugs you face otherwise they likely will never get fixed. When you report a bug, try and assign a label to it. Do not create any new labels.
 
 ## Development
 
 This project is open source, which means anyone can participate in development! I hope that this tool will be passed along by students, and maintained by them while they're at University.
 
 If you wish to get involved with development, read [DEVEL.md](DEVEL.md)
-
 
 ## Contact
 
