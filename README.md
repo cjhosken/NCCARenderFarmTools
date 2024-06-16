@@ -55,23 +55,56 @@ The tool should be relatively straightforward to use.
 
 ### User Interface
 
-//TODO
+The user interface is quite simple to get to grips with. When you first start the app, you'll be prompted with a sign in page. You'll need to enter your student (s#######) and your account password. You can choose to remember your account details so you need to sign in every time.
+
+*Your details are saved and encrypted locally, so there's no need to worry about someone else gaining access to your account details.*
+
+
+Once signed in, you'll see your farm file browser, and some action buttons at the top.
+
+// TODO (Screenshot of UI)
+
+#### Action Buttons
+
+Plus : Upload a project to the farm and submit a job. You need to first select your project folder, and then the file you want to render from.
+
+Cube : Open the Qube! app
+
+Info : Get the user guide and information about the NCCA Render Farm
+
+Bug : Report a bug
+
+#### The Farm File Browser
+
+You can expand folders to see items inside. right clicking on items will show you the action menu. Right clicking on the root folder will show custom actions for opening qube and refreshing the file browser.
+
+You are also able to drag and drop files and folders into the farm.
+
+Some shortcuts are listed below;
+
+Delete : Delete the selected item(s)
+
+F2 : Rename the selected item
+
+R : Refresh the file browser
+
+P : Upload and submit a project to the renderfarm
 
 ### Your "Farm"
 
-//TODO
-
-### Projects and Jobs
-
-//TODO
+Your farm is where you can upload projects and submit them for rendering. You can then download rendered frames back onto your local computer.
 
 #### Preparing your Projects
 
-//TODO
+When preparing a project, you want to make sure that everything is stored inside a root folder. 
+
+All your file paths must be *relative* to your render file (and shouldn't go beyond your root folder).
+
+Make sure that you have also entered the correct render settings for your project.
 
 #### Submitting Projects and Jobs
 
-// TODO
+You can either submit an entire project (by using the actions). Or, you can right click a dcc file and submit a job with it. Please make sure that all your paths are correct otherwise your renders may not be correct.
 
 ### Issues
 
@@ -82,7 +115,7 @@ The app can be buggy at times, so do be patient. If you feel that It's slowing d
 
 If everything has fallen apart, and you need to access your farm. You can do so in linux.
 
-//TODO
+See Jon Macey's videos on accessing the farm on Linux.
 
 #### Reporting Bugs
 
