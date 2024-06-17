@@ -21,7 +21,7 @@ if not exist "%USERPROFILE%\.pyenv" (
     )
 
     REM Extract the zip file
-    powershell -Command "Expand-Archive -Path %USERPROFILE%\pyenv-win.zip -DestinationPath %USERPROFILE%"
+    powershell -Command "Expand-Archive -Path %USERPROFILE%\pyenv-win.zip -DestinationPath %USERPROFILE%" -Force
     if %errorlevel% neq 0 (
         echo Error: Failed to extract pyenv-win zip file. Please check your permissions or retry.
         pause
