@@ -36,7 +36,13 @@ MAYA_SHELF_PATH = {
 }
 BLENDER_ADDON_PATH = {
     "windows":"",
-    "linux":f"{HOME_DIR}/blender/blender-4.1.0-linux-64/addons",
+    "linux":f"{HOME_DIR}/blender/blender-4.1.0-linux-x64/4.1/scripts/addons",
     "darwin":""
 }
 
+
+RENDERFARM_ADDRESS = "tete.bournemouth.ac.uk"
+RENDERFARM_PORT = 22
+
+
+HOUDINI_FARM_PATH = "/houdini"

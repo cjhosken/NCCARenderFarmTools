@@ -49,8 +49,6 @@ class NCCA_FarmPanel(NCCA_Panel, bpy.types.Panel):
         layout.operator("ncca.submit")
         layout.operator("ncca.farm")
 
-        
-
 classes = [NCCA_ToolsPanel, NCCA_FarmPanel]
 
 def register():

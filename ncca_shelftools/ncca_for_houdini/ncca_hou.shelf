@@ -20,7 +20,7 @@
   </tool>
 
   <tool name="ncca_view_renderfarm" label="View Farm" icon="TOP_commandserver">
-    <script scriptType="python"><![CDATA[import sys; import os; sys.path.append(os.path.join(os.path.expanduser("~"), "ncca", "ncca_shelftools")); from ncca_for_houdini import view; view.main())]]>
+    <script scriptType="python"><![CDATA[import sys; import os; sys.path.append(os.path.join(os.path.expanduser("~"), "ncca", "ncca_shelftools")); from ncca_for_houdini import view; view.main()]]>
     </script>
   </tool>
 </shelfDocument>

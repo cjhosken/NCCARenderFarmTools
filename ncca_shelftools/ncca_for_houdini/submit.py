@@ -1,4 +1,4 @@
-import os
+import os, sys
 import subprocess
 import tempfile
 import shutil
@@ -7,6 +7,8 @@ from config import *
 
 import hou
 from PySide2 import QtCore, QtWidgets
+
+from renderfarm.login import RenderFarmLoginDialog, NCCA_ConnectionFailedException, NCCA_InvalidCredentialsException
 
 
 class RenderFarmSubmitDialog(QtWidgets.QDialog):
@@ -59,7 +61,7 @@ class RenderFarmSubmitDialog(QtWidgets.QDialog):
 
         self.start_frame.setRange(self.min_frame,self.max_frame)
         self.start_frame.setValue(self.min_frame)
-        self.start_frame.changed.connect(self.update_frame_range)
+        self.start_frame.valueChanged.connect(self.update_frame_range)
         self.gridLayout.addWidget(self.start_frame,2,1,1,1)
         
         label=QtWidgets.QLabel("End Frame")
@@ -67,7 +69,7 @@ class RenderFarmSubmitDialog(QtWidgets.QDialog):
         self.end_frame=QtWidgets.QSpinBox()
         self.end_frame.setRange(self.min_frame,self.max_frame)
         self.end_frame.setValue(self.max_frame)
-        self.end_frame.changed.connect(self.update_frame_range)
+        self.end_frame.valueChanged.connect(self.update_frame_range)
         self.end_frame.setToolTip("End frame for rendering, set from ROP but can be changed here, this will override the ROP value on the farm")
 
         self.gridLayout.addWidget(self.end_frame,2,3,1,1)
@@ -106,41 +108,75 @@ class RenderFarmSubmitDialog(QtWidgets.QDialog):
         self.submit.setToolTip("Submit job to the farm, you must select a ROP before this will activate")
         self.gridLayout.addWidget(self.submit, 4, 5, 1, 1)
 
-
     def confirm_login(self):
-        login_dialog = QtWidgets.QDialog()
-        login_dialog.show()
+        # Create and show the login dialog
+        login_dialog = RenderFarmLoginDialog(self)
+        if login_dialog.exec_() == QtWidgets.QDialog.Accepted:
+            self.submit_project()
 
     def submit_project(self):
         # Connect to the renderfarm
+        sftp = None
+        username = ""
+
+        local_project_dir = self.project_path.text()
+        remote_project_dir = os.path.join("/home", username, "farm", "projects", os.path.basename(local_project_dir))
+        
+        #if (os.path.exists(remote_project_dir)):
+        #    sftp.rmtree(remote_project_dir)
+
+        #sftp.put(remote_project_dir, local_project_dir)
         # Upload the project folder
         # Submit the job
 
-
-        self.farm_path = f"/render/{self.user}/"
-
-        farm_location_command = self.farm_path + self.farm_location.text()
-
         frame_range=f"{self.start_frame.value()}-{self.end_frame.value()}x{self.by_frame.value()}"
+        render_home_dir = os.path.join("/render", username).replace("\\", "/")
 
-        with tempfile.TemporaryDirectory() as tmpdirname:
-            src_folder = "/home/s5605094/Programming/NCCARenderFarmTools/scripts/houdini"
-            main_script = "ncca_renderfarm_hou_payload.py"
-            main_dst_script = os.path.join(tmpdirname, main_script)
+        #try:
+        #    sys.path.append(QUBE_PYPATH)
+        #    import qb
+        #except Exception as e: 
+        #    hou.ui.displayMessage(title="NCCA Tool Error", severity=hou.severityType.Error, details=f"{e}", text="Uh oh! An error occurred. Please contact the NCCA team if this issue persists.")
+        #    self.done(0)
 
-            shutil.copy(os.path.join(src_folder, main_script), main_dst_script)
+        job = {}
+        job['name'] = self.project_name.text()
+        job['cpus'] = self.cpus.currentText()
+        job['prototype']="cmdrange"
+        job['cwd'] = render_home_dir
+        job['env'] = {"HOME" : render_home_dir}
 
-            try:
-                output=subprocess.run(["/usr/bin/python3", main_dst_script, self.project_name.text(), self.output_driver.text(), farm_location_command, self.cpus.currentText(), self.user, frame_range],capture_output=True,env={})
-                error = output.stderr.decode("utf-8")
+        package = {}
+        package['shell']="/bin/bash"
 
-                if (error):
-                    raise Exception(error)
+        # job submission setup
+        # https://www.sidefx.com/docs/houdini/ref/utils/hrender.html
+        
+        render_path = hou.hipFile.path().replace(local_project_dir, remote_project_dir)
 
-                ids=output.stdout.decode("utf-8") 
-                hou.ui.displayMessage(f"{self.project_name.text()} has been successfully added to the NCCA Renderfarm! \nID: {ids}",buttons=("Ok",),title="NCCA Tools")
-            except Exception as e:
-                hou.ui.displayMessage(title="NCCA Tool Error", severity=hou.severityType.Error, details=f"{e}", text="Uh oh! An error occurred. Please contact the NCCA team if this issue persists.")
+        pre_render = f"cd {HOUDINI_FARM_PATH}; source houdini_setup_bash;"
+
+        render_command=f"hython $HB/hrender.py -F QB_FRAME_NUMBER"
+        render_command+=f" -d {self.output_driver.text()}"
+        render_command+=f" {render_path}"
+
+        hou.ui.displayMessage(render_command)
+
+        package['cmdline'] = f"{pre_render} {render_command}"
+
+        job['pacakge'] = package
+            
+        #job['agenda'] = qb.genframes(frame_range)
+
+        #listOfJobsToSubmit = [job]
+        #try:
+        #    listOfSubmittedJobs = qb.submit(listOfJobsToSubmit)
+        #    id_list = []
+        #    for job in listOfSubmittedJobs:
+        #        id_list.append(job['id'])
+        #    hou.ui.displayMessage(itle="NCCA Tool", text=f"{self.project_name.text()} has been successfully added to the NCCA Renderfarm! \nID: {id_list}",buttons=("Ok",))
+        #except Exception as e:
+        #    hou.ui.displayMessage(title="NCCA Tool Error", severity=hou.severityType.Error, details=f"{e}", text="Uh oh! An error occurred. Please contact the NCCA team if this issue persists.")
                  
         self.done(0)
     
@@ -174,7 +210,7 @@ class RenderFarmSubmitDialog(QtWidgets.QDialog):
         self.by_frame.setValue(min(max(1, self.by_frame.value()), self.end_frame.value() - self.start_frame.value()))
 
     def check_for_submit(self):
-        self.submit.setEnabled(self.output_driver.text() and self.project_path.text())
+        self.submit.setEnabled(self.output_driver.text() is not None and self.project_path.text() is not None)
 
     def closeEvent(self,event) :    
         super(RenderFarmSubmitDialog, self).closeEvent(event)

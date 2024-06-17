@@ -12,23 +12,28 @@ class NCCA_LoginOperator(bpy.types.Operator):
 
     def execute(self, context):
         ncca = context.scene.ncca
-        for attempt in range(MAX_CONNECTION_ATTEMPTS):
-            #try:
-            #transport = paramiko.Transport((ncca.host, ncca.port))
-            #transport.connect(None, ncca.username, ncca.password)
+        if (os.path.exists(QUBE_PYPATH.get(OPERATING_SYSTEM))):
+            for attempt in range(MAX_CONNECTION_ATTEMPTS):
+                try:
+                    transport = paramiko.Transport((ncca.host, ncca.port))
+                    transport.connect(None, ncca.username, ncca.password)
                 
-            #SFTP = paramiko.SFTPClient.from_transport(transport)
+                    SFTP = paramiko.SFTPClient.from_transport(transport)
                 
-            ncca.connected = True
-            return {"FINISHED"}
-            #except paramiko.AuthenticationException:
-            #    show_message_box(message="Invalid Login Details", title="Renderfarm Error", icon="WARNING")
-            #    return {"CANCELLED"}
-            #except (paramiko.SSHException, socket.gaierror):
-            #    if (attempt >= MAX_CONNECTION_ATTEMPTS - 1):
-            #        show_message_box(message="Could not connect to the NCCA renderfarm. Try again later.", title="Renderfarm Error", icon="WARNING")
-            #        return {"CANCELLED"}
-    
+                    ncca.connected = True
+                    return {"FINISHED"}
+                except paramiko.AuthenticationException:
+                    show_message_box(title="NCCA Tool Error", message="Invalid Login Details", icon="ERROR")
+                    return {"CANCELLED"}
+                except (paramiko.SSHException, socket.gaierror):
+                    if (attempt >= MAX_CONNECTION_ATTEMPTS - 1):
+                        self.report({'ERROR'}, "Could not connect to renderfarm")
+                        return {"CANCELLED"}
+                
+        else:
+            self.report({'ERROR'}, QUBE_PYPATH_ERROR)
+            return {"CANCELLED"}
+
 class NCCA_SubmitOperator(bpy.types.Operator):
     bl_idname = "ncca.submit"
     bl_label = "Submit Project"
@@ -90,7 +95,6 @@ class NCCA_QubeOperator(bpy.types.Operator):
     bl_idname = "ncca.qube"
     bl_label = "Launch Qube!"
     bl_description = "Launch Qube!"
-
 
     def execute(self, context):
         if (os.path.exists(QUBE_EXE_PATH.get(OPERATING_SYSTEM))):
