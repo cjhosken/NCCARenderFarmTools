@@ -21,9 +21,6 @@ QUBE_PYPATH_ERROR = "qb could not be found!"
 
 MAX_CONNECTION_ATTEMPTS = 3
 
-NCCA_DIR = os.path.join(HOME_DIR, "ncca")
-
-
 HOUDINI_SHELF_PATH = {
     "windows":"",
     "linux":f"{HOME_DIR}/houdini20.0/toolbar",

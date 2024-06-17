@@ -25,7 +25,7 @@ class RenderFarmLoginDialog(QtWidgets.QDialog):
         
         # Set the GUI components and layout
         self.setWindowTitle("NCCA Renderfarm Login")
-        self.resize(600, 280)
+        self.resize(300, 200)
         
         # Main layout for form
         self.gridLayout = QtWidgets.QGridLayout(self)
@@ -98,7 +98,7 @@ class RenderFarmLoginDialog(QtWidgets.QDialog):
         Save user info (username and password) to a secure location with encryption.
         """
         encrypted_credentials = self.encrypt_credentials(username, password)
-        save_path = os.path.expanduser("~/.ncca")
+        save_path = os.path.expanduser("~/.ncca_env")
         
         with open(save_path, "wb") as file:
             file.write(encrypted_credentials)
