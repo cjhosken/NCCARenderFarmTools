@@ -1,6 +1,6 @@
 import bpy, paramiko, os, socket
 
-from .config import *
+from ..config import *
 from .panels import show_message_box
 
 SFTP = None

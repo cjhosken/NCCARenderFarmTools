@@ -10,17 +10,17 @@
 
   <tool name="ncca_qubeui" label="Launch Qube!" icon="MISC_control_panel">
     <script scriptType="python">
-    <![CDATA[exec(open('~/home/cjhosken/Documents/programming/NCCARenderFarmTools/ncca_for_houdini/ncca_for_houdini/qube.py').read())]]>
+    <![CDATA[import sys; import os; sys.path.append(os.path.join(os.path.expanduser("~"), "ncca", "ncca_shelftools")); from ncca_for_houdini import qube; qube.main()]]>
     </script>
   </tool>
 
   <tool name="ncca_submit_renderfarm_job" label="Submit Job" icon="TOP_commandserver">
-    <script scriptType="python"><![CDATA[exec(open('/home/cjhosken/Documents/programming/NCCARenderFarmTools/ncca_for_houdini/submit.py').read())]]>
+    <script scriptType="python"><![CDATA[import sys; import os; sys.path.append(os.path.join(os.path.expanduser("~"), "ncca", "ncca_shelftools")); from ncca_for_houdini import submit; submit.main()]]>
     </script>
   </tool>
 
   <tool name="ncca_view_renderfarm" label="View Farm" icon="TOP_commandserver">
-    <script scriptType="python"><![CDATA[exec(open('/home/cjhosken/Documents/programming/NCCARenderFarmTools/ncca_for_houdini/view.py').read())]]>
+    <script scriptType="python"><![CDATA[import sys; import os; sys.path.append(os.path.join(os.path.expanduser("~"), "ncca", "ncca_shelftools")); from ncca_for_houdini import view; view.main())]]>
     </script>
   </tool>
 </shelfDocument>

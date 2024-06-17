@@ -31,7 +31,7 @@ global proc shelf_NCCA () {
         -style "iconOnly" 
         -marginWidth 0
         -marginHeight 1
-        -command "exec(open('/home/cjhosken/Documents/programming/NCCARenderFarmTools/ncca_for_maya/qube.py').read())" 
+        -command "exec(open('~/ncca/ncca_shelftools/ncca_for_maya/qube.py').read())" 
         -sourceType "python" 
         -commandRepeatable 1
         -flat 1
@@ -64,7 +64,7 @@ global proc shelf_NCCA () {
         -style "iconOnly" 
         -marginWidth 0
         -marginHeight 1
-        -command "exec(open('/home/cjhosken/Documents/programming/NCCARenderFarmTools/ncca_for_maya/submit.py').read())" 
+        -command "exec(open('~/ncca/ncca_shelftools/ncca_for_maya/submit.py').read())" 
         -sourceType "python" 
         -commandRepeatable 1
         -flat 1
@@ -97,7 +97,7 @@ global proc shelf_NCCA () {
         -style "iconOnly" 
         -marginWidth 0
         -marginHeight 1
-        -command "exec(open('/home/cjhosken/Documents/programming/NCCARenderFarmTools/ncca_for_maya/farm.py').read())" 
+        -command "exec(open('~/ncca/ncca_shelftools/ncca_for_maya/farm.py').read())" 
         -sourceType "python" 
         -commandRepeatable 1
         -flat 1
