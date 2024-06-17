@@ -5,6 +5,7 @@ import sys
 import tempfile
 import webbrowser
 import shutil
+import re
 
 from config import *
 from renderfarm.submit import RenderFarmSubmitDialog
@@ -15,25 +16,7 @@ import maya.OpenMayaUI as omui
 from PySide2 import QtCore, QtWidgets
 from shiboken2 import wrapInstance
 
-RENDERER_COMMANDS = {
-    "Set by file": "file",
-    "Maya Software": "sw",
-    "Maya Hardware": "hw",
-    "Maya Hardware 2.0": "hw2",
-    "Arnold": "arnold",
-    "Renderman": "renderman",
-    "VRay": "vray",
-    "Vector Renderer": "vr"
-}
-
-FILE_EXTENSION_COMMANDS = {
-    "EXR": "exr",
-    "PNG": "png",
-    "TIF": "tif",
-    "Jpeg": "jpeg",
-    "DeepEXR": "deepexr",
-    "Maya": "maya"
-}
+from config import *
 
 def get_main_window():
     """This returns the Maya main window for parenting."""
@@ -81,7 +64,7 @@ class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         self.override_filename.setToolTip("Overrides the output file name in the Maya file.")
         self.gridLayout.addWidget(self.override_filename, 4, 0, 1, 1)
 
-        self.output_filename = QtWidgets.QLineEdit("./output/frame_###.exr")
+        self.output_filename = QtWidgets.QLineEdit("/output/frame_###.exr")
         self.output_filename.setToolTip("The file name in which rendered frames will be saved as.")
         self.gridLayout.addWidget(self.output_filename, 4, 1, 1, 5)
 
@@ -91,58 +74,6 @@ class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         self.extra_commands = QtWidgets.QLineEdit()
         self.extra_commands.setToolTip("Extra commands to be added verbatim to the render call")
         self.gridLayout.addWidget(self.extra_commands, 5, 1, 1, 5)
-
-    def set_project_location(self):
-        file_dialog = QtWidgets.QFileDialog()
-        file_dialog.setFileMode(QtWidgets.QFileDialog.Directory)
-        if file_dialog.exec_():
-            directories = file_dialog.selectedFiles()
-            self.project_location.setText(directories[0])
-
-    def accept(self):
-        start_frame_command = str(self.start_frame.value())
-        end_frame_command = str(self.end_frame.value())
-        by_frame_command = str(self.by_frame.value())
-        renderer_command = RENDERER_COMMANDS[self.active_renderer.currentText()]
-        render_camera_command = self.camera.currentText()
-        project_location_command = self.project_location.text()
-        file_location_command = self.scene_location.text()
-        output_dir_command = self.output_dir.text() if self.override_output_dir.isChecked() else ""
-        output_filename_command = self.output_filename.text() if self.override_filename.isChecked() else ""
-        output_extension_command = FILE_EXTENSION_COMMANDS[self.output_extension.currentText()] if self.override_extension.isChecked() else ""
-        extra_commands = self.extra_commands.text()
-
-        farm_path = f"/render/{self.user}/"
-
-        project_location_command = farm_path + project_location_command
-        output_dir_command = farm_path + output_dir_command
-        file_location_command = farm_path + file_location_command
-
-        submit_command = [
-            "Render",
-            "-r", renderer_command,
-            "-s", start_frame_command,
-            "-e", end_frame_command,
-            "-b", by_frame_command,
-            "-cam", render_camera_command,
-            "-proj", project_location_command,
-        ]
-
-        if output_dir_command:
-            submit_command.extend(["-rd", output_dir_command])
-        if output_filename_command:
-            submit_command.extend(["-im", output_filename_command])
-        if output_extension_command:
-            submit_command.extend(["-of", output_extension_command])
-        if extra_commands:
-            submit_command.extend(extra_commands.split())
-
-        submit_command.append(file_location_command)
-
-        print(f"NCCA Tools: Submitting render job with command: {submit_command}")
-        self.submit_job(submit_command)
-        super().accept()
-
 
     def select_project_path(self):
         # Get current project directory
@@ -167,37 +98,108 @@ class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         # Perform any additional actions (e.g., enable submit button)
         self.check_for_submit()
 
-    def submit_job(self, submit_command):
+    def submit_job(self):
+        renderer = RENDERER_COMMANDS[self.active_renderer.currentText()]
+        render_camera = self.camera.currentText()
+        extra_commands = self.extra_commands.text()
+        output_path = self.output_filename.text().replace("\\", "/")
 
-        frame_range=f"{self.start_frame.value()}-{self.end_frame.value()}x{self.by_frame.value()}"
+        local_project_dir = self.project_path.text()
+        remote_project_dir = os.path.join("/home", self.username, "farm", "projects", os.path.basename(local_project_dir)) + "/"
+        render_path = cmds.file(q=True, sn=True).replace(local_project_dir, remote_project_dir)
 
-        qb_command = " ".join(submit_command)
+        if (not output_path.startswith(remote_project_dir)):
+            output_path = os.path.join(remote_project_dir, output_path.lstrip("/")).replace("\\", "/")
 
-        try:
-            with tempfile.TemporaryDirectory() as tmpdirname:
-                src_folder = "/home/s5605094/Programming/NCCARenderFarmTools/scripts/maya"
-                main_script = "ncca_renderfarm_maya_payload.py"
-                main_dst_script = os.path.join(tmpdirname, main_script)
+        output_file = os.path.basename(output_path)
+        frame_padding = max(output_file.count("#"), len(str(int(self.frame_end.text())*int(self.frame_step.text()))) + 1)
+        output_file = re.sub(r'#+', '#', output_file)
+        output_dir = os.path.dirname(output_path)
+        output_path = os.path.join(output_dir, output_file).replace("\\", "/")
 
-                shutil.copy(os.path.join(src_folder, main_script), main_dst_script)
+        output_dir, image_name, output_file_extension, frame_number_format = self.convert_render_path(output_path)
+        output_dir += "/"
 
-                src_script = "ncca_renderfarm_maya_enable_plugins.py"
-                dst_script = os.path.join(tmpdirname, src_script)
-                shutil.copy(os.path.join(src_folder, src_script), dst_script)
+        override_extension = MAYA_FILE_EXTENSIONS.get(output_file_extension.lower(), "")
 
-                output=subprocess.run(["/usr/bin/python3", main_dst_script, self.project_name.text(), qb_command, self.cpus.currentText(), self.user, frame_range],capture_output=True,env={})
-                error = output.stderr.decode("utf-8")
+        render_options = ""
+        render_options += f"-r {renderer}"
+        render_options += f" -proj {remote_project_dir}"
 
-                if (error):
-                    raise Exception(error)
+        render_options += f" -rd {output_dir}" if output_dir else ""
+        render_options += f" -im {image_name}" if image_name else ""
 
-                ids=output.stdout.decode("utf-8") 
-                cmds.confirmDialog(message=f"{self.project_name.text()} has been successfully added to the NCCA Renderfarm! \nID: {ids}",button=["Ok"],title="NCCA Tools")
-        except Exception as e:
-            cmds.confirmDialog(title="NCCA Tool Error", message=f"Render Submission Failed! Please check your submission settings and try again. Please contact the NCCA team if this issue persists.\n\n {e}", button=["Ok"])
+        # Different render engines require different commands
+        if (renderer == "renderman"):
+            pass
+        elif (renderer == "vray"):
+            render_options += f" -pad {frame_padding}" if frame_padding else ""
+        elif (renderer == "arnold"):
+            render_options += f" -fnc {frame_number_format}" if frame_number_format else ""
+            render_options += f" -pad {frame_padding}" if frame_padding else ""
+        else:
+            pass
+        
+        render_options += f" -of {override_extension}" if override_extension else ""
+        render_options += f" -cam {render_camera}"
+
+        render_command = f"Render {render_options} -s QB_FRAME_NUMBER -e QB_FRAME_NUMBER {extra_commands} {render_path}"
+
+        command = f"{render_command}"
+
+        super().submit_project(command)
 
     def check_for_submit(self):
         self.submit.setEnabled(self.project_path.text() is not None)
+
+    def convert_render_path(self, render_path):
+        # Define regular expressions to identify patterns
+        frame_pattern = re.compile(r"(#+|\d+|_\d+|_\#|\.\#|\.\d+)")
+        
+        # Extract directory
+        output_dir = os.path.dirname(render_path)
+
+        # Extract base name
+        base_name = os.path.basename(render_path)
+        
+        # Initialize variables
+        image_name = ""
+        file_extension = ""
+        frame_number_format = ""
+        
+        # Find frame number pattern and split the base name
+        match = frame_pattern.search(base_name)
+        if match:
+            image_name = base_name[:match.start()]
+            file_extension = base_name[match.end():]
+            
+            # Handle the frame number format
+            # These formats are the ones that exist in maya.
+
+            # This code was generated by ChatGPT, and likely has bugs.
+            if match.group() == "##" or match.group() == "_#":
+                frame_number_format = "name_#.ext"
+            elif match.group() == ".#":
+                frame_number_format = "name.ext.#"
+            elif match.group() == "#":
+                frame_number_format = "name.#.ext"
+            elif re.match(r"\d+#", match.group()):
+                frame_number_format = "name#.ext"
+            elif re.match(r"_\d+", match.group()):
+                frame_number_format = "name_#.ext"
+            elif re.match(r"\.\d+", match.group()):
+                frame_number_format = "name.ext.#"
+            else:
+                frame_number_format = "name.ext"
+        else:
+            # Default case if no pattern found
+            image_name, file_extension = os.path.splitext(base_name)
+            frame_number_format = "name.ext"
+        
+        # Clean up image name
+        image_name = image_name.rstrip('_').rstrip('.')
+        
+        return output_dir, image_name, file_extension, frame_number_format
 
 def main():
     if os.path.exists(QUBE_PYPATH.get(OPERATING_SYSTEM)) or True:

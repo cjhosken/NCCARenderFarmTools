@@ -43,3 +43,23 @@ RENDERFARM_PORT = 22
 
 
 HOUDINI_FARM_PATH = "/houdini"
+
+MAYA_RENDERERS = {
+    "Set by file": "file",
+    "Maya Software": "sw",
+    "Maya Hardware": "hw",
+    "Maya Hardware 2.0": "hw2",
+    "Arnold": "arnold",
+    "Renderman": "renderman",
+    "VRay": "vray",
+    "Vector Renderer": "vr"
+}
+
+MAYA_FILE_EXTENSIONS = {
+    "EXR": "exr",
+    "PNG": "png",
+    "TIF": "tif",
+    "Jpeg": "jpeg",
+    "DeepEXR": "deepexr",
+    "Maya": "maya"
+}
