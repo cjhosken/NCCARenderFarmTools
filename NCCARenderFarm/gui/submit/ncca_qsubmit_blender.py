@@ -11,8 +11,8 @@ class NCCA_QSubmit_Blender(NCCA_QSubmitWindow):
 
 
     def __init__(self, renderfarm=None,file_path="", folder_path="", username="", file_data=None, parent=None):
-        super().__init__(renderfarm, file_path, folder_path, name=BLENDER_JOB_TITLE, username=username, parent=parent)
         self.file_data = file_data
+        super().__init__(renderfarm, file_path, folder_path, name=BLENDER_JOB_TITLE, username=username, parent=parent)
 
         # extract the file data if it exists.
         # this does not follow the json structure that other ddcs use. Instead it receives [(start, end, "Scene")]

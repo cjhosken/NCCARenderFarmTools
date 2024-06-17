@@ -6,8 +6,8 @@ from .ncca_qsubmitwindow import NCCA_QSubmitWindow
 
 class NCCA_QSubmit_Katana(NCCA_QSubmitWindow):
     def __init__(self, renderfarm=None,file_path="", folder_path="", username="", file_data=None, parent=None):
-        super().__init__(renderfarm, file_path, folder_path, name="Submit Katana Job", username=username, parent=parent)
         self.file_data = file_data
+        super().__init__(renderfarm, file_path, folder_path, name="Submit Katana Job", username=username, parent=parent)
 
         # if the file_data contains information, extract it. file_data is in json format. 
         # see render_info/__init__.py for more info. (as well as render_info/katana_render_info.py)
