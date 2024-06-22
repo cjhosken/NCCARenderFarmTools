@@ -1,14 +1,16 @@
 import os
+import json
 import subprocess
 import tempfile
 import shutil
-import paramiko, socket
+import paramiko
+import socket
 from cryptography.fernet import Fernet
-
-from config import *
-
 from PySide2 import QtCore, QtWidgets
 
+
+from .crypt import *
+from config import *
 
 class NCCA_ConnectionFailedException(Exception):
     pass
@@ -60,10 +62,18 @@ class RenderFarmLoginDialog(QtWidgets.QDialog):
 
         self.key_path = os.path.expanduser("~/.ncca_key")
         if not os.path.exists(self.key_path):
-            self.generate_key()
+            generate_key(self.key_path)
 
         with open(self.key_path, "rb") as key_file:
             self.key = key_file.read()
+
+        # Attempt to load and decrypt saved credentials
+        saved_credentials = load_saved_credentials(self.key)
+        if saved_credentials:
+            self.username_input.setText(saved_credentials['username'])
+            self.password_input.setText(saved_credentials['password'])
+            self.save_info_checkbox.setChecked(True)
+
 
     def confirm_login(self):
         username = self.username_input.text()
@@ -76,12 +86,11 @@ class RenderFarmLoginDialog(QtWidgets.QDialog):
         
         for attempt in range(MAX_CONNECTION_ATTEMPTS):
             try:
-                transport = paramiko.Transport(RENDERFARM_ADDRESS, RENDERFARM_PORT)
-                transport.connect(username=username, password=password)
-                self.sftp = paramiko.SFTPClient.from_transport(transport)
-
+                # Perform login operations here
                 if save_info:
-                    self.save_user_info(username, password)
+                    save_user_info(self.key, username, password)
+                else:
+                    remove_user_info()
                 # Close dialog on successful login
                 self.accept()
 
@@ -92,32 +101,3 @@ class RenderFarmLoginDialog(QtWidgets.QDialog):
                 if attempt >= MAX_CONNECTION_ATTEMPTS - 1:
                     QtWidgets.QMessageBox.warning(self, "Connection Failed", "Connection to the renderfarm failed.")
                     return
-    
-    def save_user_info(self, username, password):
-        """
-        Save user info (username and password) to a secure location with encryption.
-        """
-        encrypted_credentials = self.encrypt_credentials(username, password)
-        save_path = os.path.expanduser("~/.ncca_env")
-        
-        with open(save_path, "wb") as file:
-            file.write(encrypted_credentials)
-
-        print(f"Saved encrypted credentials to: {save_path}")
-
-    def encrypt_credentials(self, username, password):
-        """
-        Encrypt username and password using Fernet symmetric encryption.
-        """
-        cipher_suite = Fernet(self.key)
-        plaintext = f"{username}:{password}"
-        encrypted_data = cipher_suite.encrypt(plaintext.encode())
-        return encrypted_data
-
-    def generate_key(self):
-        """
-        Generate a new encryption key and save it to ~/.ncca_key.
-        """
-        key = Fernet.generate_key()
-        with open(self.key_path, "wb") as key_file:
-            key_file.write(key)

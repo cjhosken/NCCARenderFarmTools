@@ -1,13 +1,16 @@
-import bpy
+import bpy, os
 from bpy.props import *
+
+from ..renderfarm.crypt import *
 
 class NCCAProperties(bpy.types.PropertyGroup):
     username : StringProperty(name="Username", description="Your NCCA username",  default="")
-    password : StringProperty(name="Password", description="Your NCCA password", default="", subtype='PASSWORD')
+    password : StringProperty(name="Password", description="Your NCCA password", default="", subtype='PASSWORD', options={'HIDDEN'})
 
     host : StringProperty(name="", description="", default="tete.bournemouth.ac.uk")
     port : IntProperty(name="", description="", default=22)
 
+    key : StringProperty(name="Key", description="Encryption Key", default="")
     connected : BoolProperty(name="", description="", default=False)
 
 classes = [NCCAProperties]

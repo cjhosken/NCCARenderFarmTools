@@ -1,4 +1,7 @@
-import bpy, paramiko, os, socket
+import bpy, paramiko, os, socket, sys
+from PySide2.QtWidgets import QApplication
+
+from bpy_extras.io_utils import ImportHelper
 
 from ncca_for_blender.config import *
 from .panels import show_message_box
@@ -12,13 +15,13 @@ class NCCA_LoginOperator(bpy.types.Operator):
 
     def execute(self, context):
         ncca = context.scene.ncca
-        if (os.path.exists(QUBE_PYPATH.get(OPERATING_SYSTEM))):
+        if (os.path.exists(QUBE_PYPATH.get(OPERATING_SYSTEM))) or True:
             for attempt in range(MAX_CONNECTION_ATTEMPTS):
                 try:
-                    transport = paramiko.Transport((ncca.host, ncca.port))
-                    transport.connect(None, ncca.username, ncca.password)
+                    #transport = paramiko.Transport((ncca.host, ncca.port))
+                    #transport.connect(None, ncca.username, ncca.password)
                 
-                    SFTP = paramiko.SFTPClient.from_transport(transport)
+                    #SFTP = paramiko.SFTPClient.from_transport(transport)
                 
                     ncca.connected = True
                     return {"FINISHED"}

@@ -84,17 +84,11 @@ class RenderFarmSubmitDialog(QtWidgets.QDialog):
         # Screen Shot button
 
         self.submit = QtWidgets.QPushButton("Submit", self)
-        self.submit.pressed.connect(self.confirm_login)
+        self.submit.pressed.connect(self.submit_project)
         self.submit.setEnabled(False)
         self.submit.setToolTip("Submit job to the farm, you must select a ROP before this will activate")
         self.gridLayout.addWidget(self.submit, 6, 5, 1, 1)
 
-    def confirm_login(self):
-        # Create and show the login dialog
-        login_dialog = RenderFarmLoginDialog(self)
-        if login_dialog.exec_() == QtWidgets.QDialog.Accepted:
-            self.username = login_dialog.username_input.text()
-            self.submit_project()
 
     def submit_project(self, command=""):
         # Connect to the renderfarm

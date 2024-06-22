@@ -99,7 +99,7 @@ global proc shelf_NCCA () {
         -style "iconOnly" 
         -marginWidth 0
         -marginHeight 1
-        -command "python(\"import sys; import os; sys.path.append(os.path.join(os.environ.get('HOME'), '.ncca', 'ncca_shelftools')); from renderfarm import view; view.main()\");"
+        -command "python(\"import sys; import os; sys.path.append(os.path.join(os.environ.get('HOME'), '.ncca', 'ncca_shelftools')); from renderfarm import view; view.main('maya')\");"
         -sourceType "mel" 
         -commandRepeatable 1
         -flat 1

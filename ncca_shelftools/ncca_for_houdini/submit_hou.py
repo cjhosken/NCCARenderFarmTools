@@ -96,9 +96,13 @@ class Houdini_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
 
 def main():
     if os.path.exists(QUBE_PYPATH.get(OPERATING_SYSTEM)) or True:
-        dialog = Houdini_RenderFarmSubmitDialog()
-        dialog.setWindowFlags(QtCore.Qt.Tool | QtCore.Qt.WindowStaysOnTopHint)
-        dialog.setParent(hou.qt.mainWindow(), QtCore.Qt.Window)
-        dialog.show()
+        #Create and show the login dialog
+        
+        login_dialog = RenderFarmLoginDialog()
+        if login_dialog.exec_() == QtWidgets.QDialog.Accepted:
+            dialog = Houdini_RenderFarmSubmitDialog()
+            dialog.setWindowFlags(QtCore.Qt.Tool | QtCore.Qt.WindowStaysOnTopHint)
+            dialog.setParent(hou.qt.mainWindow(), QtCore.Qt.Window)
+            dialog.show()
     else:
         hou.ui.displayMessage(title="NCCA Tool Error",  severity=hou.severityType.Error, details=f"", text=QUBE_PYPATH_ERROR)

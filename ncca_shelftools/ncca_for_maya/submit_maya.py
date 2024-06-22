@@ -16,6 +16,7 @@ import maya.OpenMayaUI as omui
 from PySide2 import QtCore, QtWidgets
 from shiboken2 import wrapInstance
 
+from renderfarm.login import RenderFarmLoginDialog
 from config import *
 
 def get_main_window():
@@ -49,7 +50,7 @@ class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         label = QtWidgets.QLabel("Active Renderer")
         self.gridLayout.addWidget(label, 3, 0, 1, 1)
         self.active_renderer = QtWidgets.QComboBox()
-        self.active_renderer.addItems(RENDERER_COMMANDS)
+        self.active_renderer.addItems(MAYA_RENDERERS)
         self.active_renderer.setToolTip("The active renderer on the farm.")
         self.gridLayout.addWidget(self.active_renderer, 3, 1, 1, 2)
 
@@ -99,7 +100,7 @@ class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         self.check_for_submit()
 
     def submit_job(self):
-        renderer = RENDERER_COMMANDS[self.active_renderer.currentText()]
+        renderer = MAYA_RENDERERS[self.active_renderer.currentText()]
         render_camera = self.camera.currentText()
         extra_commands = self.extra_commands.text()
         output_path = self.output_filename.text().replace("\\", "/")
@@ -120,8 +121,6 @@ class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         output_dir, image_name, output_file_extension, frame_number_format = self.convert_render_path(output_path)
         output_dir += "/"
 
-        override_extension = MAYA_FILE_EXTENSIONS.get(output_file_extension.lower(), "")
-
         render_options = ""
         render_options += f"-r {renderer}"
         render_options += f" -proj {remote_project_dir}"
@@ -140,7 +139,7 @@ class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         else:
             pass
         
-        render_options += f" -of {override_extension}" if override_extension else ""
+        render_options += f" -of {output_file_extension}" if output_file_extension else ""
         render_options += f" -cam {render_camera}"
 
         render_command = f"Render {render_options} -s QB_FRAME_NUMBER -e QB_FRAME_NUMBER {extra_commands} {render_path}"
@@ -203,8 +202,11 @@ class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
 
 def main():
     if os.path.exists(QUBE_PYPATH.get(OPERATING_SYSTEM)) or True:
+        
         main_window = get_main_window()
-        dialog = Maya_RenderFarmSubmitDialog(main_window)
-        dialog.show()
+        login_dialog = RenderFarmLoginDialog(main_window)
+        if login_dialog.exec_() == QtWidgets.QDialog.Accepted:
+            dialog = Maya_RenderFarmSubmitDialog(main_window)
+            dialog.show()
     else:
         cmds.confirmDialog(title="NCCA Tool Error", message=f"Uh oh! An error occurred. Please contact the NCCA team if this issue persists.\n\n", button=["Ok"])

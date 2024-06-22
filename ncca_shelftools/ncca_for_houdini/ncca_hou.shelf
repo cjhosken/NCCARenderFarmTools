@@ -18,8 +18,8 @@
     </script>
   </tool>
 
-  <tool name="ncca_view_renderfarm" label="View Farm" icon="TOP_commandserver">
-    <script scriptType="python"><![CDATA[import sys; import os; sys.path.append(os.path.join(os.environ.get("HOME"), ".ncca", "ncca_shelftools")); from renderfarm import view; view.main()]]>
+  <tool name="ncca_view_renderfarm" label="View Farm" icon="BUTTONS_internet">
+    <script scriptType="python"><![CDATA[import sys; import os; sys.path.append(os.path.join(os.environ.get("HOME"), ".ncca", "ncca_shelftools")); from renderfarm import view; view.main('houdini')]]>
     </script>
   </tool>
 </shelfDocument>

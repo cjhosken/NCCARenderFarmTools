@@ -1,4 +1,8 @@
 import bpy
+import os
+import base64
+
+from ..renderfarm.crypt import *
 
 def show_message_box(title = "Message Box", message = "", icon = 'INFO'):
     def draw(self, context):
@@ -25,31 +29,21 @@ class NCCA_ToolsPanel(NCCA_Panel, bpy.types.Panel):
         layout.use_property_split = True
         layout.use_property_decorate = False
 
-        layout.prop(ncca, "username")
-        layout.prop(ncca, "password")
-        layout.operator("ncca.qube")
         if (not ncca.connected):
+            layout.prop(ncca, "username")
+            layout.prop(ncca, "password")
             layout.operator("ncca.login")
+        else:
+            layout.label(text="User: " + ncca.username)
 
-class NCCA_FarmPanel(NCCA_Panel, bpy.types.Panel):
-    bl_idname = "NCCA_PT_farm"
-    bl_label = "NCCA Renderfarm"
-    bl_parent_id="NCCA_PT_tools"
+        layout.operator("ncca.qube")
+        
+        if (ncca.connected):
+            layout.operator("ncca.submit")
+            layout.operator("ncca.farm")
 
-    @classmethod
-    def poll(cls, context):
-        return context.scene.ncca.connected
 
-    def draw(self, context):
-        layout = self.layout
-        ncca = context.scene.ncca
-        layout.use_property_split = True
-        layout.use_property_decorate = False
-
-        layout.operator("ncca.submit")
-        layout.operator("ncca.farm")
-
-classes = [NCCA_ToolsPanel, NCCA_FarmPanel]
+classes = [NCCA_ToolsPanel]
 
 def register():
     for cls in classes:
