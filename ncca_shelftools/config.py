@@ -31,12 +31,6 @@ MAYA_SHELF_PATH = {
     "linux":f"{HOME_DIR}/maya/2023/prefs/shelves",
     "darwin":""
 }
-BLENDER_ADDON_PATH = {
-    "windows":"",
-    "linux":f"{HOME_DIR}/blender/blender-4.1.0-linux-x64/4.1/scripts/addons",
-    "darwin":""
-}
-
 
 RENDERFARM_ADDRESS = "tete.bournemouth.ac.uk"
 RENDERFARM_PORT = 22
