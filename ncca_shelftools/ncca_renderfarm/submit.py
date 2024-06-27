@@ -1,23 +1,14 @@
-import os, sys
-import subprocess
-import tempfile
-import shutil
-
 from config import *
-
-from PySide2 import QtCore, QtWidgets
-
-from renderfarm.login import RenderFarmLoginDialog, NCCA_ConnectionFailedException, NCCA_InvalidCredentialsException
-
 
 class RenderFarmSubmitDialog(QtWidgets.QDialog):
     """"""
-    def __init__(self, title="NCCA Renderfarm Submit Tool", parent=None):
+    def __init__(self, title="NCCA Renderfarm Submit Tool", sftp=None, parent=None):
         super().__init__(parent)
         self.setWindowTitle(title)
         self.resize(600, 280)
         self.init_ui()
         self.finish_ui()
+        self.sftp = sftp
 
     def init_ui(self):
         # Main layout for form
@@ -89,19 +80,17 @@ class RenderFarmSubmitDialog(QtWidgets.QDialog):
         self.submit.setToolTip("Submit job to the farm, you must select a ROP before this will activate")
         self.gridLayout.addWidget(self.submit, 6, 5, 1, 1)
 
-
     def submit_project(self, command=""):
         # Connect to the renderfarm
-        sftp = None
         username = self.username
 
         local_project_dir = self.project_path.text()
         remote_project_dir = os.path.join("/home", username, "farm", "projects", os.path.basename(local_project_dir))
         
-        #if (os.path.exists(remote_project_dir)):
-        #    sftp.rmtree(remote_project_dir)
+        #if (self.sftp.exists(remote_project_dir)):
+        #    self.sftp.rmtree(remote_project_dir)
 
-        #sftp.put(remote_project_dir, local_project_dir)
+        #self.sftp.put(remote_project_dir, local_project_dir)
         # Upload the project folder
         # Submit the job
 

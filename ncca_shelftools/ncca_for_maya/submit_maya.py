@@ -1,32 +1,15 @@
-import os
-import platform
-import subprocess
-import sys
-import tempfile
-import webbrowser
-import shutil
-import re
-
 from config import *
-from renderfarm.submit import RenderFarmSubmitDialog
 
 import maya.cmds as cmds
-import maya.OpenMayaAnim as OMA
-import maya.OpenMayaUI as omui
-from PySide2 import QtCore, QtWidgets
-from shiboken2 import wrapInstance
 
-from renderfarm.login import RenderFarmLoginDialog
-from config import *
+from ncca_renderfarm.submit import RenderFarmSubmitDialog
+from ncca_renderfarm.login import RenderFarmLoginDialog
 
-def get_main_window():
-    """This returns the Maya main window for parenting."""
-    window = omui.MQtUtil.mainWindow()
-    return wrapInstance(int(window), QtWidgets.QDialog)
+from utils import get_maya_window
 
 class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
-    def __init__(self, parent=None):
-        super().__init__("NCCA Renderfarm Maya Submit Tool", parent)
+    def __init__(self, sftp=None, parent=None):
+        super().__init__("NCCA Renderfarm Maya Submit Tool", sftp, parent)
         name = os.path.basename(cmds.file(q=True, sn=True))
 
         if (not name):
@@ -61,7 +44,7 @@ class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         self.camera.setToolTip("The camera used for rendering on the farm.")
         self.gridLayout.addWidget(self.camera, 3, 4, 1, 2)
 
-        self.override_filename = QtWidgets.QLabel("Output File Name")
+        self.override_filename = QtWidgets.QLabel("Output File")
         self.override_filename.setToolTip("Overrides the output file name in the Maya file.")
         self.gridLayout.addWidget(self.override_filename, 4, 0, 1, 1)
 
@@ -141,10 +124,14 @@ class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         
         render_options += f" -of {output_file_extension}" if output_file_extension else ""
         render_options += f" -cam {render_camera}"
-
+        
         render_command = f"Render {render_options} -s QB_FRAME_NUMBER -e QB_FRAME_NUMBER {extra_commands} {render_path}"
 
-        command = f"{render_command}"
+        pre_render_command = "export PATH=bin/"
+
+        print(cmds.about(version=True))
+
+        command = f"{pre_render_command} {render_command}"
 
         super().submit_project(command)
 
@@ -202,11 +189,11 @@ class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
 
 def main():
     if os.path.exists(QUBE_PYPATH.get(OPERATING_SYSTEM)) or True:
-        
-        main_window = get_main_window()
+        main_window = get_maya_window()
         login_dialog = RenderFarmLoginDialog(main_window)
-        if login_dialog.exec_() == QtWidgets.QDialog.Accepted:
-            dialog = Maya_RenderFarmSubmitDialog(main_window)
+        sftp = login_dialog.exec_()
+        if sftp is not None:
+            dialog = Maya_RenderFarmSubmitDialog(sftp=sftp, parent=main_window)
             dialog.show()
     else:
-        cmds.confirmDialog(title="NCCA Tool Error", message=f"Uh oh! An error occurred. Please contact the NCCA team if this issue persists.\n\n", button=["Ok"])
+        cmds.confirmDialog(title="NCCA Error", message=f"Uh oh! An error occurred. Please contact the NCCA team if this issue persists.\n\n", button=["Ok"])

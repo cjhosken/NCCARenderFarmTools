@@ -1,20 +1,13 @@
-import os, sys
-import subprocess
-import tempfile
-import shutil
-
 from config import *
 
 import hou
-from PySide2 import QtCore, QtWidgets
-
-from renderfarm.login import RenderFarmLoginDialog, NCCA_ConnectionFailedException, NCCA_InvalidCredentialsException
-from renderfarm.submit import RenderFarmSubmitDialog
+from ncca_renderfarm.login import RenderFarmLoginDialog
+from ncca_renderfarm.submit import RenderFarmSubmitDialog
 
 class Houdini_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
     """"""
-    def __init__(self, parent=None):
-        super().__init__("NCCA Renderfarm Houdini Submit Tool", parent)
+    def __init__(self, sftp=None, parent=None):
+        super().__init__("NCCA Renderfarm Houdini Submit Tool", sftp, parent)
         # Move to Build mode
         # Set the GUI components and layout
         name=hou.hipFile.basename()
@@ -99,10 +92,10 @@ def main():
         #Create and show the login dialog
         
         login_dialog = RenderFarmLoginDialog()
-        if login_dialog.exec_() == QtWidgets.QDialog.Accepted:
-            dialog = Houdini_RenderFarmSubmitDialog()
-            dialog.setWindowFlags(QtCore.Qt.Tool | QtCore.Qt.WindowStaysOnTopHint)
+        sftp = login_dialog.exec_()
+        if sftp is not None:
+            dialog = Houdini_RenderFarmSubmitDialog(sftp=sftp)
             dialog.setParent(hou.qt.mainWindow(), QtCore.Qt.Window)
             dialog.show()
     else:
-        hou.ui.displayMessage(title="NCCA Tool Error",  severity=hou.severityType.Error, details=f"", text=QUBE_PYPATH_ERROR)
+        hou.ui.displayMessage(title="NCCA Error",  severity=hou.severityType.Error, details=f"", text=QUBE_PYPATH_ERROR)

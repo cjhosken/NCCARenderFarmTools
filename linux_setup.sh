@@ -40,4 +40,4 @@ $MAYAPY_PATH -m pip install --upgrade pip
 $MAYAPY_PATH -m pip install -r requirements.txt
 
 # Optionally provide feedback that the setup is complete
-echo "NCCA setup completed successfully."
+echo "Setup completed successfully."

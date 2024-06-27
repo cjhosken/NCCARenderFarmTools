@@ -26,12 +26,12 @@ global proc shelf_NCCA () {
         -useAlpha 1
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
-        -image "contentBrowserGeneric.png" 
-        -image1 "contentBrowserGeneric.png" 
+        -image "nodeEditorHypershadePerspLayout.png" 
+        -image1 "nodeEditorHypershadePerspLayout.png" 
         -style "iconOnly" 
         -marginWidth 0
         -marginHeight 1
-        -command "python(\"import sys; import os; sys.path.append(os.path.join(os.environ.get('HOME'), '.ncca', 'ncca_shelftools')); from renderfarm import qube; qube.main()\");"
+        -command "python(\"import sys, os; sys.path.append(os.path.join(os.path.expanduser('~'), '.ncca', 'ncca_shelftools')); from ncca_renderfarm import qube; qube.main()\");"
         -sourceType "mel" 
         -commandRepeatable 1
         -flat 1
@@ -65,7 +65,7 @@ global proc shelf_NCCA () {
         -style "iconOnly" 
         -marginWidth 0
         -marginHeight 1
-        -command "python(\"import sys; import os; sys.path.append(os.path.join(os.environ.get('HOME'), '.ncca', 'ncca_shelftools')); from ncca_for_maya import submit_maya; submit_maya.main()\");"
+        -command "python(\"import sys, os; sys.path.append(os.path.join(os.path.expanduser('~'), '.ncca', 'ncca_shelftools')); from ncca_for_maya import submit_maya; submit_maya.main()\");"
         -sourceType "mel" 
         -commandRepeatable 1
         -flat 1
@@ -99,7 +99,7 @@ global proc shelf_NCCA () {
         -style "iconOnly" 
         -marginWidth 0
         -marginHeight 1
-        -command "python(\"import sys; import os; sys.path.append(os.path.join(os.environ.get('HOME'), '.ncca', 'ncca_shelftools')); from renderfarm import view; view.main('maya')\");"
+        -command "python(\"import sys, os; sys.path.append(os.path.join(os.path.expanduser('~'), '.ncca', 'ncca_shelftools')); from ncca_renderfarm import viewer; viewer.main('maya')\");"
         -sourceType "mel" 
         -commandRepeatable 1
         -flat 1

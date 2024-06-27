@@ -1,16 +1,8 @@
-import os
-import json
-import subprocess
-import tempfile
-import shutil
+from config import *
 import paramiko
 import socket
-from cryptography.fernet import Fernet
-from PySide2 import QtCore, QtWidgets
-
 
 from .crypt import *
-from config import *
 
 class NCCA_ConnectionFailedException(Exception):
     pass
@@ -60,12 +52,8 @@ class RenderFarmLoginDialog(QtWidgets.QDialog):
         self.login_button.setEnabled(True)
         self.login_button.setToolTip("Submit job to the farm. Please enter your username and password.")
 
-        self.key_path = os.path.expanduser("~/.ncca_key")
-        if not os.path.exists(self.key_path):
-            generate_key(self.key_path)
-
-        with open(self.key_path, "rb") as key_file:
-            self.key = key_file.read()
+        generate_key()
+        self.key = load_key()
 
         # Attempt to load and decrypt saved credentials
         saved_credentials = load_saved_credentials(self.key)
@@ -74,7 +62,6 @@ class RenderFarmLoginDialog(QtWidgets.QDialog):
             self.password_input.setText(saved_credentials['password'])
             self.save_info_checkbox.setChecked(True)
 
-
     def confirm_login(self):
         username = self.username_input.text()
         password = self.password_input.text()
@@ -82,22 +69,28 @@ class RenderFarmLoginDialog(QtWidgets.QDialog):
         
         if not username or not password:
             QtWidgets.QMessageBox.warning(self, "Input Error", "Username and password cannot be empty.")
-            return
-        
-        for attempt in range(MAX_CONNECTION_ATTEMPTS):
-            try:
-                # Perform login operations here
-                if save_info:
-                    save_user_info(self.key, username, password)
-                else:
-                    remove_user_info()
-                # Close dialog on successful login
-                self.accept()
+        else:
+            for attempt in range(MAX_CONNECTION_ATTEMPTS):
+                try:
+                    #
+                    # sftp connection login
+                    #
+                    #
+                    sftp = "yes"
+                    #
+                    # Perform login operations here
+                    if save_info:
+                        save_user_info(self.key, username, password)
+                    else:
+                        remove_user_info()
 
-            except paramiko.AuthenticationException:
-                QtWidgets.QMessageBox.warning(self, "Login Failed", "Invalid username or password.")
-                return
-            except (paramiko.SSHException, socket.gaierror):
-                if attempt >= MAX_CONNECTION_ATTEMPTS - 1:
-                    QtWidgets.QMessageBox.warning(self, "Connection Failed", "Connection to the renderfarm failed.")
-                    return
+                    # Close dialog on and return sftp successful login
+                    self.accept()
+                    return sftp
+
+                except paramiko.AuthenticationException:
+                    QtWidgets.QMessageBox.warning(self, "Login Failed", "Invalid username or password.")
+                except (paramiko.SSHException, socket.gaierror):
+                    if attempt >= MAX_CONNECTION_ATTEMPTS - 1:
+                        QtWidgets.QMessageBox.warning(self, "Connection Failed", "Connection to the NCCA Renderfarm failed.")
+        return None
