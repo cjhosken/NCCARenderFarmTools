@@ -6,8 +6,8 @@ from ncca_renderfarm.submit import RenderFarmSubmitDialog
 
 class Houdini_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
     """"""
-    def __init__(self, sftp=None, parent=None):
-        super().__init__("NCCA Renderfarm Houdini Submit Tool", sftp, parent)
+    def __init__(self, info=None, parent=None):
+        super().__init__("NCCA Renderfarm Houdini Submit Tool", info, parent)
         # Move to Build mode
         # Set the GUI components and layout
         name=hou.hipFile.basename()
@@ -92,9 +92,9 @@ def main():
         #Create and show the login dialog
         
         login_dialog = RenderFarmLoginDialog()
-        sftp = login_dialog.exec_()
-        if sftp is not None:
-            dialog = Houdini_RenderFarmSubmitDialog(sftp=sftp)
+        if login_dialog.exec_() == QtWidgets.QDialog.Accepted:
+            login_info = login_dialog.get_login_info()
+            dialog = Houdini_RenderFarmSubmitDialog(info=login_info)
             dialog.setParent(hou.qt.mainWindow(), QtCore.Qt.Window)
             dialog.show()
     else:

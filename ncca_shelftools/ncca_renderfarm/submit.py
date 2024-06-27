@@ -2,13 +2,15 @@ from config import *
 
 class RenderFarmSubmitDialog(QtWidgets.QDialog):
     """"""
-    def __init__(self, title="NCCA Renderfarm Submit Tool", sftp=None, parent=None):
+    def __init__(self, title="NCCA Renderfarm Submit Tool", info=None, parent=None):
         super().__init__(parent)
         self.setWindowTitle(title)
         self.resize(600, 280)
         self.init_ui()
         self.finish_ui()
-        self.sftp = sftp
+
+        self.sftp = info["sftp"]
+        self.username = info["username"]
 
     def init_ui(self):
         # Main layout for form
@@ -26,8 +28,8 @@ class RenderFarmSubmitDialog(QtWidgets.QDialog):
         label=QtWidgets.QLabel("CPU Count")
         self.gridLayout.addWidget(label, 0, 4, 1, 1)
         self.cpus=QtWidgets.QComboBox()
-        self.cpus.addItems(str(i) for i in range(1, 8+1))
-        self.cpus.setCurrentIndex(1)
+        self.cpus.addItems(str(i) for i in range(1, MAX_CPUS+1))
+        self.cpus.setCurrentText(str(DEFAULT_CPU_USAGE))
         self.cpus.setToolTip("number of nodes to use, please be respectful of others and only use high numbers if farm is empty")
         self.gridLayout.addWidget(self.cpus, 0, 5, 1, 1)
 

@@ -4,6 +4,7 @@ REM Set variables (adjust paths as needed)
 set NCCA_DIR=%USERPROFILE%\.ncca
 set MAYA_SHELF_PATH=%USERPROFILE%\Documents\maya\2023\prefs\shelves
 set MAYAPY_PATH=C:\Program Files\Autodesk\Maya2023\bin\mayapy.exe
+set HYTHON_PATH=c:\Program Files\Side Effects Software\Houdini 20.0.751\bin\hython.exe
 set HOUDINI_SHELF_PATH=%USERPROFILE%\Documents\houdini20.0\toolbar
 
 REM Create NCCA_DIR if it doesn't exist
@@ -22,7 +23,7 @@ xcopy /e /i .\ncca_shelftools "%ncca_shelftools_dir%"
 
 REM Paths to specific shelf files and addons
 set maya_ncca_shelf=%MAYA_SHELF_PATH%\shelf_NCCA.mel
-set houdini_ncca_shelf=%HOUDINI_SHELF_PATH%\shelf_NCCA.mel
+set houdini_ncca_shelf=%HOUDINI_SHELF_PATH%\ncca_hou.shelf
 
 REM Remove existing files and directories if they exist
 if exist "%maya_ncca_shelf%" (
@@ -40,6 +41,9 @@ copy "%ncca_shelftools_dir%\ncca_for_maya\shelf_NCCA.mel" "%MAYA_SHELF_PATH%\she
 REM Install required Python packages using mayapy
 "%MAYAPY_PATH%" -m pip install --upgrade pip
 "%MAYAPY_PATH%" -m pip install -r requirements.txt
+
+"%HYTHON_PATH%" -m pip install --upgrade pip
+"%HYTHON_PATH%" -m pip install -r requirements.txt
 
 REM Optionally provide feedback that the setup is complete
 echo Setup completed successfully.

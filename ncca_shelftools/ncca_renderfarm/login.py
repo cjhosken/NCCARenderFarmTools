@@ -14,6 +14,10 @@ class RenderFarmLoginDialog(QtWidgets.QDialog):
     """
     Render Farm Login Dialog
     """
+
+    username = ""
+    sftp = None
+
     def __init__(self, parent=None):
         super().__init__(parent)
         
@@ -76,17 +80,17 @@ class RenderFarmLoginDialog(QtWidgets.QDialog):
                     # sftp connection login
                     #
                     #
-                    sftp = "yes"
-                    #
-                    # Perform login operations here
+
+                    self.sftp = None
+                    self.username = username
+
                     if save_info:
                         save_user_info(self.key, username, password)
                     else:
                         remove_user_info()
 
                     # Close dialog on and return sftp successful login
-                    self.accept()
-                    return sftp
+                    return self.accept()
 
                 except paramiko.AuthenticationException:
                     QtWidgets.QMessageBox.warning(self, "Login Failed", "Invalid username or password.")
@@ -94,3 +98,6 @@ class RenderFarmLoginDialog(QtWidgets.QDialog):
                     if attempt >= MAX_CONNECTION_ATTEMPTS - 1:
                         QtWidgets.QMessageBox.warning(self, "Connection Failed", "Connection to the NCCA Renderfarm failed.")
         return None
+    
+    def get_login_info(self):
+        return {"username": self.username, "sftp" : self.sftp}

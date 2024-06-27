@@ -45,6 +45,9 @@ MAYA_SHELF_PATH = {
 RENDERFARM_ADDRESS = "tete.bournemouth.ac.uk"
 RENDERFARM_PORT = 22
 
+MAX_CPUS = 8
+DEFAULT_CPU_USAGE=2
+
 HOUDINI_FARM_PATH = "/path/to/houdini"
 
 MAYA_RENDERERS = {
@@ -67,3 +70,12 @@ MAYA_FILE_EXTENSIONS = {
     "DeepEXR": "deepexr",
     "Maya": "maya"
 }
+
+SUPPORTED_IMAGE_FORMATS = [
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".tiff",
+    ".tif",
+    ".exr"
+]

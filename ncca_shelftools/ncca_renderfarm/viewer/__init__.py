@@ -20,11 +20,11 @@ def main(dcc=""):
     if os.path.exists(QUBE_PYPATH.get(OPERATING_SYSTEM)) or True:
         # Initialize and execute the login dialog
         login_dialog = RenderFarmLoginDialog(parent)
-        sftp = login_dialog.exec_()  # Execute the dialog and get the SFTP object
 
         # If SFTP login is successful, initialize the RenderFarmViewer
-        if sftp is not None:
-            dialog = NCCA_RenderFarmViewer(sftp=sftp, parent=parent)
+        if login_dialog.exec_() == QtWidgets.QDialog.Accepted:
+            login_info = login_dialog.get_login_info()
+            dialog = NCCA_RenderFarmViewer(info=login_info, parent=parent)
 
             # If the DCC is Houdini, set the Houdini main window as parent
             if dcc == "houdini":

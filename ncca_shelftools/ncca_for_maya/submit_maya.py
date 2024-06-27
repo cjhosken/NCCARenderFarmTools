@@ -8,8 +8,8 @@ from ncca_renderfarm.login import RenderFarmLoginDialog
 from utils import get_maya_window
 
 class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
-    def __init__(self, sftp=None, parent=None):
-        super().__init__("NCCA Renderfarm Maya Submit Tool", sftp, parent)
+    def __init__(self, info=None, parent=None):
+        super().__init__("NCCA Renderfarm Maya Submit Tool", info, parent)
         name = os.path.basename(cmds.file(q=True, sn=True))
 
         if (not name):
@@ -191,9 +191,9 @@ def main():
     if os.path.exists(QUBE_PYPATH.get(OPERATING_SYSTEM)) or True:
         main_window = get_maya_window()
         login_dialog = RenderFarmLoginDialog(main_window)
-        sftp = login_dialog.exec_()
-        if sftp is not None:
-            dialog = Maya_RenderFarmSubmitDialog(sftp=sftp, parent=main_window)
+        if login_dialog.exec_() == QtWidgets.QDialog.Accepted:
+            login_info = login_dialog.get_login_info()
+            dialog = Maya_RenderFarmSubmitDialog(info=login_info, parent=main_window)
             dialog.show()
     else:
         cmds.confirmDialog(title="NCCA Error", message=f"Uh oh! An error occurred. Please contact the NCCA team if this issue persists.\n\n", button=["Ok"])
