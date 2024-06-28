@@ -45,6 +45,8 @@ class Houdini_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
 
         houdini_version = hou.applicationVersionString()
 
+        HOUDINI_FARM_PATH = os.path.join(os.path.dirname(HOUDINI_FARM_PATH), "")
+
         pre_render = f"cd {HOUDINI_FARM_PATH}; source houdini_setup_bash;"
 
         render_command=f"hython $HB/hrender.py -F QB_FRAME_NUMBER"
