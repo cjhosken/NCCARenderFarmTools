@@ -52,3 +52,22 @@ def exr_to_png(input_file, output_file):
     
     except Exception as e:
         QtWidgets.QMessageBox.warning(None, "NCCA Error", f"Error converting {input_file} to PNG: {str(e)}")
+
+
+def sftp_exists(sftp=None, remote_path=""):
+    return False
+
+def sftp_isdir(sftp=None, remote_path=""):
+    return False
+
+def sftp_isfile(sftp=None, remote_path=""):
+    return False
+
+def sftp_download(sftp=None, remote_path="", local_path=""):
+    pass
+
+def sftp_upload(sftp=None, local_path="", remote_path=""):
+    pass
+
+def sftp_delete(sftp=None, remote_path=""):
+    pass
