@@ -1,11 +1,14 @@
 from config import *
-from PySide2.QtWidgets import QMainWindow, QTreeView, QFileSystemModel, QVBoxLayout, QMenu, QAction, QApplication
+from PySide2.QtWidgets import QMainWindow, QTreeView, QStyle, QFileSystemModel, QVBoxLayout, QMenu, QAction, QApplication
 from PySide2.QtCore import QDir, Qt, QDateTime, QPoint
+from PySide2.QtGui import QPixmap, QIcon
+
+
 
 class QFarmSystemModel(QFileSystemModel):
     def __init__(self, *args, **kwargs):
         super(QFarmSystemModel, self).__init__(*args, **kwargs)
-    
+
     def lessThan(self, left, right):
         left_file_info = self.fileInfo(left)
         right_file_info = self.fileInfo(right)

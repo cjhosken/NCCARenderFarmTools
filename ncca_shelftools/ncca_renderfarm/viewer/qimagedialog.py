@@ -6,8 +6,8 @@ from PySide2.QtCore import Qt
 class QImageDialog(QDialog):
     def __init__(self, image_path, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Image Viewer")
         self.image_path = image_path
+        self.setWindowTitle(os.path.basename(self.image_path))
         
         # Layout for dialog
         layout = QVBoxLayout(self)

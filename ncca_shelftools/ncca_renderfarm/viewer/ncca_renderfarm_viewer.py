@@ -62,7 +62,6 @@ class NCCA_RenderFarmViewer(QMainWindow):
     def on_double_click(self, index):
         # Example of handling double-clicked event
         file_path = self.file_system_model.filePath(index)
-        print("Selected File:", file_path)
 
         file_name, file_ext = os.path.splitext(os.path.basename(file_path))
 
