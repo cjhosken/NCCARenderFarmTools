@@ -1,2 +1,4 @@
 paramiko
-opencv-python
+Pillow
+numpy
+OpenEXR
