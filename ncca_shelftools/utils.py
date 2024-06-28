@@ -1,20 +1,35 @@
-from config import *
-from shiboken2 import wrapInstance
-import OpenEXR
-import Imath
-import numpy as np
-from PIL import Image
-
-from PySide2 import QtWidgets
+from config import * 
+from shiboken2 import wrapInstance 
+import OpenEXR, Imath  
+import numpy as np 
+from PIL import Image 
+from PySide2 import QtWidgets  
 
 def get_maya_window():
-    """This returns the Maya main window for parenting."""
-    import maya.OpenMayaUI as omui
+    """
+    Returns the main Maya window as a QtWidgets.QDialog instance.
+    This function wraps the main Maya window using shiboken2's wrapInstance function.
+    """
+    import maya.OpenMayaUI as omui  # Import Maya UI module
 
-    window = omui.MQtUtil.mainWindow()
-    return wrapInstance(int(window), QtWidgets.QDialog)
+    window = omui.MQtUtil.mainWindow()  # Get the main Maya window
+    return wrapInstance(int(window), QtWidgets.QDialog)  # Wrap the Maya window instance as QDialog
 
 def exr_to_png(input_file, output_file):
+    """
+    Converts an EXR file to a PNG file.
+
+    Args:
+    - input_file (str): Path to the input EXR file.
+    - output_file (str): Path to save the output PNG file.
+    
+    Raises:
+    - ValueError: If the channel data size does not match the expected image size.
+
+    This function reads specific channels ('R', 'G', 'B') from the EXR file,
+    reshapes and stacks them to form an RGB image, normalizes the pixel values,
+    converts them to uint8 format, and saves the result as a PNG image using PIL.
+    """
     try:
         # Open the EXR file
         exr_file = OpenEXR.InputFile(input_file)
@@ -55,19 +70,84 @@ def exr_to_png(input_file, output_file):
 
 
 def sftp_exists(sftp=None, remote_path=""):
-    return True
+    """
+    Check if a file or directory exists on the remote SFTP server.
+
+    Args:
+    - sftp: SFTP connection object (not used in this placeholder function).
+    - remote_path (str): Path to the remote file or directory.
+
+    Returns:
+    - bool: True if the file or directory exists, False otherwise.
+
+    This is a placeholder function that always returns True.
+    """
+    return True  # Placeholder function that always returns True
 
 def sftp_isdir(sftp=None, remote_path=""):
-    return False
+    """
+    Check if a path on the remote SFTP server is a directory.
+
+    Args:
+    - sftp: SFTP connection object (not used in this placeholder function).
+    - remote_path (str): Path to the remote file or directory.
+
+    Returns:
+    - bool: True if the path is a directory, False otherwise.
+
+    This is a placeholder function that always returns False.
+    """
+    return False  # Placeholder function that always returns False
 
 def sftp_isfile(sftp=None, remote_path=""):
-    return False
+    """
+    Check if a path on the remote SFTP server is a file.
+
+    Args:
+    - sftp: SFTP connection object (not used in this placeholder function).
+    - remote_path (str): Path to the remote file or directory.
+
+    Returns:
+    - bool: True if the path is a file, False otherwise.
+
+    This is a placeholder function that always returns False.
+    """
+    return False  # Placeholder function that always returns False
 
 def sftp_download(sftp=None, remote_path="", local_path=""):
-    pass
+    """
+    Download a file from the remote SFTP server to the local machine.
+
+    Args:
+    - sftp: SFTP connection object (not used in this placeholder function).
+    - remote_path (str): Path to the remote file.
+    - local_path (str): Path to save the downloaded file locally.
+
+    This is a placeholder function that does nothing (pass statement).
+    """
+    pass  # Placeholder function for downloading files via SFTP (does nothing)
 
 def sftp_upload(sftp=None, local_path="", remote_path=""):
-    pass
+    """
+    Upload a file from the local machine to the remote SFTP server.
+
+    Args:
+    - sftp: SFTP connection object (not used in this placeholder function).
+    - local_path (str): Path to the local file.
+    - remote_path (str): Path to save the uploaded file on the remote server.
+
+    This is a placeholder function that does nothing (pass statement).
+    """
+    pass  # Placeholder function for uploading files via SFTP (does nothing)
 
 def sftp_delete(sftp=None, remote_path=""):
-    pass
+    """
+    Delete a file or directory on the remote SFTP server.
+
+    Args:
+    - sftp: SFTP connection object (not used in this placeholder function).
+    - remote_path (str): Path to the remote file or directory to delete.
+
+    This is a placeholder function that does nothing (pass statement).
+    """
+    pass  # Placeholder function for deleting files via SFTP (does nothing)

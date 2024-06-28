@@ -1,29 +1,39 @@
-from config import *
-import paramiko
-import socket
-
-from .crypt import *
+from config import *  
+import paramiko, socket  
+from .crypt import * 
 
 class NCCA_ConnectionFailedException(Exception):
+    """
+    Custom exception for connection failures to NCCA Renderfarm.
+    """
     pass
 
 class NCCA_InvalidCredentialsException(Exception):
+    """
+    Custom exception for invalid credentials when logging in to NCCA Renderfarm.
+    """
     pass
 
 class RenderFarmLoginDialog(QtWidgets.QDialog):
     """
-    Render Farm Login Dialog
+    Render Farm Login Dialog class for NCCA Renderfarm login GUI.
     """
 
-    username = ""
-    sftp = None
+    username = ""  # Initialize class variable for storing username
+    sftp = None  # Initialize class variable for SFTP connection
 
     def __init__(self, parent=None):
+        """
+        Initialize RenderFarmLoginDialog instance.
+        
+        Args:
+        - parent: Optional parent widget (default is None).
+        """
         super().__init__(parent)
         
         # Set the GUI components and layout
-        self.setWindowTitle("NCCA Renderfarm Login")
-        self.resize(300, 200)
+        self.setWindowTitle("NCCA Renderfarm Login")  # Set window title
+        self.resize(300, 200)  # Set initial dialog size
         
         # Main layout for form
         self.gridLayout = QtWidgets.QGridLayout(self)
@@ -56,40 +66,43 @@ class RenderFarmLoginDialog(QtWidgets.QDialog):
         self.login_button.setEnabled(True)
         self.login_button.setToolTip("Submit job to the farm. Please enter your username and password.")
 
-        generate_key()
-        self.key = load_key()
+        generate_key()  # Generate encryption key (assuming this function exists)
+        self.key = load_key()  # Load encryption key from storage (assuming this function exists)
 
         # Attempt to load and decrypt saved credentials
-        saved_credentials = load_saved_credentials(self.key)
+        saved_credentials = load_saved_credentials(self.key)  # Load saved credentials (assuming this function exists)
         if saved_credentials:
-            self.username_input.setText(saved_credentials['username'])
-            self.password_input.setText(saved_credentials['password'])
-            self.save_info_checkbox.setChecked(True)
+            self.username_input.setText(saved_credentials['username'])  # Set username from saved credentials
+            self.password_input.setText(saved_credentials['password'])  # Set password from saved credentials
+            self.save_info_checkbox.setChecked(True)  # Check the save info checkbox if credentials are loaded
 
     def confirm_login(self):
-        username = self.username_input.text()
-        password = self.password_input.text()
-        save_info = self.save_info_checkbox.isChecked()
+        """
+        Attempt to log in to the NCCA Renderfarm using entered credentials.
+
+        This function validates the entered username and password,
+        attempts to establish an SFTP connection, and handles exceptions.
+        """
+        username = self.username_input.text()  # Get entered username
+        password = self.password_input.text()  # Get entered password
+        save_info = self.save_info_checkbox.isChecked()  # Check if save info checkbox is checked
         
         if not username or not password:
             QtWidgets.QMessageBox.warning(self, "Input Error", "Username and password cannot be empty.")
         else:
-            for attempt in range(MAX_CONNECTION_ATTEMPTS):
+            for attempt in range(MAX_CONNECTION_ATTEMPTS):  # Try to connect multiple times
                 try:
-                    #
-                    # sftp connection login
-                    #
-                    #
-
-                    self.sftp = None
-                    self.username = username
+                    # Attempt to establish SFTP connection here
+                    
+                    self.sftp = None  # Initialize SFTP connection variable
+                    self.username = username  # Set class username variable
 
                     if save_info:
-                        save_user_info(self.key, username, password)
+                        save_user_info(self.key, username, password)  # Save user info if checkbox is checked
                     else:
-                        remove_user_info()
+                        remove_user_info()  # Remove saved user info if checkbox is not checked
 
-                    # Close dialog on and return sftp successful login
+                    # Close dialog on successful login
                     return self.accept()
 
                 except paramiko.AuthenticationException:
@@ -97,7 +110,15 @@ class RenderFarmLoginDialog(QtWidgets.QDialog):
                 except (paramiko.SSHException, socket.gaierror):
                     if attempt >= MAX_CONNECTION_ATTEMPTS - 1:
                         QtWidgets.QMessageBox.warning(self, "Connection Failed", "Connection to the NCCA Renderfarm failed.")
-        return None
+        return None  # Return None if login fails
     
     def get_login_info(self):
+        """
+        Retrieve the logged-in username and SFTP connection.
+
+        Returns:
+        - dict: Dictionary containing 'username' and 'sftp' keys.
+        """
         return {"username": self.username, "sftp" : self.sftp}
+
+# End of RenderFarmLoginDialog class
