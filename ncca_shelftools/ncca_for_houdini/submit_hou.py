@@ -90,7 +90,7 @@ class Houdini_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         self.submit.setEnabled(self.output_driver.text() is not None and self.project_path.text() is not None)
 
 def main():
-    if os.path.exists(QUBE_PYPATH.get(OPERATING_SYSTEM)) or True:
+    if os.path.exists(QUBE_PYPATH.get(OPERATING_SYSTEM)):
         #Create and show the login dialog
         
         login_dialog = RenderFarmLoginDialog()
@@ -100,4 +100,4 @@ def main():
             dialog.setParent(hou.qt.mainWindow(), QtCore.Qt.Window)
             dialog.show()
     else:
-        hou.ui.displayMessage(title="NCCA Error",  severity=hou.severityType.Error, details=f"", text=QUBE_PYPATH_ERROR)
+        QtWidgets.QMessageBox.warning(None, "NCCA Error", "Uh oh! An error occurred. Please contact the NCCA team if this issue persists.")

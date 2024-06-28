@@ -190,7 +190,7 @@ class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         return output_dir, image_name, file_extension, frame_number_format
 
 def main():
-    if os.path.exists(QUBE_PYPATH.get(OPERATING_SYSTEM)) or True:
+    if os.path.exists(QUBE_PYPATH.get(OPERATING_SYSTEM)):
         main_window = get_maya_window()
         login_dialog = RenderFarmLoginDialog(main_window)
         if login_dialog.exec_() == QtWidgets.QDialog.Accepted:
@@ -198,4 +198,4 @@ def main():
             dialog = Maya_RenderFarmSubmitDialog(info=login_info, parent=main_window)
             dialog.show()
     else:
-        cmds.confirmDialog(title="NCCA Error", message=f"Uh oh! An error occurred. Please contact the NCCA team if this issue persists.\n\n", button=["Ok"])
+        QtWidgets.QMessageBox.warning(None, "NCCA Error", "Uh oh! An error occurred. Please contact the NCCA team if this issue persists.")

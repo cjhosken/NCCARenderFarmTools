@@ -16,8 +16,8 @@ def main(dcc=""):
     if dcc == "maya":
         parent = get_maya_window()
 
-    # Check if the Qube Python path exists for the current operating system (placeholder 'or True' used here)
-    if os.path.exists(QUBE_PYPATH.get(OPERATING_SYSTEM)) or True:
+    # Check if the Qube Python path exists for the current operating system
+    if os.path.exists(QUBE_PYPATH.get(OPERATING_SYSTEM)):
         # Initialize and execute the login dialog
         login_dialog = RenderFarmLoginDialog(parent)
 
@@ -36,4 +36,4 @@ def main(dcc=""):
             dialog.show()
     else:
         # If the Qube Python path does not exist, show an error dialog
-        QtWidgets.QMessageBox.warning(self, "NCCA Error", "Uh oh! An error occurred. Please contact the NCCA team if this issue persists.")
+        QtWidgets.QMessageBox.warning(None, "NCCA Error", "Uh oh! An error occurred. Please contact the NCCA team if this issue persists.")
