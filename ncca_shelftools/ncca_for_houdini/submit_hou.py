@@ -21,6 +21,9 @@ class Houdini_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         self.end_frame.setValue(frames[1])
 
         self.update_frame_range()
+
+    def test(self):
+        hou.ui.displayMessage(title="NCCA Error",  severity=hou.severityType.Error, details=f"", text='TESTING')
     
     def init_ui(self):
         super().init_ui()
@@ -37,28 +40,26 @@ class Houdini_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         # job submission setup
         # https://www.sidefx.com/docs/houdini/ref/utils/hrender.html
 
-    def submit_project(self):
+    def submit_project(self, command=""):
         local_project_dir = self.project_path.text()
         remote_project_dir = os.path.join("/home", self.username, "farm", "projects", os.path.basename(local_project_dir))
 
         render_path = hou.hipFile.path().replace(local_project_dir, remote_project_dir)
 
         houdini_version = hou.applicationVersionString()
+        houdini_farm_path_edit = os.path.join(os.path.dirname(HOUDINI_FARM_PATH), "")
+        pre_render = f"cd {houdini_farm_path_edit}; source houdini_setup_bash;"
 
-        HOUDINI_FARM_PATH = os.path.join(os.path.dirname(HOUDINI_FARM_PATH), "")
+        render_command = f"hython $HB/hrender.py -F QB_FRAME_NUMBER"
+        render_command += f" -d {self.output_driver.text()}"
+        render_command += f" {render_path}"
 
-        pre_render = f"cd {HOUDINI_FARM_PATH}; source houdini_setup_bash;"
+        full_command = f"{pre_render} {render_command}"
 
-        render_command=f"hython $HB/hrender.py -F QB_FRAME_NUMBER"
-        render_command+=f" -d {self.output_driver.text()}"
-        render_command+=f" {render_path}"
+        print(full_command)
 
-        command = f"{pre_render} {render_command}"
+        super().submit_project(command=full_command)
 
-        hou.ui.displayMessage(command)
-
-        super().submit_project(command)
-    
     def select_project_path(self):
         folder_path=hou.ui.selectFile(os.path.dirname(str(hou.getenv("JOB"))),"Choose folder on Farm",False,hou.fileType.Directory,"", os.path.basename(str(hou.getenv("JOB"))),False,False,hou.fileChooserMode.Write)
         self.raise_()
@@ -84,16 +85,6 @@ class Houdini_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
 
             self.check_for_submit()
 
-    def confirm_override(self, file_path):
-        reply = hou.ui.displayMessage(
-            f"{file_path} already exists. Do you wish to continue?", 
-            buttons=("Yes", "No"),
-            default_choice=1,
-            title="Confirm Override"
-        )
-        self.raise_()
-        return (reply == 0)
-
     def update_frame_range(self):
         self.by_frame.setRange(1, self.end_frame.value() - self.start_frame.value())
         self.by_frame.setValue(min(max(1, self.by_frame.value()), self.end_frame.value() - self.start_frame.value()))
@@ -109,7 +100,6 @@ def main():
         if login_dialog.exec_() == QtWidgets.QDialog.Accepted:
             login_info = login_dialog.get_login_info()
             dialog = Houdini_RenderFarmSubmitDialog(info=login_info)
-            dialog.setWindowFlags(QtCore.Qt.Tool | QtCore.Qt.WindowStaysOnTopHint)
             dialog.setParent(hou.qt.mainWindow(), QtCore.Qt.Window)
             dialog.show()
     else:

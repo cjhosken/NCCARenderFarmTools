@@ -4,7 +4,7 @@
 NCCA_DIR="$HOME/.ncca"
 MAYA_SHELF_PATH="$HOME/maya/2023/prefs/shelves"
 MAYAPY_PATH="/usr/autodesk/maya/bin/mayapy"
-HYTHON_PATH="/opt/hfs20.0/bin/hython"
+HYTHON_PATH="/opt/hfs20.0.751/bin/hython"
 HOUDINI_SHELF_PATH="$HOME/houdini20.0/toolbar"
 
 # Create NCCA_DIR if it doesn't exist

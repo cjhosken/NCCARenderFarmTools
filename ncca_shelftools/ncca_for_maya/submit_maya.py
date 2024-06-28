@@ -82,7 +82,7 @@ class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         # Perform any additional actions (e.g., enable submit button)
         self.check_for_submit()
 
-    def submit_job(self):
+    def submit_project(self, command=""):
         renderer = MAYA_RENDERERS[self.active_renderer.currentText()]
         render_camera = self.camera.currentText()
         extra_commands = self.extra_commands.text()
@@ -96,7 +96,7 @@ class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
             output_path = os.path.join(remote_project_dir, output_path.lstrip("/")).replace("\\", "/")
 
         output_file = os.path.basename(output_path)
-        frame_padding = max(output_file.count("#"), len(str(int(self.frame_end.text())*int(self.frame_step.text()))) + 1)
+        frame_padding = max(output_file.count("#"), len(str(int(self.end_frame.text())*int(self.by_frame.text()))) + 1)
         output_file = re.sub(r'#+', '#', output_file)
         output_dir = os.path.dirname(output_path)
         output_path = os.path.join(output_dir, output_file).replace("\\", "/")
@@ -127,12 +127,13 @@ class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         
         render_command = f"Render {render_options} -s QB_FRAME_NUMBER -e QB_FRAME_NUMBER {extra_commands} {render_path}"
 
-
         maya_version = cmds.about(version=True)
 
         pre_render_command = "export PATH=bin/:$PATH"
 
         command = f"{pre_render_command} {render_command}"
+
+        print(command)
 
         super().submit_project(command)
 

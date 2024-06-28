@@ -1,9 +1,9 @@
 from config import *
 from utils import *
 
-from PySide2.QtWidgets import QMainWindow, QTreeView, QFileSystemModel, QVBoxLayout, QMenu, QAction, QApplication, QMessageBox, QFileDialog
+from PySide2.QtWidgets import QMainWindow, QWidget, QTreeView, QFileSystemModel, QVBoxLayout, QMenu, QAction, QApplication, QMessageBox, QFileDialog
 
-class RenderFarmSubmitDialog(QtWidgets.QDialog):
+class RenderFarmSubmitDialog(QMainWindow):
     """"""
     def __init__(self, title="NCCA Renderfarm Submit Tool", info=None, parent=None):
         super().__init__(parent)
@@ -16,8 +16,10 @@ class RenderFarmSubmitDialog(QtWidgets.QDialog):
         self.username = info["username"]
 
     def init_ui(self):
+        self.central_widget = QWidget(self)
+        self.setCentralWidget(self.central_widget)
         # Main layout for form
-        self.gridLayout = QtWidgets.QGridLayout(self)
+        self.gridLayout = QtWidgets.QGridLayout(self.central_widget)
         self.home_dir=os.environ.get("HOME")
         self.user=os.environ.get("USER")
 
@@ -96,7 +98,7 @@ class RenderFarmSubmitDialog(QtWidgets.QDialog):
             if self.confirm_override(remote_project_dir):
                 sftp_delete(remote_project_dir)
             else:
-                self.done(0)
+                return
         
         #sftp_upload(remote_project_dir, local_project_dir)
         # Submit the job
@@ -136,8 +138,7 @@ class RenderFarmSubmitDialog(QtWidgets.QDialog):
         #    hou.ui.displayMessage(itle="NCCA Tool", text=f"{self.project_name.text()} has been successfully added to the NCCA Renderfarm! \nID: {id_list}",buttons=("Ok",))
         #except Exception as e:
         #    hou.ui.displayMessage(title="NCCA Tool Error", severity=hou.severityType.Error, details=f"{e}", text="Uh oh! An error occurred. Please contact the NCCA team if this issue persists.")
-                 
-        self.done(0)
+        self.close()
 
     def confirm_override(self, file_path):
         reply = QMessageBox.question(None, 'Confirm Override', 
