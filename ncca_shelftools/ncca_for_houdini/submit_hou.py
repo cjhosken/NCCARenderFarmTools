@@ -21,9 +21,6 @@ class Houdini_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         self.end_frame.setValue(frames[1])
 
         self.update_frame_range()
-
-    def test(self):
-        hou.ui.displayMessage(title="NCCA Error",  severity=hou.severityType.Error, details=f"", text='TESTING')
     
     def init_ui(self):
         super().init_ui()
@@ -56,7 +53,7 @@ class Houdini_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
 
         full_command = f"{pre_render} {render_command}"
 
-        print(full_command)
+        #print(full_command)
 
         super().submit_project(command=full_command)
 
