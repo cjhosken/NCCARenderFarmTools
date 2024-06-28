@@ -55,7 +55,7 @@ def exr_to_png(input_file, output_file):
 
 
 def sftp_exists(sftp=None, remote_path=""):
-    return False
+    return True
 
 def sftp_isdir(sftp=None, remote_path=""):
     return False

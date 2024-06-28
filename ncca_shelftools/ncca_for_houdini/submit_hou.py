@@ -84,6 +84,16 @@ class Houdini_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
 
             self.check_for_submit()
 
+    def confirm_override(self, file_path):
+        reply = hou.ui.displayMessage(
+            f"{file_path} already exists. Do you wish to continue?", 
+            buttons=("Yes", "No"),
+            default_choice=1,
+            title="Confirm Override"
+        )
+        self.raise_()
+        return (reply == 0)
+
     def update_frame_range(self):
         self.by_frame.setRange(1, self.end_frame.value() - self.start_frame.value())
         self.by_frame.setValue(min(max(1, self.by_frame.value()), self.end_frame.value() - self.start_frame.value()))
@@ -99,6 +109,7 @@ def main():
         if login_dialog.exec_() == QtWidgets.QDialog.Accepted:
             login_info = login_dialog.get_login_info()
             dialog = Houdini_RenderFarmSubmitDialog(info=login_info)
+            dialog.setWindowFlags(QtCore.Qt.Tool | QtCore.Qt.WindowStaysOnTopHint)
             dialog.setParent(hou.qt.mainWindow(), QtCore.Qt.Window)
             dialog.show()
     else:

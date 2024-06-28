@@ -2,7 +2,7 @@
 
 # Set variables from config.py (adjust paths as needed)
 NCCA_DIR="$HOME/.ncca"
-MAYA_SHELF_PATH="$HOME/maya/2024/prefs/shelves"
+MAYA_SHELF_PATH="$HOME/maya/2023/prefs/shelves"
 MAYAPY_PATH="/usr/autodesk/maya/bin/mayapy"
 HYTHON_PATH="/opt/hfs20.0/bin/hython"
 HOUDINI_SHELF_PATH="$HOME/houdini20.0/toolbar"

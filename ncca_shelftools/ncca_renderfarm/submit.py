@@ -1,4 +1,7 @@
 from config import *
+from utils import *
+
+from PySide2.QtWidgets import QMainWindow, QTreeView, QFileSystemModel, QVBoxLayout, QMenu, QAction, QApplication, QMessageBox, QFileDialog
 
 class RenderFarmSubmitDialog(QtWidgets.QDialog):
     """"""
@@ -89,11 +92,13 @@ class RenderFarmSubmitDialog(QtWidgets.QDialog):
         local_project_dir = self.project_path.text()
         remote_project_dir = os.path.join("/home", username, "farm", "projects", os.path.basename(local_project_dir))
         
-        #if (self.sftp.exists(remote_project_dir)):
-        #    self.sftp.rmtree(remote_project_dir)
-
-        #self.sftp.put(remote_project_dir, local_project_dir)
-        # Upload the project folder
+        if (sftp_exists(remote_project_dir)):
+            if self.confirm_override(remote_project_dir):
+                sftp_delete(remote_project_dir)
+            else:
+                self.done(0)
+        
+        #sftp_upload(remote_project_dir, local_project_dir)
         # Submit the job
 
         frame_range=f"{self.start_frame.value()}-{self.end_frame.value()}x{self.by_frame.value()}"
@@ -133,6 +138,12 @@ class RenderFarmSubmitDialog(QtWidgets.QDialog):
         #    hou.ui.displayMessage(title="NCCA Tool Error", severity=hou.severityType.Error, details=f"{e}", text="Uh oh! An error occurred. Please contact the NCCA team if this issue persists.")
                  
         self.done(0)
+
+    def confirm_override(self, file_path):
+        reply = QMessageBox.question(None, 'Confirm Override', 
+            f"{file_path} already exists. Do you wish to continue?", 
+            QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        return reply == QMessageBox.Yes
 
     def select_project_path(self):
         pass

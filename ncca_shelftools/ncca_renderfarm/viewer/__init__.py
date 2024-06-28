@@ -29,6 +29,7 @@ def main(dcc=""):
             # If the DCC is Houdini, set the Houdini main window as parent
             if dcc == "houdini":
                 import hou
+                dialog.setWindowFlags(QtCore.Qt.Tool | QtCore.Qt.WindowStaysOnTopHint)
                 dialog.setParent(hou.qt.mainWindow(), QtCore.Qt.Window)
 
             # Show the RenderFarmViewer dialog
