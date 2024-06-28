@@ -5,6 +5,8 @@ import Imath
 import numpy as np
 from PIL import Image
 
+from PySide2 import QtWidgets
+
 def get_maya_window():
     """This returns the Maya main window for parenting."""
     import maya.OpenMayaUI as omui
@@ -47,8 +49,6 @@ def exr_to_png(input_file, output_file):
         # Convert to PIL Image and save as PNG
         image = Image.fromarray(img)
         image.save(output_file)
-        
-        print(f"Conversion successful: {input_file} -> {output_file}")
     
     except Exception as e:
-        print(f"Error converting {input_file} to PNG: {str(e)}")
+        QtWidgets.QMessageBox.warning(None, "NCCA Error", f"Error converting {input_file} to PNG: {str(e)}")
