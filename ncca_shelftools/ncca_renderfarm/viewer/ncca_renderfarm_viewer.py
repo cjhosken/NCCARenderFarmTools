@@ -1,12 +1,12 @@
 from config import *
-from PySide2.QtWidgets import QMainWindow, QTreeView, QFileSystemModel, QVBoxLayout, QMenu, QAction, QApplication
+from PySide2.QtWidgets import QMainWindow, QTreeView, QFileSystemModel, QVBoxLayout, QMenu, QAction, QApplication, QMessageBox, QFileDialog
 from PySide2.QtCore import QDir, Qt, QDateTime, QPoint
 import tempfile, shutil
 
 from .qfarmsystemmodel import QFarmSystemModel
 from .qimagedialog import QImageDialog
 
-from utils import exr_to_png
+from utils import *
 
 
 class NCCA_RenderFarmViewer(QMainWindow):
@@ -70,6 +70,15 @@ class NCCA_RenderFarmViewer(QMainWindow):
 
         # handle image viewing
 
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Delete:
+            index = self.tree_view.currentIndex()
+            if index.isValid():
+                file_path = self.file_system_model.filePath(index)
+                self.delete_item(file_path)
+        else:
+            super().keyPressEvent(event)
+
     def on_custom_context_menu(self, point):
         index = self.tree_view.indexAt(point)
         if not index.isValid():
@@ -101,7 +110,7 @@ class NCCA_RenderFarmViewer(QMainWindow):
             temp_file_path = os.path.join(temp_dir, file_name)
             shutil.copy(file_path, temp_file_path)
 
-            if (file_ext.lower() in [".exr", ".deepexr"]):
+            if (file_ext.lower() in SUPPORTED_EXR_IMAGE_FORMATS):
                 alt_file_name = file_name_without_ext + ".png"
                 alt_file_path = os.path.join(temp_dir, alt_file_name)
                 exr_to_png(temp_file_path, alt_file_path)
@@ -111,9 +120,23 @@ class NCCA_RenderFarmViewer(QMainWindow):
             dialog.exec_()
 
     def download_item(self, file_path):
-        # Logic to open the file
-        print(f"Downloading item: {file_path}")
+        destination_path = ""
+
+        if os.path.isdir(file_path):
+            destination_path = QFileDialog.getExistingDirectory(self, "Select Destination Folder")
+            destination_path = os.path.join(destination_path, os.path.basename(file_path))
+        else:
+            destination_path, _ = QFileDialog.getSaveFileName(self, "Save File As", os.path.basename(file_path))
+        
+        print(f"{file_path} >> {destination_path}")
+
+        if destination_path:
+            sftp_download(file_path, destination_path)
 
     def delete_item(self, file_path):
         # Logic to delete the file
-        print(f"Deleting item: {file_path}")
+        reply = QMessageBox.question(self, 'Confirm Delete', 
+                                     f"Are you sure you want to delete '{file_path}'?", 
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            sftp_delete(file_path)

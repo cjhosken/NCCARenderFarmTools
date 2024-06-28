@@ -72,12 +72,12 @@ MAYA_FILE_EXTENSIONS = {
     "Maya": "maya"
 }
 
+SUPPORTED_EXR_IMAGE_FORMATS = [".exr", ".deepexr"]
+
 SUPPORTED_IMAGE_FORMATS = [
     ".png",
     ".jpg",
     ".jpeg",
     ".tiff",
     ".tif",
-    ".exr",
-    ".deepexr",
-]
+] + SUPPORTED_EXR_IMAGE_FORMATS
