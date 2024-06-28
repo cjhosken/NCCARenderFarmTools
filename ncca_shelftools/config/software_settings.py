@@ -29,3 +29,13 @@ MAYA_FILE_EXTENSIONS = {
     "DeepEXR": "deepexr",
     "Maya": "maya"
 }
+
+QUBE_PYPATH = {
+    "windows" : f"/path/to/qb",
+    "linux" : f"/path/to/qb"
+}
+
+QUBE_EXE_PATH = {
+    "windows" : f"/path/to/qube",
+    "linux" : f"/path/to/qube"
+}

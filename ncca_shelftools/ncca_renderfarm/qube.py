@@ -25,4 +25,4 @@ def main():
             QtWidgets.QMessageBox.warning(None, "NCCA Error", f"{e}")
     else:
         # Display a warning message box if the executable path does not exist
-        QtWidgets.QMessageBox.warning(None, "NCCA Error", QUBE_EXE_PATH_ERROR)
+        QtWidgets.QMessageBox.warning(None, "NCCA Error", "Could not find Qube")

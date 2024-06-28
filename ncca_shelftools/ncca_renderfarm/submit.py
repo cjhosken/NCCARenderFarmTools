@@ -100,18 +100,18 @@ class RenderFarmSubmitDialog(QMainWindow):
             else:
                 return
         
-        # sftp_upload(remote_project_dir, local_project_dir)
+        sftp_upload(remote_project_dir, local_project_dir)
         # Submit the job
 
         frame_range=f"{self.start_frame.value()}-{self.end_frame.value()}x{self.by_frame.value()}"
         render_home_dir = os.path.join("/render", username).replace("\\", "/")
 
-        #try:
-        #    sys.path.append(QUBE_PYPATH)
-        #    import qb
-        #except Exception as e: 
-        #    QtWidgets.QMessageBox.warning(None, "NCCA Error", f"{e}")
-        #    self.close()
+        try:
+            sys.path.append(QUBE_PYPATH.get(OPERATING_SYSTEM))
+            import qb
+        except Exception as e: 
+            QtWidgets.QMessageBox.warning(None, "NCCA Error", f"{e}")
+            self.close()
 
         job = {}
         job['name'] = self.project_name.text()
@@ -134,17 +134,17 @@ class RenderFarmSubmitDialog(QMainWindow):
 
         job['pacakge'] = package
             
-        #job['agenda'] = qb.genframes(frame_range)
+        job['agenda'] = qb.genframes(frame_range)
 
-        #listOfJobsToSubmit = [job]
-        #try:
-        #    listOfSubmittedJobs = qb.submit(listOfJobsToSubmit)
-        #    id_list = []
-        #    for job in listOfSubmittedJobs:
-        #        id_list.append(job['id'])
-        #    QtWidgets.QMessageBox.warning(None, "NCCA Error", f"{self.project_name.text()} has been successfully added to the NCCA Renderfarm! \nID: {id_list}")
-        #except Exception as e:
-        #    QtWidgets.QMessageBox.warning(None, "NCCA Error", f"{e}")
+        listOfJobsToSubmit = [job]
+        try:
+            listOfSubmittedJobs = qb.submit(listOfJobsToSubmit)
+            id_list = []
+            for job in listOfSubmittedJobs:
+                id_list.append(job['id'])
+            QtWidgets.QMessageBox.warning(None, "NCCA Error", f"{self.project_name.text()} has been successfully added to the NCCA Renderfarm! \nID: {id_list}")
+        except Exception as e:
+            QtWidgets.QMessageBox.warning(None, "NCCA Error", f"{e}")
         
         self.close()
 
