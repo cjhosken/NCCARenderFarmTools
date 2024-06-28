@@ -127,9 +127,10 @@ class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         
         render_command = f"Render {render_options} -s QB_FRAME_NUMBER -e QB_FRAME_NUMBER {extra_commands} {render_path}"
 
-        pre_render_command = "export PATH=bin/"
 
-        print(cmds.about(version=True))
+        maya_version = cmds.about(version=True)
+
+        pre_render_command = "export PATH=bin/:$PATH"
 
         command = f"{pre_render_command} {render_command}"
 

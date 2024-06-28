@@ -43,6 +43,8 @@ class Houdini_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
 
         render_path = hou.hipFile.path().replace(local_project_dir, remote_project_dir)
 
+        houdini_version = hou.applicationVersionString()
+
         pre_render = f"cd {HOUDINI_FARM_PATH}; source houdini_setup_bash;"
 
         render_command=f"hython $HB/hrender.py -F QB_FRAME_NUMBER"
