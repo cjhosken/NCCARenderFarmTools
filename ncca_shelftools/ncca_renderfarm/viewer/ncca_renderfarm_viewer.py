@@ -22,7 +22,7 @@ class NCCA_RenderFarmViewer(QMainWindow):
         - parent: Optional parent widget (default is None).
         """
         super().__init__(parent)
-        self.setWindowTitle("NCCA Renderfarm Viewer")  # Set window title
+        self.setWindowTitle(NCCA_VIEWER_DIALOG_TITLE)  # Set window title
         self.resize(300, 600)  # Set initial window size
         
         self.sftp = info["sftp"]  # Initialize SFTP connection from info dictionary
@@ -115,15 +115,15 @@ class NCCA_RenderFarmViewer(QMainWindow):
         context_menu = QMenu(self)  # Create a QMenu for the context menu
 
         if file_ext.lower() in SUPPORTED_IMAGE_FORMATS:
-            open_action = QAction("Open", self)  # Create action to open the file
+            open_action = QAction(NCCA_VIEWER_ACTION_OPEN_LABEL, self)  # Create action to open the file
             open_action.triggered.connect(lambda: self.open_item(file_path))  # Connect action to open_item method
             context_menu.addAction(open_action)  # Add action to context menu
 
-        download_action = QAction("Download", self)  # Create action to download the file
+        download_action = QAction(NCCA_VIEWER_ACTION_DOWNLOAD_LABEL, self)  # Create action to download the file
         download_action.triggered.connect(lambda: self.download_item(file_path))  # Connect action to download_item method
         context_menu.addAction(download_action)  # Add action to context menu
 
-        delete_action = QAction("Delete", self)  # Create action to delete the file
+        delete_action = QAction(NCCA_VIEWER_ACTION_DELETE_LABEL, self)  # Create action to delete the file
         delete_action.triggered.connect(lambda: self.delete_item(file_path))  # Connect action to delete_item method
         context_menu.addAction(delete_action)  # Add action to context menu
 
@@ -162,10 +162,10 @@ class NCCA_RenderFarmViewer(QMainWindow):
         destination_path = ""
 
         if os.path.isdir(file_path):
-            destination_path = QFileDialog.getExistingDirectory(self, "Select Destination Folder")  # Get destination folder for directory
+            destination_path = QFileDialog.getExistingDirectory(self, NCCA_VIEWER_FOLDER_PROMPT)  # Get destination folder for directory
             destination_path = os.path.join(destination_path, os.path.basename(file_path))  # Set destination path for directory
         else:
-            destination_path, _ = QFileDialog.getSaveFileName(self, "Save File As", os.path.basename(file_path))  # Get save file path
+            destination_path, _ = QFileDialog.getSaveFileName(self, NCCA_VIEWER_FILE_PROMPT, os.path.basename(file_path))  # Get save file path
          
         if destination_path:
             sftp_download(file_path, destination_path)  # Download file using SFTP
@@ -177,9 +177,9 @@ class NCCA_RenderFarmViewer(QMainWindow):
         Args:
         - file_path (str): Path of the file to delete.
         """
-        reply = QMessageBox.question(self, 'Confirm Delete', 
-                                     f"Are you sure you want to delete '{file_path}'?", 
-                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)  # Confirmation dialog
+        reply = QMessageBox.question(self, NCCA_DELETE_TITLE, 
+                                    NCCA_DELETE_MESSAGE.format(file_path), 
+                                    QMessageBox.Yes | QMessageBox.No, QMessageBox.No)  # Confirmation dialog
 
         if reply == QMessageBox.Yes:
             sftp_delete(file_path)  # Delete file using SFTP

@@ -39,6 +39,6 @@ class QImageDialog(QDialog):
         if not pixmap.isNull():  # Check if the QPixmap was successfully loaded
             self.image_label.setPixmap(pixmap.scaledToWidth(800))  # Scale the image to fit within 800 pixels width
         else:
-            self.image_label.setText("Error loading image")  # Display an error message if image loading fails
+            self.image_label.setText(IMAGE_LOAD_ERROR)  # Display an error message if image loading fails
 
 # End of QImageDialog class

@@ -22,7 +22,7 @@ def main():
                 raise subprocess.CalledProcessError(1, error)
         except Exception as e:
             # Display a warning message box with the error details if an exception occurs
-            QtWidgets.QMessageBox.warning(None, "NCCA Error", f"{e}")
+            QtWidgets.QMessageBox.warning(None, NCCA_GENERAL_ERROR_TITLE, f"{e}")
     else:
         # Display a warning message box if the executable path does not exist
-        QtWidgets.QMessageBox.warning(None, "NCCA Error", "Could not find Qube")
+        QtWidgets.QMessageBox.warning(None, QUBE_ERROR_TITLE, QUBE_EXE_ERROR_MESSAGE)

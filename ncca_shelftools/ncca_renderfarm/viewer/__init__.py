@@ -36,4 +36,4 @@ def main(dcc=""):
             dialog.show()
     else:
         # If the Qube Python path does not exist, show an error dialog
-        QtWidgets.QMessageBox.warning(None, "NCCA Error", "Uh oh! An error occurred. Please contact the NCCA team if this issue persists.")
+        QtWidgets.QMessageBox.warning(None, QUBE_ERROR_TITLE, QUBE_PYTHON_ERROR_MESSAGE)

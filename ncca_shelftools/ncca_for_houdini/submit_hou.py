@@ -7,7 +7,7 @@ from ncca_renderfarm.submit import RenderFarmSubmitDialog
 class Houdini_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
     """"""
     def __init__(self, info=None, parent=None):
-        super().__init__("NCCA Renderfarm Houdini Submit Tool", info, parent)
+        super().__init__(NCCA_HOUSUBMIT_DIALOG_TITLE, info, parent)
         # Move to Build mode
         # Set the GUI components and layout
         name=hou.hipFile.basename()
@@ -26,8 +26,8 @@ class Houdini_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         super().init_ui()
 
         # row 1 select output drive
-        self.select_output=QtWidgets.QPushButton("Select ROP")
-        self.select_output.setToolTip("Select the output ROP to render, these will be either in the /shop or /stage level")
+        self.select_output=QtWidgets.QPushButton(NCCA_HOUSUBMIT_ROP_LABEL)
+        self.select_output.setToolTip(NCCA_HOUSUBMIT_ROP_TOOLTIP)
         self.select_output.clicked.connect(self.select_output_driver)
         self.gridLayout.addWidget(self.select_output,3,0,1,1)
         self.output_driver = QtWidgets.QLineEdit(self)
@@ -58,7 +58,7 @@ class Houdini_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         super().submit_project(command=full_command)
 
     def select_project_path(self):
-        folder_path=hou.ui.selectFile(os.path.dirname(str(hou.getenv("JOB"))),"Choose folder on Farm",False,hou.fileType.Directory,"", os.path.basename(str(hou.getenv("JOB"))),False,False,hou.fileChooserMode.Write)
+        folder_path=hou.ui.selectFile(os.path.dirname(str(hou.getenv("JOB"))),NCCA_SUBMIT_PROJECTFOLDER_CAPTION,False,hou.fileType.Directory,"", os.path.basename(str(hou.getenv("JOB"))),False,False,hou.fileChooserMode.Write)
         self.raise_()
 
         if folder_path != None:
@@ -100,4 +100,4 @@ def main():
             dialog.setParent(hou.qt.mainWindow(), QtCore.Qt.Window)
             dialog.show()
     else:
-        QtWidgets.QMessageBox.warning(None, "NCCA Error", "Uh oh! An error occurred. Please contact the NCCA team if this issue persists.")
+        QtWidgets.QMessageBox.warning(None, QUBE_ERROR_TITLE, QUBE_PYTHON_ERROR_MESSAGE)

@@ -9,7 +9,7 @@ from utils import get_maya_window
 
 class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
     def __init__(self, info=None, parent=None):
-        super().__init__("NCCA Renderfarm Maya Submit Tool", info, parent)
+        super().__init__(NCCA_MAYASUBMIT_DIALOG_TITLE, info, parent)
         name = os.path.basename(cmds.file(q=True, sn=True))
 
         if (not name):
@@ -30,33 +30,32 @@ class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
     def init_ui(self):
         super().init_ui()
 
-        label = QtWidgets.QLabel("Active Renderer")
+        label = QtWidgets.QLabel(NCCA_MAYASUBMIT_RENDERER_LABEL)
         self.gridLayout.addWidget(label, 3, 0, 1, 1)
         self.active_renderer = QtWidgets.QComboBox()
         self.active_renderer.addItems(MAYA_RENDERERS)
-        self.active_renderer.setToolTip("The active renderer on the farm.")
+        self.active_renderer.setToolTip(NCCA_MAYASUBMIT_RENDERER_TOOLTIP)
         self.gridLayout.addWidget(self.active_renderer, 3, 1, 1, 2)
 
-        label = QtWidgets.QLabel("Render Camera")
+        label = QtWidgets.QLabel(NCCA_MAYASUBMIT_CAMERA_LABEL)
         self.gridLayout.addWidget(label, 3, 3, 1, 1)
         self.camera = QtWidgets.QComboBox(self)
         self.camera.addItems(cmds.listCameras(p=True))
-        self.camera.setToolTip("The camera used for rendering on the farm.")
+        self.camera.setToolTip(NCCA_MAYASUBMIT_CAMERA_TOOLTIP)
         self.gridLayout.addWidget(self.camera, 3, 4, 1, 2)
 
-        self.override_filename = QtWidgets.QLabel("Output File")
-        self.override_filename.setToolTip("Overrides the output file name in the Maya file.")
-        self.gridLayout.addWidget(self.override_filename, 4, 0, 1, 1)
+        label = QtWidgets.QLabel(NCCA_MAYASUBMIT_OUTPUT_LABEL)
+        self.gridLayout.addWidget(label, 4, 0, 1, 1)
 
-        self.output_filename = QtWidgets.QLineEdit("/output/frame_###.exr")
-        self.output_filename.setToolTip("The file name in which rendered frames will be saved as.")
+        self.output_filename = QtWidgets.QLineEdit(NCCA_MAYASUBMIT_OUTPUT_DEFAULT)
+        self.output_filename.setToolTip(NCCA_MAYASUBMIT_OUTPUT_TOOLTIP)
         self.gridLayout.addWidget(self.output_filename, 4, 1, 1, 5)
 
 
-        label = QtWidgets.QLabel("Extra Commands")
+        label = QtWidgets.QLabel(NCCA_MAYASUBMIT_EXTRA_LABEL)
         self.gridLayout.addWidget(label, 5, 0, 1, 1)
         self.extra_commands = QtWidgets.QLineEdit()
-        self.extra_commands.setToolTip("Extra commands to be added verbatim to the render call")
+        self.extra_commands.setToolTip(NCCA_MAYASUBMIT_EXTRA_TOOLTIP)
         self.gridLayout.addWidget(self.extra_commands, 5, 1, 1, 5)
 
     def select_project_path(self):
@@ -68,7 +67,7 @@ class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
             dialogStyle=2,  # Use folder selection mode
             fileMode=3,     # Select directory mode
             startingDirectory=current_project,  # Start from the current project directory
-            caption="Choose folder on Farm",
+            caption=NCCA_SUBMIT_PROJECTFOLDER_CAPTION,
             okCaption="Select",
             cancelCaption="Cancel"
         )
@@ -198,4 +197,4 @@ def main():
             dialog = Maya_RenderFarmSubmitDialog(info=login_info, parent=main_window)
             dialog.show()
     else:
-        QtWidgets.QMessageBox.warning(None, "NCCA Error", "Uh oh! An error occurred. Please contact the NCCA team if this issue persists.")
+        QtWidgets.QMessageBox.warning(None, QUBE_ERROR_TITLE, QUBE_PYTHON_ERROR_MESSAGE)

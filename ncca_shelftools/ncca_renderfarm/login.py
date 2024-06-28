@@ -32,21 +32,21 @@ class RenderFarmLoginDialog(QtWidgets.QDialog):
         super().__init__(parent)
         
         # Set the GUI components and layout
-        self.setWindowTitle("NCCA Renderfarm Login")  # Set window title
+        self.setWindowTitle(NCCA_LOGIN_DIALOG_TITLE)  # Set window title
         self.resize(300, 200)  # Set initial dialog size
         
         # Main layout for form
         self.gridLayout = QtWidgets.QGridLayout(self)
         
         # Username label and field
-        self.username_label = QtWidgets.QLabel("Username:", self)
+        self.username_label = QtWidgets.QLabel(NCCA_LOGIN_USERNAME, self)
         self.gridLayout.addWidget(self.username_label, 0, 0)
         
         self.username_input = QtWidgets.QLineEdit(self)
         self.gridLayout.addWidget(self.username_input, 0, 1)
         
         # Password label and field
-        self.password_label = QtWidgets.QLabel("Password:", self)
+        self.password_label = QtWidgets.QLabel(NCCA_LOGIN_PASSWORD, self)
         self.gridLayout.addWidget(self.password_label, 1, 0)
         
         self.password_input = QtWidgets.QLineEdit(self)
@@ -54,11 +54,11 @@ class RenderFarmLoginDialog(QtWidgets.QDialog):
         self.gridLayout.addWidget(self.password_input, 1, 1)
         
         # Save Info checkbox
-        self.save_info_checkbox = QtWidgets.QCheckBox("Save Info", self)
+        self.save_info_checkbox = QtWidgets.QCheckBox(NCCA_LOGIN_SAVE_LABEL, self)
         self.gridLayout.addWidget(self.save_info_checkbox, 2, 0, 1, 2)
         
         # Login button
-        self.login_button = QtWidgets.QPushButton("Login", self)
+        self.login_button = QtWidgets.QPushButton(NCCA_LOGIN_LOGIN_LABEL, self)
         self.login_button.pressed.connect(self.confirm_login)
         self.gridLayout.addWidget(self.login_button, 3, 0, 1, 2)
         
@@ -88,7 +88,7 @@ class RenderFarmLoginDialog(QtWidgets.QDialog):
         save_info = self.save_info_checkbox.isChecked()  # Check if save info checkbox is checked
         
         if not username or not password:
-            QtWidgets.QMessageBox.warning(self, "Input Error", "Username and password cannot be empty.")
+            QtWidgets.QMessageBox.warning(self, NCCA_LOGIN_ERROR_TITLE, NCCA_LOGIN_EMPTY_MESSAGE)
         else:
             for attempt in range(MAX_CONNECTION_ATTEMPTS):  # Try to connect multiple times
                 try:
@@ -106,10 +106,10 @@ class RenderFarmLoginDialog(QtWidgets.QDialog):
                     return self.accept()
 
                 except paramiko.AuthenticationException:
-                    QtWidgets.QMessageBox.warning(self, "Login Failed", "Invalid username or password.")
+                    QtWidgets.QMessageBox.warning(self, NCCA_LOGIN_ERROR_TITLE, NCCA_LOGIN_ERROR_MESSAGE)
                 except (paramiko.SSHException, socket.gaierror):
                     if attempt >= MAX_CONNECTION_ATTEMPTS - 1:
-                        QtWidgets.QMessageBox.warning(self, "Connection Failed", "Connection to the NCCA Renderfarm failed.")
+                        QtWidgets.QMessageBox.warning(self, NCCA_CONNECTION_ERROR_TITLE, NCCA_CONNECTION_ERROR_MESSAGE)
         return None  # Return None if login fails
     
     def get_login_info(self):

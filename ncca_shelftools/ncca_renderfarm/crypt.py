@@ -33,8 +33,7 @@ def load_saved_credentials(key):
         credentials = json.loads(decrypted_data.decode())
         return credentials
     except Exception as e:
-        # Print an error message if decryption fails
-        print(f"Error decrypting credentials: {str(e)}")
+        # Return 'None' if decryption fails
         return None
 
 def decrypt_credentials(key, encrypted_credentials):

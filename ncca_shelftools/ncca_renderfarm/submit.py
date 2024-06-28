@@ -5,7 +5,7 @@ from PySide2.QtWidgets import QMainWindow, QWidget, QMessageBox
 
 class RenderFarmSubmitDialog(QMainWindow):
     """"""
-    def __init__(self, title="NCCA Renderfarm Submit Tool", info=None, parent=None):
+    def __init__(self, title=NCCA_SUBMIT_DIALOG_TITLE, info=None, parent=None):
         super().__init__(parent)
         self.setWindowTitle(title)
         self.resize(600, 280)
@@ -24,23 +24,23 @@ class RenderFarmSubmitDialog(QMainWindow):
         self.user=os.environ.get("USER")
 
         # row 0 project name
-        label=QtWidgets.QLabel("Project Name")
+        label=QtWidgets.QLabel(NCCA_SUBMIT_PROJECTNAME_LABEL)
         self.gridLayout.addWidget(label,0,0,1,1)
         self.project_name = QtWidgets.QLineEdit(self)
-        self.project_name.setToolTip("This is the name of the project as it will appear on the Qube GUI")
+        self.project_name.setToolTip(NCCA_SUBMIT_PROJECTNAME_TOOLTIP)
         self.gridLayout.addWidget(self.project_name, 0, 1, 1, 3)
 
-        label=QtWidgets.QLabel("CPU Count")
+        label=QtWidgets.QLabel(NCCA_SUBMIT_CPUCOUNT_LABEL)
         self.gridLayout.addWidget(label, 0, 4, 1, 1)
         self.cpus=QtWidgets.QComboBox()
         self.cpus.addItems(str(i) for i in range(1, MAX_CPUS+1))
         self.cpus.setCurrentText(str(DEFAULT_CPU_USAGE))
-        self.cpus.setToolTip("number of nodes to use, please be respectful of others and only use high numbers if farm is empty")
+        self.cpus.setToolTip(NCCA_SUBMIT_CPUCOUNT_TOOLTIP)
         self.gridLayout.addWidget(self.cpus, 0, 5, 1, 1)
 
         # row 1 select output drive
-        self.select_project=QtWidgets.QPushButton("Project Folder")
-        self.select_project.setToolTip("Select the output ROP to render, these will be either in the /shop or /stage level")
+        self.select_project=QtWidgets.QPushButton(NCCA_SUBMIT_PROJECTFOLDER_LABEL)
+        self.select_project.setToolTip(NCCA_SUBMIT_PROJECTFOLDER_TOOLTIP)
         self.select_project.clicked.connect(self.select_project_path)
         self.gridLayout.addWidget(self.select_project,1,0,1,1)
         self.project_path = QtWidgets.QLineEdit(self)
@@ -48,43 +48,43 @@ class RenderFarmSubmitDialog(QMainWindow):
         self.gridLayout.addWidget(self.project_path, 1, 1, 1, 5)
 
         # row 2
-        label=QtWidgets.QLabel("Start Frame")
+        label=QtWidgets.QLabel(NCCA_SUBMIT_STARTFRAME_LABEL)
         self.gridLayout.addWidget(label,2,0,1,1)
         self.start_frame=QtWidgets.QSpinBox()
-        self.start_frame.setToolTip("Start frame for rendering, set from ROP but can be changed here, this will override the ROP value on the farm")
+        self.start_frame.setToolTip(NCCA_SUBMIT_STARTFRAME_TOOLTIP)
 
         self.start_frame.valueChanged.connect(self.update_frame_range)
         self.gridLayout.addWidget(self.start_frame,2,1,1,1)
         
-        label=QtWidgets.QLabel("End Frame")
+        label=QtWidgets.QLabel(NCCA_SUBMIT_ENDFRAME_LABEL)
         self.gridLayout.addWidget(label,2,2,1,1)
         self.end_frame=QtWidgets.QSpinBox()
         self.end_frame.valueChanged.connect(self.update_frame_range)
-        self.end_frame.setToolTip("End frame for rendering, set from ROP but can be changed here, this will override the ROP value on the farm")
+        self.end_frame.setToolTip(NCCA_SUBMIT_ENDFRAME_TOOLTIP)
 
         self.gridLayout.addWidget(self.end_frame,2,3,1,1)
 
-        label=QtWidgets.QLabel("By Frame")
+        label=QtWidgets.QLabel(NCCA_SUBMIT_BYFRAME_LABEL)
         self.gridLayout.addWidget(label,2,4,1,1)
         self.by_frame=QtWidgets.QSpinBox()
         self.by_frame.setRange(1, self.end_frame.value() - self.start_frame.value())
         self.by_frame.setValue(1)
-        self.by_frame.setToolTip("Frame Step for rendering, set from ROP but can be changed here, this will override the ROP value on the farm")
+        self.by_frame.setToolTip(NCCA_SUBMIT_BYFRAME_TOOLTIP)
 
         self.gridLayout.addWidget(self.by_frame,2,5,1,1)
    
     def finish_ui(self):
-        self.Cancel = QtWidgets.QPushButton("Close", self)
-        self.Cancel.setToolTip("Close the submit dialog")
+        self.Cancel = QtWidgets.QPushButton(NCCA_SUBMIT_CLOSE_LABEL, self)
+        self.Cancel.setToolTip(NCCA_SUBMIT_CLOSE_TOOLTIP)
         self.Cancel.clicked.connect(self.close)
         self.gridLayout.addWidget(self.Cancel, 6, 0, 1, 1)
 
         # Screen Shot button
 
-        self.submit = QtWidgets.QPushButton("Submit", self)
+        self.submit = QtWidgets.QPushButton(NCCA_SUBMIT_SUBMIT_LABEL, self)
         self.submit.pressed.connect(self.submit_project)
         self.submit.setEnabled(False)
-        self.submit.setToolTip("Submit job to the farm, you must select a ROP before this will activate")
+        self.submit.setToolTip(NCCA_SUBMIT_SUBMIT_TOOLTIP)
         self.gridLayout.addWidget(self.submit, 6, 5, 1, 1)
 
     def submit_project(self, command=""):
@@ -110,7 +110,7 @@ class RenderFarmSubmitDialog(QMainWindow):
             sys.path.append(QUBE_PYPATH.get(OPERATING_SYSTEM))
             import qb
         except Exception as e: 
-            QtWidgets.QMessageBox.warning(None, "NCCA Error", f"{e}")
+            QtWidgets.QMessageBox.warning(None, NCCA_GENERAL_ERROR_TITLE, f"{e}")
             self.close()
 
         job = {}
@@ -142,15 +142,15 @@ class RenderFarmSubmitDialog(QMainWindow):
             id_list = []
             for job in listOfSubmittedJobs:
                 id_list.append(job['id'])
-            QtWidgets.QMessageBox.warning(None, "NCCA Error", f"{self.project_name.text()} has been successfully added to the NCCA Renderfarm! \nID: {id_list}")
+            QtWidgets.QMessageBox.warning(None, NCCA_GENERAL_TITLE, NCCA_SUBMIT_MESSAGE.format(self.project_name.text(), id_list))
         except Exception as e:
-            QtWidgets.QMessageBox.warning(None, "NCCA Error", f"{e}")
+            QtWidgets.QMessageBox.warning(None, NCCA_GENERAL_ERROR_TITLE, f"{e}")
         
         self.close()
 
     def confirm_override(self, file_path):
-        reply = QMessageBox.question(None, 'Confirm Override', 
-            f"{file_path} already exists. Do you wish to continue?", 
+        reply = QMessageBox.question(None, NCCA_OVERRIDE_TITLE, 
+            NCCA_OVERRIDE_MESSAGE.format(file_path), 
             QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         return reply == QMessageBox.Yes
 
