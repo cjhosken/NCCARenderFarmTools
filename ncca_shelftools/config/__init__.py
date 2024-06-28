@@ -78,5 +78,6 @@ SUPPORTED_IMAGE_FORMATS = [
     ".jpeg",
     ".tiff",
     ".tif",
-    ".exr"
+    ".exr",
+    ".deepexr",
 ]

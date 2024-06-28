@@ -39,10 +39,7 @@ copy "%ncca_shelftools_dir%\ncca_for_houdini\ncca_hou.shelf" "%HOUDINI_SHELF_PAT
 copy "%ncca_shelftools_dir%\ncca_for_maya\shelf_NCCA.mel" "%MAYA_SHELF_PATH%\shelf_NCCA.mel"
 
 REM Install required Python packages using mayapy
-"%MAYAPY_PATH%" -m pip install --upgrade pip
 "%MAYAPY_PATH%" -m pip install -r requirements.txt
-
-"%HYTHON_PATH%" -m pip install --upgrade pip
 "%HYTHON_PATH%" -m pip install -r requirements.txt
 
 REM Optionally provide feedback that the setup is complete

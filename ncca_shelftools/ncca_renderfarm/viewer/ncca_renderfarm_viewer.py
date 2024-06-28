@@ -101,7 +101,7 @@ class NCCA_RenderFarmViewer(QMainWindow):
             temp_file_path = os.path.join(temp_dir, file_name)
             shutil.copy(file_path, temp_file_path)
 
-            if (file_ext.lower() in [".exr"]):
+            if (file_ext.lower() in [".exr", ".deepexr"]):
                 alt_file_name = file_name_without_ext + ".png"
                 alt_file_path = os.path.join(temp_dir, alt_file_name)
                 exr_to_png(temp_file_path, alt_file_path)
