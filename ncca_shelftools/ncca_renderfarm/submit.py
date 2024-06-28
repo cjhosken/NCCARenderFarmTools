@@ -100,7 +100,7 @@ class RenderFarmSubmitDialog(QMainWindow):
             else:
                 return
         
-        #sftp_upload(remote_project_dir, local_project_dir)
+        # sftp_upload(remote_project_dir, local_project_dir)
         # Submit the job
 
         frame_range=f"{self.start_frame.value()}-{self.end_frame.value()}x{self.by_frame.value()}"
@@ -110,8 +110,8 @@ class RenderFarmSubmitDialog(QMainWindow):
         #    sys.path.append(QUBE_PYPATH)
         #    import qb
         #except Exception as e: 
-        #    hou.ui.displayMessage(title="NCCA Tool Error", severity=hou.severityType.Error, details=f"{e}", text="Uh oh! An error occurred. Please contact the NCCA team if this issue persists.")
-        #    self.done(0)
+        #    QtWidgets.QMessageBox.warning(None, "NCCA Error", f"{e}")
+        #    self.close()
 
         job = {}
         job['name'] = self.project_name.text()
@@ -123,7 +123,14 @@ class RenderFarmSubmitDialog(QMainWindow):
         package = {}
         package['shell']="/bin/bash"
 
-        package['cmdline'] = command
+        # upload payload source.sh
+        if (sftp_exists()):
+            sftp_delete()
+        
+        sftp_upload()
+        source_command = f"source /render/{self.username}/.ncca/farm_source.sh;"
+
+        package['cmdline'] = source_command + command
 
         job['pacakge'] = package
             
@@ -135,9 +142,10 @@ class RenderFarmSubmitDialog(QMainWindow):
         #    id_list = []
         #    for job in listOfSubmittedJobs:
         #        id_list.append(job['id'])
-        #    hou.ui.displayMessage(itle="NCCA Tool", text=f"{self.project_name.text()} has been successfully added to the NCCA Renderfarm! \nID: {id_list}",buttons=("Ok",))
+        #    QtWidgets.QMessageBox.warning(None, "NCCA Error", f"{self.project_name.text()} has been successfully added to the NCCA Renderfarm! \nID: {id_list}")
         #except Exception as e:
-        #    hou.ui.displayMessage(title="NCCA Tool Error", severity=hou.severityType.Error, details=f"{e}", text="Uh oh! An error occurred. Please contact the NCCA team if this issue persists.")
+        #    QtWidgets.QMessageBox.warning(None, "NCCA Error", f"{e}")
+        
         self.close()
 
     def confirm_override(self, file_path):
