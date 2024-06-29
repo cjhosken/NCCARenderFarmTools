@@ -151,3 +151,54 @@ def sftp_delete(sftp=None, remote_path=""):
     This is a placeholder function that does nothing (pass statement).
     """
     pass  # Placeholder function for deleting files via SFTP (does nothing)
+
+
+
+def sftp_setup(sftp=None, username=""):
+    """
+    Sets up the SFTP environment for the given username by ensuring the necessary directories exist and uploading a payload script.
+
+    Directory Structure:
+
+    /home/
+        username/
+            .ncca/
+            farm/
+                projects/
+                output/
+    
+    Args:
+        sftp: SFTP client object used to perform SFTP operations.
+        username (str): The username for which the SFTP environment is being set up.
+    """
+    
+    # Define the home directory and NCCA script path for the given username
+    FARM_HOME = f"/home/{username}"
+    NCCA_SCRIPT_PATH = FARM_HOME + "/.ncca"
+
+    # Check if the NCCA script path exists, and delete it if it does
+    if sftp_exists(sftp, NCCA_SCRIPT_PATH):
+        sftp_delete(sftp, NCCA_SCRIPT_PATH)
+
+    # Upload the payload script to the NCCA script path
+    sftp_upload(sftp, "../payload", NCCA_SCRIPT_PATH)
+
+    # Define the farm directory and its subdirectories
+    FARM_DIR = FARM_HOME + "/farm"
+    PROJECT_DIR = FARM_DIR + "/projects"
+    OUTPUT_DIR = FARM_DIR + "/output"
+
+    # Check if the farm directory exists, and create it if it does not
+    if not sftp_exists(FARM_DIR):
+        # create FARM_DIR 
+        pass
+
+    # Check if the project directory exists, and create it if it does not
+    if not sftp_exists(PROJECT_DIR):
+        # create PROJECT DIR
+        pass
+    
+    # Check if the output directory exists, and create it if it does not
+    if not sftp_exists(OUTPUT_DIR):
+        # create OUTPUT DIR
+        pass
