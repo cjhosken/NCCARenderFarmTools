@@ -12,7 +12,7 @@ NCCA_CONNECTION_ERROR_MESSAGE = "Connection to the NCCA Renderfarm failed."
 
 QUBE_ERROR_TITLE = "Qube Error"
 QUBE_EXE_ERROR_MESSAGE = "Qube could not be found! Make sure that you have installed Qube from Apps Anywhere."
-QUBE_PYTHON_ERROR_MESSAGE = "Qb coule not be found! Make sure that you have installed Qube from Apps Anywhere." 
+QUBE_PYTHON_ERROR_MESSAGE = "Qb could not be found! Make sure that you have installed Qube from Apps Anywhere." 
 
 IMAGE_LOAD_ERROR = "Error Loading Image."
 CONVERT_IMAGE_ERROR = "Error converting {} to .png: {}"
