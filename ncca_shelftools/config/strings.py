@@ -11,17 +11,17 @@ NCCA_CONNECTION_ERROR_TITLE = "Connection Failed"
 NCCA_CONNECTION_ERROR_MESSAGE = "Connection to the NCCA Renderfarm failed."
 
 QUBE_ERROR_TITLE = "Qube Error"
-QUBE_EXE_ERROR_MESSAGE = "Qube could not be found! Make sure that you have installed Qube from Apps Anywhere."
-QUBE_PYTHON_ERROR_MESSAGE = "Qb could not be found! Make sure that you have installed Qube from Apps Anywhere." 
+QUBE_EXE_ERROR_MESSAGE = "Qube could not be found! Make sure that you have installed Qube from Apps Anywhere.  If you are on Linux, or this issue continues to occur, please contact the NCCA admin."
+QUBE_PYTHON_ERROR_MESSAGE = "Qb could not be found! Make sure that you have installed Qube from Apps Anywhere. If you are on Linux, or this issue continues to occur, please contact the NCCA admin." 
 
-IMAGE_LOAD_ERROR = "Error Loading Image."
+IMAGE_LOAD_ERROR = "Image Error"
 CONVERT_IMAGE_ERROR = "Error converting {} to .png: {}"
 
 NCCA_GENERAL_TITLE = "NCCA"
-NCCA_SUBMIT_MESSAGE = "{} has been successfully added to the NCCA Renderfarm! \nID: {}"
+NCCA_SUBMIT_MESSAGE = "'{}' has been successfully added to the NCCA Renderfarm! \nID: {}"
 
 NCCA_OVERRIDE_TITLE = "Confirm Override"
-NCCA_OVERRIDE_MESSAGE = "{} already exists. Do you wish to continue?"
+NCCA_OVERRIDE_MESSAGE = "'{}' already exists. Do you wish to override the project?"
 
 NCCA_DELETE_TITLE = "Confirm Delete"
 NCCA_DELETE_MESSAGE = "Are you sure you want to delete '{}'?"
