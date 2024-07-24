@@ -1,11 +1,11 @@
 @echo off
 
 REM Set variables (adjust paths as needed)
-set NCCA_DIR=%USERPROFILE%\.ncca
-set MAYA_SHELF_PATH=%USERPROFILE%\Documents\maya\2023\prefs\shelves
-set MAYAPY_PATH=C:\Program Files\Autodesk\Maya2023\bin\mayapy.exe
-set HYTHON_PATH=c:\Program Files\Side Effects Software\Houdini 20.0.751\bin\hython.exe
-set HOUDINI_SHELF_PATH=%USERPROFILE%\Documents\houdini20.0\toolbar
+set NCCA_DIR="%USERPROFILE%\.ncca"
+set MAYA_BASE_PATH="%USERPROFILE%\Documents\maya"
+set MAYAPY_BASE_PATH="C:\Program Files\Autodesk"
+set HYTHON_BASE_PATH="C:\Program Files\Side Effects Software"
+set HOUDINI_SHELF_BASE_PATH="%USERPROFILE%\Documents"
 
 REM Create NCCA_DIR if it doesn't exist
 if not exist "%NCCA_DIR%" (
@@ -21,26 +21,51 @@ if exist "%ncca_shelftools_dir%" (
 REM Copy 'ncca_shelftools' directory to NCCA_DIR
 xcopy /e /i .\ncca_shelftools "%ncca_shelftools_dir%"
 
-REM Paths to specific shelf files and addons
-set maya_ncca_shelf=%MAYA_SHELF_PATH%\shelf_NCCA.mel
-set houdini_ncca_shelf=%HOUDINI_SHELF_PATH%\ncca_hou.shelf
+REM Copy shelf files into each Maya version directory under %USERPROFILE%\Documents\maya
+for /d %%d in ("%MAYA_BASE_PATH%\*") do (
+    if exist "%%d\prefs\shelves" (
+        echo Copying to Maya directory: %%d
+        REM Remove existing shelf file if it exists
+        if exist "%%d\prefs\shelves\shelf_NCCA.mel" (
+            del "%%d\prefs\shelves\shelf_NCCA.mel"
+        )
 
-REM Remove existing files and directories if they exist
-if exist "%maya_ncca_shelf%" (
-    del "%maya_ncca_shelf%"
+        REM Copy the new shelf file
+        copy "%ncca_shelftools_dir%\ncca_for_maya\shelf_NCCA.mel" "%%d\prefs\shelves\shelf_NCCA.mel"
+    )
 )
 
-if exist "%houdini_ncca_shelf%" (
-    del "%houdini_ncca_shelf%"
+REM Install the required python packages for maya
+for /d %%d in (""%MAYAPY_BASE_PATH%\Maya*"") do (
+    echo "%%d\bin\mayapy.exe"
+    if exist "%%d\bin\mayapy.exe" (
+        echo Installing Requirements for mayapy: %%d
+        "%%d\bin\mayapy.exe" -m pip install --upgrade pip
+        "%%d\bin\mayapy.exe" -m pip install -r requirements.txt
+    )
 )
 
-REM Copy new files and directories
-copy "%ncca_shelftools_dir%\ncca_for_houdini\ncca_hou.shelf" "%HOUDINI_SHELF_PATH%\ncca_hou.shelf"
-copy "%ncca_shelftools_dir%\ncca_for_maya\shelf_NCCA.mel" "%MAYA_SHELF_PATH%\shelf_NCCA.mel"
+REM Iterate through Houdini directories and add shelf
+for /d %%d in ("%HOUDINI_SHELF_BASE_PATH%\houdini20.*.*") do (
+    if exist "%%d\toolbar" (
+        echo Copying to Houdini shelf directory: %%d
+        if exist "%%d\toolbar\ncca_hou.shelf" (
+            del "%%d\toolbar\ncca_hou.shelf"
+        )
+        copy "%ncca_shelftools_dir%\ncca_for_houdini\ncca_hou.shelf" "%%d\toolbar\ncca_hou.shelf"
+    )
+)
 
-REM Install required Python packages using mayapy
-"%MAYAPY_PATH%" -m pip install -r requirements.txt
-"%HYTHON_PATH%" -m pip install -r requirements.txt
+REM Install the required python packages for houdini
+for /d %%d in (""%HYTHON_BASE_PATH%\Houdini*"") do (
+    echo "%%d\bin\hython.exe"
+    if exist "%%d\bin\hython.exe" (
+        echo Installing Requirements for Hython: %%d
+        "%%d\bin\hython.exe" -m pip install --upgrade pip
+        "%%d\bin\hython.exe" -m pip install -r requirements.txt
+    )
+)
 
 REM Optionally provide feedback that the setup is complete
-echo Setup completed successfully.
+echo Setup completed successfully!
+pause
