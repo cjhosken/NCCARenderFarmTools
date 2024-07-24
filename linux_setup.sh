@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# Set variables from config.py (adjust paths as needed)
+# Set base paths (adjust paths as needed)
 NCCA_DIR="$HOME/.ncca"
-MAYA_SHELF_PATH="$HOME/maya/2023/prefs/shelves"
-MAYAPY_PATH="/usr/autodesk/maya/bin/mayapy"
-HYTHON_PATH="/opt/hfs20.0.751/bin/hython"
-HOUDINI_SHELF_PATH="$HOME/houdini20.0/toolbar"
+MAYA_BASE_PATH="$HOME/maya"
+MAYAPY_BASE_PATH="/usr/autodesk/maya"
+HYTHON_BASE_PATH="/opt"
+HOUDINI_BASE_PATH="$HOME/houdini"
 
 # Create NCCA_DIR if it doesn't exist
 mkdir -p "$NCCA_DIR"
@@ -19,26 +19,47 @@ fi
 # Copy 'ncca_shelftools' directory to NCCA_DIR
 cp -r ./ncca_shelftools "$ncca_shelftools_dir"
 
-# Paths to specific shelf files and addons
-maya_ncca_shelf="$MAYA_SHELF_PATH/shelf_NCCA.mel"
-houdini_ncca_shelf="$HOUDINI_SHELF_PATH/ncca_hou.shelf"
+# Iterate over Maya versions and copy shelf files
+for maya_version_dir in "$MAYA_BASE_PATH"/*; do
+    if [ -d "$maya_version_dir/prefs/shelves" ]; then
+        maya_shelf_path="$maya_version_dir/prefs/shelves/shelf_NCCA.mel"
+        echo Copying to Maya directory: $maya_version_dir
+        if [ -f "$maya_shelf_path" ]; then
+            rm "$maya_shelf_path"
+        fi
+        cp "$ncca_shelftools_dir/ncca_for_maya/shelf_NCCA.mel" "$maya_shelf_path"
+    fi
+done
 
-# Remove existing files and directories if they exist
-if [ -f "$maya_ncca_shelf" ]; then
-    rm "$maya_ncca_shelf"
-fi
+# Iterate over Houdini versions and copy shelf files
+for houdini_version_dir in "$HOUDINI_BASE_PATH"*; do
+    if [ -d "$houdini_version_dir/toolbar" ]; then
+        houdini_shelf_path="$houdini_version_dir/toolbar/ncca_hou.shelf"
+        echo Copying to Houdini directory: $houdini_version_dir
+        if [ -f "$houdini_shelf_path" ]; then
+            rm "$houdini_shelf_path"
+        fi
+        cp "$ncca_shelftools_dir/ncca_for_houdini/ncca_hou.shelf" "$houdini_shelf_path"
+    fi
+done
 
-if [ -f "$houdini_ncca_shelf" ]; then
-    rm "$houdini_ncca_shelf"
-fi
+# Install required Python packages using mayapy
+for maya_version in "$MAYAPY_BASE_PATH"/*; do
+    if [ -x "$maya_version/bin/mayapy" ]; then
+        echo Installing Requirements for mayapy: $maya_version
+        "$maya_version/bin/mayapy" -m pip install --upgrade pip
+        "$maya_version/bin/mayapy" -m pip install -r requirements.txt
+    fi
+done
 
-
-# Copy new files and directories
-cp "$ncca_shelftools_dir/ncca_for_houdini/ncca_hou.shelf" "$HOUDINI_SHELF_PATH/ncca_hou.shelf"
-cp "$ncca_shelftools_dir/ncca_for_maya/shelf_NCCA.mel" "$MAYA_SHELF_PATH/shelf_NCCA.mel"
-
-$MAYAPY_PATH -m pip install -r requirements.txt
-$HYTHON_PATH -m pip install -r requirements.txt
+# Install required Python packages using hython
+for houdini_version in "$HYTHON_BASE_PATH"/*; do
+    if [ -x "$houdini_version/bin/hython" ]; then
+        echo Installing Requirements for hython: $houdini_version
+        "$houdini_version/bin/hython" -m pip install --upgrade pip
+        "$houdini_version/bin/hython" -m pip install -r requirements.txt
+    fi
+done
 
 # Optionally provide feedback that the setup is complete
 echo "Setup completed successfully."
