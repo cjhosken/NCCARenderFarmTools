@@ -1,5 +1,5 @@
-# NCCAShelfTools
-The NCCA Shelf Tools allow users to interact with the NCCA Renderfarm. The shelf tools can be run from inside DCCs (Digital Content Creators). Currently, the shelf tools only support:
+# NCCA RenderFarm Tools
+The NCCA Renderfarm Tools allow users to interact with the NCCA Renderfarm. The shelf tools can be run from inside DCCs (Digital Content Creators). Currently, the shelf tools only support:
 
  - Maya (CPU Only)
  - Houdini (CPU Only)
