@@ -1,4 +1,4 @@
-paramiko
-Pillow
-numpy
-OpenEXR
+paramiko==3.4.0
+Pillow==10.4.0
+numpy==2.0.1
+OpenEXR==3.2.4

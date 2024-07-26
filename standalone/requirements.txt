@@ -1,9 +1,9 @@
 cryptography==42.0.8
-paramiko
-python-dotenv
-opencv-python
+paramiko==3.4.0
+python-dotenv==1.0.1
+opencv-python==4.10.0.84
 Pillow==10.4.0
-numpy
+numpy==2.0.1
 PyQt6==6.7.0
-pyexr
-pyinstaller==6.8.0 # pyinstaller should always remain in requirements.txt, otherwise the application will not build.
+pyexr==0.4.0
+pyinstaller==6.9.0 # pyinstaller should always remain in requirements.txt, otherwise the application will not build.
