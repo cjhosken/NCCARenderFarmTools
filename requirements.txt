@@ -1,8 +1,4 @@
 paramiko
-python-dotenv
 Pillow
-opencv-python
 numpy
-PyQt6
-pyexr
-pyinstaller # pyinstaller should always remain in requirements.txt, otherwise the application will not build.
+OpenEXR

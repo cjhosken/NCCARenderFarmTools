@@ -1,57 +1,65 @@
 #!/bin/bash
 
-# As not alot of students have strong technical knowledge, It's ideal to make installation as simple as possible.
-# This is the linux shell script that users can run, which will install .pyenv, install python, and build the application.
-# When this script is finished, users can then run launch.sh to start the application.
+# Set base paths (adjust paths as needed)
+NCCA_DIR="$HOME/.ncca"
+MAYA_BASE_PATH="$HOME/maya"
+MAYAPY_BASE_PATH="/usr/autodesk/maya"
+HYTHON_BASE_PATH="/opt"
+HOUDINI_BASE_PATH="$HOME/houdini"
 
-set -e
+# Create NCCA_DIR if it doesn't exist
+mkdir -p "$NCCA_DIR"
 
-# Determine the project directory where this script resides
-PROJECT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+# Remove existing 'ncca_shelftools' directory in NCCA_DIR if it exists
+ncca_shelftools_dir="$NCCA_DIR/ncca_shelftools"
+if [ -d "$ncca_shelftools_dir" ]; then
+    rm -rf "$ncca_shelftools_dir"
+fi
 
-# Check if pyenv is installed
-if [ ! -d "$HOME/.pyenv" ]; then
-    echo "Installing pyenv..."
+# Copy 'ncca_shelftools' directory to NCCA_DIR
+cp -r ./ncca_shelftools "$ncca_shelftools_dir"
 
-    # Download the pyenv installer
-    curl https://pyenv.run | bash
-    if [ $? -ne 0 ]; then
-        echo "Error: Failed to download pyenv installer. Please check your internet connection or retry."
-        exit 1
+# Iterate over Maya versions and copy shelf files
+for maya_version_dir in "$MAYA_BASE_PATH"/*; do
+    if [ -d "$maya_version_dir/prefs/shelves" ]; then
+        maya_shelf_path="$maya_version_dir/prefs/shelves/shelf_NCCA.mel"
+        echo Copying to Maya directory: $maya_version_dir
+        if [ -f "$maya_shelf_path" ]; then
+            rm "$maya_shelf_path"
+        fi
+        cp "$ncca_shelftools_dir/ncca_for_maya/shelf_NCCA.mel" "$maya_shelf_path"
     fi
-fi
+done
 
-# Add pyenv to the PATH and initialize it
-export PATH="$HOME/.pyenv/bin:$PATH"
-eval "$(pyenv init --path)"
-eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
+# Iterate over Houdini versions and copy shelf files
+for houdini_version_dir in "$HOUDINI_BASE_PATH"*; do
+    if [ -d "$houdini_version_dir/toolbar" ]; then
+        houdini_shelf_path="$houdini_version_dir/toolbar/ncca_hou.shelf"
+        echo Copying to Houdini directory: $houdini_version_dir
+        if [ -f "$houdini_shelf_path" ]; then
+            rm "$houdini_shelf_path"
+        fi
+        cp "$ncca_shelftools_dir/ncca_for_houdini/ncca_hou.shelf" "$houdini_shelf_path"
+    fi
+done
 
-# Read the Python version from the .python-version file. Ideally, this should be kept up to date with the vfx reference platform.
-if [ -f "$PROJECT_DIR/.python-version" ]; then
-    PYTHON_VERSION=$(cat "$PROJECT_DIR/.python-version")
-else
-    echo "Error: .python-version file not found or is empty."
-    exit 1
-fi
+# Install required Python packages using mayapy
+for maya_version in "$MAYAPY_BASE_PATH"/*; do
+    if [ -x "$maya_version/bin/mayapy" ]; then
+        echo Installing Requirements for mayapy: $maya_version
+        "$maya_version/bin/mayapy" -m pip install --upgrade pip
+        "$maya_version/bin/mayapy" -m pip install -r requirements.txt
+    fi
+done
 
-# Check if Python is already installed
-if ! pyenv versions --bare | grep -q "^$PYTHON_VERSION\$"; then
-    echo "Installing Python $PYTHON_VERSION..."
-    pyenv install $PYTHON_VERSION
-fi
+# Install required Python packages using hython
+for houdini_version in "$HYTHON_BASE_PATH"/*; do
+    if [ -x "$houdini_version/bin/hython" ]; then
+        echo Installing Requirements for hython: $houdini_version
+        "$houdini_version/bin/hython" -m pip install --upgrade pip
+        "$houdini_version/bin/hython" -m pip install -r requirements.txt
+    fi
+done
 
-# Set the installed Python version locally for this project
-pyenv local $PYTHON_VERSION
-
-# Install pip if not already installed
-pip install --upgrade pip
-
-# Install dependencies from requirements.txt
-pip install -r "$PROJECT_DIR/requirements.txt"
-
-# Build the Python project
-echo "Building the executable..."
-pyinstaller "$PROJECT_DIR/nccarenderfarm.spec" --noconfirm
-
-echo "Build completed! You can now run ./launch.sh"
+# Optionally provide feedback that the setup is complete
+echo "Setup completed successfully."

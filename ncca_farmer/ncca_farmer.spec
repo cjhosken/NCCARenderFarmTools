@@ -3,13 +3,13 @@
 # The build settings for the app. This has been set up in a rush so there might be ways to polish up the way the code builds.
 
 a = Analysis(
-    ['NCCARenderFarm/main.py'],
-    pathex=['NCCARenderFarm'],
+    ['src/main.py'],
+    pathex=['src'],
     binaries=[],
     datas=[
-        ("NCCARenderFarm/resources/images/*", "resources/images/"),
-        ("NCCARenderFarm/renderfarm/payload/*", "renderfarm/payload/"),
-        ("NCCARenderFarm/render_info/*", "render_info/")
+        ("src/resources/images/*", "resources/images/"),
+        ("src/renderfarm/payload/*", "renderfarm/payload/"),
+        ("src/render_info/*", "render_info/")
     ],
     hiddenimports=["tkinter", "qb"],
     hookspath=[],

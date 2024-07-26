@@ -1,0 +1,9 @@
+RENDERFARM_ADDRESS = "tete.bournemouth.ac.uk"
+RENDERFARM_PORT = 22
+
+MAX_CONNECTION_ATTEMPTS = 3
+
+MAX_CPUS = 8
+DEFAULT_CPU_USAGE = 2
+
+HOUDINI_FARM_PATH = "/path/to/houdini"

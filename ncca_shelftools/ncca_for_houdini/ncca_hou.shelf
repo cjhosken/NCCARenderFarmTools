@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<shelfDocument>
+  <toolshelf name="ncca" label="NCCA">
+    <memberTool name="ncca_qubeui"/>
+    <memberTool name="ncca_submit_renderfarm_job"/>
+    <memberTool name="ncca_view_renderfarm"/>
+
+  </toolshelf>
+
+  <tool name="ncca_qubeui" label="Launch Qube!" icon="MISC_control_panel">
+    <script scriptType="python">
+    <![CDATA[import sys, os; sys.path.append(os.path.join(os.path.expanduser('~'), ".ncca", "ncca_shelftools")); from ncca_renderfarm import qube; qube.main()]]>
+    </script>
+  </tool>
+
+  <tool name="ncca_submit_renderfarm_job" label="Submit Job" icon="TOP_commandserver">
+    <script scriptType="python"><![CDATA[import sys, os; sys.path.append(os.path.join(os.path.expanduser('~'), ".ncca", "ncca_shelftools")); from ncca_for_houdini import submit_hou; submit_hou.main()]]>
+    </script>
+  </tool>
+
+  <tool name="ncca_view_renderfarm" label="View Farm" icon="BUTTONS_internet">
+    <script scriptType="python"><![CDATA[import sys, os; sys.path.append(os.path.join(os.path.expanduser('~'), ".ncca", "ncca_shelftools")); from ncca_renderfarm import viewer; viewer.main('houdini')]]>
+    </script>
+  </tool>
+</shelfDocument>
