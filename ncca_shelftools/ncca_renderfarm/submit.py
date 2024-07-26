@@ -1,7 +1,5 @@
 from config import *
 from utils import *
-
-
 from PySide2.QtWidgets import QMainWindow, QWidget, QMessageBox
 
 class RenderFarmSubmitDialog(QMainWindow):

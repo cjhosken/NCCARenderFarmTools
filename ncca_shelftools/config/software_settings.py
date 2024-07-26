@@ -2,16 +2,6 @@ import os
 
 HOME_DIR = os.path.expanduser("~")
 
-HOUDINI_SHELF_PATH = {
-    "windows": f"{HOME_DIR}/Documents/houdini20.0/toolbar",
-    "linux": f"{HOME_DIR}/houdini20.0/toolbar",
-}
-
-MAYA_SHELF_PATH = {
-    "windows": f"{HOME_DIR}/Documents/maya/2023/prefs/shelves",
-    "linux": f"{HOME_DIR}/maya/2023/prefs/shelves",
-}
-
 # All available render engines for Maya
 #
 # Some render engines are excluded as the NCCA does not use them. (they also don't work)
