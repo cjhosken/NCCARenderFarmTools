@@ -29,5 +29,11 @@ This project is open source, which means anyone can participate in development! 
 
 If you wish to get involved with development, read [DEVEL.md](DEVEL.md)
 
-## Contact
+## Contributors
 This software was initially developed by me, Christopher Hosken, in the summer of 2024.
+
+Other Contributors include:
+    - Jon Macey (Inspired Code)
+
+
+*If you have contributed to the project, feel free to add yourself to the list of contributors.*
