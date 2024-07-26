@@ -1,13 +1,13 @@
 # NCCA RenderFarm Tools
 The NCCA Renderfarm Tools allow users to interact with the NCCA Renderfarm. The shelf tools can be run from inside DCCs (Digital Content Creators). Currently, the shelf tools only support:
 
- - Maya (CPU Only)
+ - Maya
     - Maya Software Render
     - Arnold CPU (Watermarked)
     - Renderman CPU (Outdated)
     - VRay CPU (License Errors)
 
- - Houdini (CPU Only)
+ - Houdini
     - Mantra
     - Karma CPU
 
