@@ -23,7 +23,7 @@ The standalone application allows users to manage their renderfarm. They can sub
 ### Installation
 To install the standalone application, navigate to `standalone/` and run either `linux_setup.sh` or `windows_setup.sh`. The app should then install. 
 
-To run the app, navigate to `standalone/ncca_farmer/` and run the `main` executable.
+To run the app, navigate to `standalone/ncca_farmer/` and run the `ncca_farmer` executable.
 
 ### Usage
 //TODO
