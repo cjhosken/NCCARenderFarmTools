@@ -52,6 +52,6 @@ pip install -r "$PROJECT_DIR/requirements.txt"
 
 # Build the Python project
 echo "Building the executable..."
-pyinstaller "$PROJECT_DIR/nccarenderfarm.spec" --noconfirm
+pyinstaller "$PROJECT_DIR/ncca_farmer.spec" --noconfirm
 
 echo "Build completed! You can now run ./launch.sh"
