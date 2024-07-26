@@ -24,7 +24,7 @@ It is strongly recommended you have a bit of knowledge of git (pushing, pulling,
 
 On windows, first install git and vscode from Apps Anywhere. Run vscode, and in the source control panel, choose initialize reposoity. Enter `cjhosken/NCCARenderFarmTools`
 
-Open the project and then run `window_setup.bat`
+Open the project and then run `windows_setup.bat`
 
 ### Running and Python linting
 
@@ -62,7 +62,7 @@ When you come across issues with IT, such as not having the correct software ver
 
 ## Code Authors
 
-In `NCCARenderFarm/config/app.py` there is a variable called APPLICATION_AUTHORS.
+In `app/src/config/app.py` there is a variable called APPLICATION_AUTHORS.
 
 If you feel that you've contributed large amounts to the project, feel free to add yourself to APPLICATION_AUTHORS. This is done on a trust basis. Please don't remove other people's names without their permission.
 

@@ -1,5 +1,6 @@
 # NCCARenderFarmTools
-A standalone application that interacts with the NCCA Renderfarm.
+
+The NCCA RenderFarm Tools are tools that allow NCCA members to interact with the NCCA Renderfarm.
 
 ## Supported Software
 
@@ -12,8 +13,8 @@ The NCCA Renderfarm currently only supports:
 
 <br>
 
- - Houdini 20.0.506 Mantra
- - Houdini 20.0.506 Karma CPU (XPU unspported)
+ - Houdini Mantra
+ - Houdini Karma CPU (XPU unspported)
 
 ## Installation
 Before running the app, you'll need to install it. The first step is downloading the app from GitHub. 
