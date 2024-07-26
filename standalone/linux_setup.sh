@@ -57,6 +57,6 @@ pip install -r "requirements.txt"
 
 # Build the Python project
 echo "Building the executable..."
-pyinstaller "ncca_farmer.spec" --noconfirm
+pyinstaller "ncca_farmer.spec" --noconfirm --distpath "." --workpath "build"
 
 echo "Build completed!"

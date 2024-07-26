@@ -77,7 +77,7 @@ call python -m pip install -r requirements.txt
 
 REM Build the Python project
 echo Building the executable...
-call pyinstaller ncca_farmer.spec --noconfirm
+call pyinstaller ncca_farmer.spec --noconfirm --distpath . --workpath build
 
 echo Build completed!
 endlocal
