@@ -30,6 +30,7 @@ class NCCA_QMessageBox(NCCA_QDialog):
         self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.label.setFixedWidth(LARGE_MESSAGE_BOX_SIZE.width() - MARGIN_DEFAULT*2)
         self.label.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
+        self.label.setStyleSheet(f"color: {APP_FOREGROUND_COLOR};")
         self.label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         self.label.setOpenExternalLinks(True)
 
@@ -118,6 +119,4 @@ class NCCA_QMessageBox(NCCA_QDialog):
     @staticmethod
     def fatal(parent, title="Fatal", text="", confirm_text=MESSAGE_FATAL_CONFIRM_TEXT, size=LARGE_MESSAGE_BOX_SIZE):
         """Creates a fatal popup dialog"""
-        popup = NCCA_QMessageBox._create_popup(parent, MESSAGE_FATAL_HEADER+title, text + "\n" + MESSAGE_CONTACT_LABEL, WARNING_ICON_PATH, confirm_text, size=size)
-        popup.setWindowFlags(Qt.WindowType.WindowStaysOnTopHint)
-        return popup.exec()
+        return NCCA_QMessageBox._create_popup(parent, MESSAGE_FATAL_HEADER+title, text + "\n" + MESSAGE_CONTACT_LABEL, WARNING_ICON_PATH, confirm_text, size=size).exec()

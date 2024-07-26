@@ -62,6 +62,7 @@ NCCA_QMAINWINDOW_NAVBAR_STYLESHEET=f"""
 NCCA_QMESSAGEBOX_SCROLL_AREA_STYLESHEET=f"""
                 QScrollArea {{
                     border: none;
+                    color: {APP_FOREGROUND_COLOR};
                     background: transparent;
                 }}
                 QScrollArea > QWidget > QWidget {{

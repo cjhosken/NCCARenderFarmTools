@@ -20,7 +20,7 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
             NCCA_QMessageBox.fatal(
                 self,
                 title=MESSAGE_QUBE_LABEL,
-                text=QB_IMPORT_ERROR_MESSAGE + "\n\n" + QB_IMPORT_ERROR,
+                text=QB_IMPORT_ERROR_MESSAGE + "\n\n" + QB_IMPORT_ERROR
             )
 
             sys.exit(1)
