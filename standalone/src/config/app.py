@@ -1,7 +1,7 @@
 # This file contains the general configuration variables for the app.
 import os
 
-APPLICATION_NAME = "NCCA Renderfarm 2024"
+APPLICATION_NAME = "NCCA Farmer 2024"
 # APPLICATION_VERSION Should only really be changed on large rewrites.
 APPLICATION_VERSION = "1.0.0"
 
@@ -20,25 +20,7 @@ APPLICATION_CLI_HEADER = f"""{APPLICATION_NAME}
 Written by: {APPLICATION_AUTHORS}
 """
 
-# Environment encryption variables. These can be changed, although there shouldn't be a need to.
-#
-# When the user chooses to save their details on sign in, their username and password is saved to the NCCA_ENVIRONMENT_PATH.
-# To avoid having the details directly visible, they're encrypted.
-NCCA_ENVIRONMENT_PATH = os.path.expanduser('~/.ncca')
-# NCCA_ENCRYPTION_KEY_TEXT is how the details are encrypted. Different strings will result in different encryptions.
-NCCA_ENCRYPTION_KEY_TEXT="NCCA_ENCRYPTION_KEY"
-
-# NCCA_USERNAME_KEY_TEXT and NCCA_PASSWORD_KEY_TEXT are json keys for the details. For example:
-#
-# NCCA_USERNAME : "username"
-# NCCA_PASSWORD : "password"
-#
-# This is for an extra layer of encryption.
-
-NCCA_USERNAME_KEY_TEXT="NCCA_USERNAME"
-NCCA_PASSWORD_KEY_TEXT="NCCA_PASSWORD"
-
-
-
-# When downloading files f ro
-LOCAL_TEMP_FOLDER = "tmp"
+HOME_DIR = os.path.expanduser("~")
+NCCA_DIR = os.path.join(HOME_DIR, ".ncca")
+NCCA_KEY_PATH = os.path.join(HOME_DIR, ".ncca_key")
+NCCA_ENV_PATH = os.path.join(HOME_DIR, ".ncca_env")

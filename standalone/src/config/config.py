@@ -3,7 +3,7 @@ from PyQt6.QtCore import *
 from PyQt6.QtGui import *
 from PyQt6.QtWidgets import *
 from PyQt6.QtSvg import *
-import sys, os, shutil, tempfile, re, json
+import sys, os, shutil, tempfile, re, json, platform
 from cryptography.fernet import Fernet
 from dotenv import load_dotenv
 import paramiko, socket, subprocess, threading, zipfile, stat, queue, multiprocessing
@@ -13,27 +13,13 @@ import traceback, pyexr
 
 # Get the machine's operating system.
 # it's either "macos", "linux", "windows", or "unkown"
-def get_os():
-    if os.name == 'posix':
-        uname = os.uname()
-        if uname.sysname == 'Darwin':
-            return 'macos'
-        elif uname.sysname == 'Linux':
-            return 'linux'
-        else:
-            return 'Other POSIX'
-    elif os.name == 'nt':
-        return 'windows'
-    else:
-        return 'unknown'
+# A global for the machine's operating system.
+OPERATING_SYSTEM = platform.system().lower()
 
 # Due to being cross platform, the application default is to use / for all paths, even on linux. \ will cause issues on the renderfarm, as well as in Qt styling.
 # os.path.join() is valid when youre doing os only operations.
 def join_path(*paths):
     return os.path.join(*paths).replace("\\", "/")
-
-# A global for the machine's operating system.
-OPERATING_SYSTEM = get_os()
 
 ICON_SIZE = QSize(24, 24)
 ICON_BUTTON_SIZE = QSize(48, 48)

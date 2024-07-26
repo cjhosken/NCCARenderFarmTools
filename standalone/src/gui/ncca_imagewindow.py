@@ -2,6 +2,7 @@ from config import *
 from .widgets import *
 from .ncca_qmainwindow import NCCA_QMainWindow
 from .dialogs import *
+from PIL import Image
 
 class NCCA_ImageWindow(NCCA_QMainWindow):
     """Interface for viewing images."""

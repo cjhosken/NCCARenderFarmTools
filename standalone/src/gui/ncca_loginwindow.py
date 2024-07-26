@@ -1,11 +1,11 @@
 from config import *
 from renderfarm import *
-from utils import *
 from .widgets import *
 from .dialogs import *
 
 from .ncca_qmainwindow import NCCA_QMainWindow
 from .ncca_renderfarmwindow import NCCA_RenderFarmWindow
+from utils import generate_key, load_key, load_saved_credentials, save_user_info, remove_user_info
 from resources import *
 
 class NCCA_LoginWindow(NCCA_QMainWindow):
@@ -14,7 +14,6 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
     def __init__(self, name):
         """Initializes the login window and loads any existing environment variables."""
         super().__init__(name, LOGIN_WINDOW_SIZE)
-        self.load_environment()
 
         if (QB_IMPORT_ERROR):
             NCCA_QMessageBox.fatal(
@@ -24,6 +23,14 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
             )
 
             sys.exit(1)
+
+        generate_key()
+        self.key = load_key()
+        saved_credentials = load_saved_credentials(self.key)
+        if saved_credentials:
+            self.username.setText(saved_credentials['username'])
+            self.password.setText(saved_credentials['password'])
+            self.keep_details.setChecked(True)
 
     def init_ui(self):
         """Initializes the UI"""
@@ -102,52 +109,20 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
         try:
             self.open_main_window()
             if self.keep_details.isChecked():
-                self.store_environment()
+                save_user_info(self.key, self.username.text(), self.password.text())
             else:
-                self.remove_environment()
+                remove_user_info()
         except NCCA_RenderfarmConnectionError:
             self.handleFailedConnection()
         except NCCA_RenderfarmInvalidLoginError:
             self.handleInvalidLogin()
-
-    def store_environment(self):
-        """Stores the user details in the environment file"""
-        gen_key = Fernet.generate_key()
-        cipher = Fernet(gen_key)
-        env_variables = {
-            NCCA_USERNAME_KEY_TEXT: self.username.text(),
-            NCCA_PASSWORD_KEY_TEXT: self.password.text()
-        }
-        encrypted_variables = {key: cipher.encrypt(value.encode()).decode() for key, value in env_variables.items()}
-        self.remove_environment()
-        with open(NCCA_ENVIRONMENT_PATH, 'w') as f:
-            f.write(f"{NCCA_ENCRYPTION_KEY_TEXT}={gen_key.decode()}\n")
-            for key, value in encrypted_variables.items():
-                f.write(f"{key}={value}\n")
-
-    def load_environment(self):
-        """Loads the environment file"""
-        load_dotenv(NCCA_ENVIRONMENT_PATH)
-        encryption_key = os.getenv(f"{NCCA_ENCRYPTION_KEY_TEXT}")
-        if encryption_key:
-            cipher = Fernet(encryption_key.encode())
-            username_encrypted = os.getenv(NCCA_USERNAME_KEY_TEXT)
-            password_encrypted = os.getenv(NCCA_PASSWORD_KEY_TEXT)
-            self.username.setText(cipher.decrypt(username_encrypted.encode()).decode())
-            self.password.setText(cipher.decrypt(password_encrypted.encode()).decode())
-            self.keep_details.setChecked(True)
-
-    def remove_environment(self):
-        """Deletes the environment file if it exists"""
-        if os.path.isfile(NCCA_ENVIRONMENT_PATH):
-            os.remove(NCCA_ENVIRONMENT_PATH)
 
     def handleFailedConnection(self):
         """Handles the UI when the connection to the render farm fails"""
         self.clearLayout()
         self.main_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.title = QLabel(APPLICATION_NAME)
-        self.title.setAlignment(Qt.AlignCenter)
+        self.title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.title.setFont(TITLE_FONT)
         self.main_layout.addWidget(self.title)
 
@@ -160,7 +135,7 @@ class NCCA_LoginWindow(NCCA_QMainWindow):
         self.main_layout.addStretch()
 
         image_label = QLabel()
-        pixmap = QPixmap(NO_CONNECTION_IMAGE).scaled(NO_CONNECTION_IMAGE_SIZE, Qt.KeepAspectRatio)
+        pixmap = QPixmap(NO_CONNECTION_IMAGE).scaled(NO_CONNECTION_IMAGE_SIZE, Qt.AspectRatioMode.KeepAspectRatio)
         image_label.setPixmap(pixmap)
         image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.main_layout.addWidget(image_label)

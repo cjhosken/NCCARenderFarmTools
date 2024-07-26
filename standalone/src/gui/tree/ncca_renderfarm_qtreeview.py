@@ -540,23 +540,16 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
             # To view images on the renderfarm, the application first needs to download it locally, and then open it with a custom image viewer.
 
             local_path = file_path
-            # os.path.join is used here as its an os specific function.
-            # if you try and join the paths before, it will ceate /path/to/temp/folder\\tmp482fhsd72, which it cant read properly.
-            temp_dir = tempfile.TemporaryDirectory(dir=os.path.join(get_user_home(), LOCAL_TEMP_FOLDER)).name 
-            if os.path.exists(temp_dir):
-                shutil.rmtree(temp_dir)
-            
-            # make the temporary directory and get the image path
-            os.mkdir(temp_dir)
-            local_path = join_path(temp_dir, file_name)
+            with tempfile.TemporaryDirectory() as temp_dir:
+                local_path = join_path(temp_dir, file_name)
 
-            # download the image to the local image path
-            self.model().renderfarm.download(remote_path=file_path, local_path=local_path, show_info=False, show_progress=False)
-            
-            # Open the image viewer
-            self.image_dialog = NCCA_ImageWindow(image_path=local_path)
-            self.image_dialog.setGeometry(self.geometry())
-            self.image_dialog.show()
+                # download the image to the local image path
+                self.model().renderfarm.download(remote_path=file_path, local_path=local_path, show_info=False, show_progress=False)
+                
+                # Open the image viewer
+                self.image_dialog = NCCA_ImageWindow(image_path=local_path)
+                self.image_dialog.setGeometry(self.geometry())
+                self.image_dialog.show()
 
     def uploadProjectToSelectedIndex(self):
         """Uploads a project to the currently selected index (folder)"""
@@ -761,16 +754,12 @@ class NCCA_RenderFarm_QTreeView(QTreeView):
         # To get dcc scene data on the renderfarm, the application first needs to download it locally, and then run the render_info commands.
         # os.path.join is used here as its an os specific function.
         # if you try and join the paths before, it will ceate /path/to/temp/folder\\tmp482fhsd72, which it cant read properly.
-        temp_dir = tempfile.TemporaryDirectory(dir=os.path.join(get_user_home(), LOCAL_TEMP_FOLDER)).name
-        
-        # Make the temporary directory
-        os.mkdir(temp_dir)
-        
-        local_path = join_path(temp_dir, file_name)
+        with tempfile.TemporaryDirectory() as temp_dir:
+            local_path = join_path(temp_dir, file_name)
 
-        # Download the dcc file from the renderfarm.
-        self.model().renderfarm.download(remote_path=file_path, local_path=local_path, show_info=False, show_progress=False)
+            # Download the dcc file from the renderfarm.
+            self.model().renderfarm.download(remote_path=file_path, local_path=local_path, show_info=False, show_progress=False)
 
-        # submit a job.
-        # folder_path is none because gui/submit/ncca_qsubmitwindow.py will catch it and make it a renderfarm path.
-        self.submit_job(file_path=file_path, folder_path=None, local_path=local_path)
+            # submit a job.
+            # folder_path is none because gui/submit/ncca_qsubmitwindow.py will catch it and make it a renderfarm path.
+            self.submit_job(file_path=file_path, folder_path=None, local_path=local_path)

@@ -32,10 +32,6 @@ RENDERFARM_PROJECT_DIR="projects"
 # RENDERFARM_OUTPUT_DIR is the default directory for Maya and Blender to save to.
 RENDERFARM_OUTPUT_DIR="output"
 
-# When temporarily downloading from the farm onto the computer (for viewing images, reading dcc scene data), all temporary folders will be saved in home/user/LOCAL_TMP_FOLDER or C:/Users/user/LOCAL_TEMP_FOLDEr
-# When the application closes, LOCAL_TEMP_FOLDER will be deleted.
-LOCAL_TEMP_FOLDER = "tmp"
-
 # FARM_CPUS is the number of available cpus on the renderfarm.
 FARM_CPUS = 8
 # DEFAULT_CPU_USAGE is the default number of cpus that a user has when submitting a job.

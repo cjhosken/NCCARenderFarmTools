@@ -39,14 +39,14 @@ class RenderFarmLoginDialog(QtWidgets.QDialog):
         self.gridLayout = QtWidgets.QGridLayout(self)
         
         # Username label and field
-        self.username_label = QtWidgets.QLabel(NCCA_LOGIN_USERNAME, self)
+        self.username_label = QtWidgets.QLabel(NCCA_LOGIN_USERNAME_LABEL, self)
         self.gridLayout.addWidget(self.username_label, 0, 0)
         
         self.username_input = QtWidgets.QLineEdit(self)
         self.gridLayout.addWidget(self.username_input, 0, 1)
         
         # Password label and field
-        self.password_label = QtWidgets.QLabel(NCCA_LOGIN_PASSWORD, self)
+        self.password_label = QtWidgets.QLabel(NCCA_LOGIN_PASSWORD_LABEL, self)
         self.gridLayout.addWidget(self.password_label, 1, 0)
         
         self.password_input = QtWidgets.QLineEdit(self)
@@ -120,5 +120,3 @@ class RenderFarmLoginDialog(QtWidgets.QDialog):
         - dict: Dictionary containing 'username' and 'sftp' keys.
         """
         return {"username": self.username, "sftp" : self.sftp}
-
-# End of RenderFarmLoginDialog class

@@ -20,7 +20,6 @@ class NCCA_RenderFarmWindow(NCCA_QMainWindow):
         self.home_path = join_path(RENDERFARM_ROOT, self.username, RENDERFARM_FARM_DIR)
 
         super().__init__(name, MAIN_WINDOW_SIZE)
-        self.create_temp()
 
     def init_ui(self):
         super().init_ui()
@@ -80,25 +79,4 @@ class NCCA_RenderFarmWindow(NCCA_QMainWindow):
         if index.isValid():
             destination_folder = self.browser.model().get_file_path(index)
         self.browser.submit_project(destination_folder)
-
-    def create_temp(self):
-        """creates the application temp folder"""
-        # This creates the temp folder in the user home.
-        # /home/username/temp_folder
-        # C:/Users/username/temp_folder
-
-        tmp_path = os.path.join(get_user_home(), LOCAL_TEMP_FOLDER)
-        self.clear_temp(tmp_path) #it wipes the temp folder on start to clear out any old data
-        os.mkdir(tmp_path)
-
-    def clear_temp(self, tmp_path=os.path.join(get_user_home(), LOCAL_TEMP_FOLDER)):
-        """clears the application temp folder"""
-        # Removes the temp folder to clear out any existing local data
-        if os.path.exists(tmp_path):
-            shutil.rmtree(tmp_path)
-
-    def closeEvent(self, event):
-        """Handles the application close event"""
-        # This function does not run on crash.
-        self.clear_temp()
         
