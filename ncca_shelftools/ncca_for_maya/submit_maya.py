@@ -111,15 +111,26 @@ class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         render_options += f" -im {image_name}" if image_name else ""
 
         # Different render engines require different commands
+        use_gpu = False
+
         if (renderer == "renderman"):
+            use_gpu = cmds.getAttr("rmanGlobals.rman__ri_spooledGPU")
             pass
         elif (renderer == "vray"):
+            use_gpu = cmds.getAttr("vraySettings.sys_rayc_dynMemLimit") > 0
             render_options += f" -pad {frame_padding}" if frame_padding else ""
         elif (renderer == "arnold"):
+            use_gpu = cmds.getAttr("defaultArnoldRenderOptions.aiRenderDevice") == 1
             render_options += f" -fnc {frame_number_format}" if frame_number_format else ""
             render_options += f" -pad {frame_padding}" if frame_padding else ""
         else:
             pass
+
+        if use_gpu:
+            QtWidgets.QMessageBox.warning(None, "GPU Unsupported!",
+                                              "GPU Rendering is not supported on the render farm. "
+                                              "This is because the renderfarm has no GPUs.")
+            return
         
         render_options += f" -of {output_file_extension}" if output_file_extension else ""
         render_options += f" -cam {render_camera}"

@@ -2,7 +2,14 @@
 The NCCA Renderfarm Tools allow users to interact with the NCCA Renderfarm. The shelf tools can be run from inside DCCs (Digital Content Creators). Currently, the shelf tools only support:
 
  - Maya (CPU Only)
+    - Maya Software Render
+    - Arnold (Watermarked)
+    - Renderman (Outdated)
+    - VRay (License Errors)
+
  - Houdini (CPU Only)
+    - Mantra
+    - Karma CPU
 
 
 ## Installation
@@ -11,8 +18,6 @@ To install the shelf tools, navigate to `shelf_tools/` and run either `linux_set
 
 ## Usage
 //TODO
-
-
 
 ## Issues
 The app can be buggy at times, so do be patient. If you feel that It's slowing down or something unusual is happening. Try restarting. If it keeps happening, report a bug either through the UI or at https://github.com/cjhosken/NCCARenderFarmTools/issues.
