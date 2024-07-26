@@ -1,5 +1,9 @@
 #!/bin/bash
 
+SCRIPT_PATH=$(realpath "$0")
+SCRIPT_DIR=$(dirname "$SCRIPT_PATH")
+cd $SCRIPT_DIR
+
 # Set base paths (adjust paths as needed)
 NCCA_DIR="$HOME/.ncca"
 MAYA_BASE_PATH="$HOME/maya"

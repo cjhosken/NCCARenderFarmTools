@@ -4,10 +4,15 @@
 # This is the linux shell script that users can run, which will install .pyenv, install python, and build the application.
 # When this script is finished, users can then run launch.sh to start the application.
 
-set -e
 
 # Determine the project directory where this script resides
-PROJECT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+SCRIPT_PATH=$(realpath "$0")
+SCRIPT_DIR=$(dirname "$SCRIPT_PATH")
+cd $SCRIPT_DIR
+
+pwd
+
+set -e
 
 # Check if pyenv is installed
 if [ ! -d "$HOME/.pyenv" ]; then
@@ -28,8 +33,8 @@ eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
 
 # Read the Python version from the .python-version file. Ideally, this should be kept up to date with the vfx reference platform.
-if [ -f "$PROJECT_DIR/.python-version" ]; then
-    PYTHON_VERSION=$(cat "$PROJECT_DIR/.python-version")
+if [ -f ".python-version" ]; then
+    PYTHON_VERSION=$(cat ".python-version")
 else
     echo "Error: .python-version file not found or is empty."
     exit 1
@@ -48,10 +53,10 @@ pyenv local $PYTHON_VERSION
 pip install --upgrade pip
 
 # Install dependencies from requirements.txt
-pip install -r "$PROJECT_DIR/requirements.txt"
+pip install -r "requirements.txt"
 
 # Build the Python project
 echo "Building the executable..."
-pyinstaller "$PROJECT_DIR/ncca_farmer.spec" --noconfirm
+pyinstaller "ncca_farmer.spec" --noconfirm
 
-echo "Build completed! You can now run ./launch.sh"
+echo "Build completed!"
