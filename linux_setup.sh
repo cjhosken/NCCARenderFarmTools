@@ -32,16 +32,6 @@ fi
 # Copy 'ncca_shelftools' directory to NCCA_DIR
 cp -r ./ncca_shelftools "$ncca_shelftools_dir"
 
-# Remove existing 'payload' directory in NCCA_DIR if it exists
-# The 'payload' directory contains python and shell scripts that can be run on the renderfarm.
-ncca_payload_dir="$NCCA_DIR/payload"
-if [ -d "$ncca_payload_dir" ]; then
-    rm -rf "$ncca_payload_dir"
-fi
-
-# Copy 'payload' directory to NCCA_DIR
-cp -r ../payload "$ncca_payload_dir"
-
 # Iterate over Maya versions and copy shelf files
 for maya_version_dir in "$MAYA_BASE_PATH"/*; do
     if [ -d "$maya_version_dir/prefs/shelves" ]; then

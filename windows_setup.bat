@@ -30,16 +30,6 @@ if exist "%ncca_shelftools_dir%" (
 REM Copy 'ncca_shelftools' directory to NCCA_DIR
 xcopy /e /i .\ncca_shelftools "%ncca_shelftools_dir%"
 
-REM Remove existing 'payload' directory in NCCA_DIR if it exists
-REM The 'payload' directory contains python and shell scripts that can be run on the renderfarm.
-set ncca_payload_dir="%NCCA_DIR%\payload"
-if exist "%ncca_payload_dir%" (
-    rmdir /s /q "%ncca_payload_dir%"
-)
-
-REM Copy 'payload' directory to NCCA_DIR
-xcopy /e /i ..\payload "%NCCA_DIR%\payload"
-
 REM Iterate over Maya versions and copy shelf files
 for /d %%d in ("%MAYA_BASE_PATH%\*") do (
     if exist "%%d\prefs\shelves" (
