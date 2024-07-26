@@ -8,7 +8,6 @@ from cryptography.fernet import Fernet
 from dotenv import load_dotenv
 import paramiko, socket, subprocess, threading, zipfile, stat, queue, multiprocessing
 os.environ["OPENCV_IO_ENABLE_OPENEXR"] = "1" 
-from PIL import Image, ImageTk
 import cv2, numpy as np
 import traceback, pyexr
 

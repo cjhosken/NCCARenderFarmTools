@@ -8,10 +8,9 @@ a = Analysis(
     binaries=[],
     datas=[
         ("src/resources/images/*", "resources/images/"),
-        ("src/renderfarm/payload/*", "renderfarm/payload/"),
         ("src/render_info/*", "render_info/")
     ],
-    hiddenimports=["tkinter", "qb"],
+    hiddenimports=["qb"],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
@@ -25,9 +24,10 @@ pyz = PYZ(a.pure)
 exe = EXE(
     pyz,
     a.scripts,
+    a.binaries,
     [],
     exclude_binaries=True,
-    name='main',
+    name='ncca_farmer',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

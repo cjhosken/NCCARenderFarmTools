@@ -57,6 +57,9 @@ pip install -r "requirements.txt"
 
 # Build the Python project
 echo "Building the executable..."
+
+export CRYPTOGRAPHY_OPENSSL_NO_LEGACY=1
+export QT_QPA_PLATFORM=wayland
 pyinstaller "ncca_farmer.spec" --noconfirm --distpath "." --workpath "build"
 
 NCCA_DIR="$HOME/.ncca"
