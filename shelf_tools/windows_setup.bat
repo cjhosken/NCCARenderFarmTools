@@ -1,5 +1,8 @@
 @echo off
 
+set PROJECT_DIR=%~dp0
+cd %PROJECT_DIR%
+
 REM Set variables (adjust paths as needed)
 set NCCA_DIR="%USERPROFILE%\.ncca"
 set MAYA_BASE_PATH="%USERPROFILE%\Documents\maya"

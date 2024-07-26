@@ -7,6 +7,7 @@ REM When this script is finished, users can then run launch.bat to start the app
 
 REM Determine the project directory where this script resides
 set PROJECT_DIR=%~dp0
+cd %PROJECT_DIR%
 
 REM Check if pyenv is installed
 if not exist "%USERPROFILE%\.pyenv" (
