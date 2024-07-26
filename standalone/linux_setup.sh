@@ -4,13 +4,29 @@
 # This is the linux shell script that users can run, which will install .pyenv, install python, and build the application.
 # When this script is finished, users can then run launch.sh to start the application.
 
+# Instantly exit the script if any command fails
+set -e
 
-# Determine the project directory where this script resides
+# Determine the script directory and cd to it
 SCRIPT_PATH=$(realpath "$0")
 SCRIPT_DIR=$(dirname "$SCRIPT_PATH")
 cd $SCRIPT_DIR
 
-set -e
+# Set base paths (adjust paths as needed)
+NCCA_DIR="$HOME/.ncca"
+
+# Create NCCA_DIR if it doesn't exist
+mkdir -p "$NCCA_DIR"
+
+# Remove existing 'payload' directory in NCCA_DIR if it exists
+# The 'payload' directory contains python and shell scripts that can be run on the renderfarm.
+ncca_payload_dir="$NCCA_DIR/payload"
+if [ -d "$ncca_payload_dir" ]; then
+    rm -rf "$ncca_payload_dir"
+fi
+
+# Copy 'payload' directory to NCCA_DIR
+cp -r ../payload "$ncca_payload_dir"
 
 # Check if pyenv is installed
 if [ ! -d "$HOME/.pyenv" ]; then
@@ -56,15 +72,7 @@ pip install -r "requirements.txt"
 # Build the Python project
 echo "Building the executable..."
 
+# Build the python project into an executable
 pyinstaller "ncca_farmer.spec" --noconfirm --distpath "." --workpath "build"
 
-NCCA_DIR="$HOME/.ncca"
-mkdir -p "$NCCA_DIR"
-ncca_payload_dir="$NCCA_DIR/payload"
-if [ -d "$ncca_payload_dir" ]; then
-    rm -rf "$ncca_payload_dir"
-fi
-
-cp -r ../payload "$ncca_payload_dir"
-
-echo "Build completed!"
+read -p "Build completed successfully! Press Enter to exit..."

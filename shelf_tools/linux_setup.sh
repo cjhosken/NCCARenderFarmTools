@@ -1,8 +1,17 @@
 #!/bin/bash
 
+# As not alot of students have strong technical knowledge, It's ideal to make installation as simple as possible.
+# This is the linux shell script that users can run, which will copy shelf tool scripts into Maya and Houdini, as well as install the required python depencies in mayapy and hython.
+# When this script is finished, users can then run launch Maya or Houdini and use the shelf tools.
+
+# Instantly exit the script if any command fails
+set -e
+
+# Determine the script directory and cd to it
 SCRIPT_PATH=$(realpath "$0")
 SCRIPT_DIR=$(dirname "$SCRIPT_PATH")
 cd $SCRIPT_DIR
+
 
 # Set base paths (adjust paths as needed)
 NCCA_DIR="$HOME/.ncca"
@@ -23,11 +32,14 @@ fi
 # Copy 'ncca_shelftools' directory to NCCA_DIR
 cp -r ./ncca_shelftools "$ncca_shelftools_dir"
 
+# Remove existing 'payload' directory in NCCA_DIR if it exists
+# The 'payload' directory contains python and shell scripts that can be run on the renderfarm.
 ncca_payload_dir="$NCCA_DIR/payload"
 if [ -d "$ncca_payload_dir" ]; then
     rm -rf "$ncca_payload_dir"
 fi
 
+# Copy 'payload' directory to NCCA_DIR
 cp -r ../payload "$ncca_payload_dir"
 
 # Iterate over Maya versions and copy shelf files
@@ -72,5 +84,4 @@ for houdini_version in "$HYTHON_BASE_PATH"/*; do
     fi
 done
 
-# Optionally provide feedback that the setup is complete
-echo "Setup completed successfully."
+read -p "Setup completed successfully! Press Enter to exit..."
