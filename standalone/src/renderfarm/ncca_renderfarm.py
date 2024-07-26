@@ -1,6 +1,5 @@
 from config import *
 from gui.dialogs import *
-from .payload import PAYLOAD_DIR
 
 # Custom exceptions to be caught in the login page.
 class NCCA_RenderfarmConnectionError(Exception):
@@ -59,7 +58,7 @@ class NCCA_RenderFarm(paramiko.SSHClient):
                 if self.exists(ncca_dir) and self.isdir(ncca_dir):
                     self.delete_folder(ncca_dir)
                 
-                self.upload_folder(PAYLOAD_DIR, ncca_dir, None)
+                self.upload_folder("~/.ncca/payload", ncca_dir, None)
                 return
                     
             except paramiko.AuthenticationException:

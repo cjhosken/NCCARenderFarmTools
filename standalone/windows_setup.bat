@@ -79,5 +79,13 @@ REM Build the Python project
 echo Building the executable...
 call pyinstaller ncca_farmer.spec --noconfirm --distpath . --workpath build
 
+set NCCA_DIR="%USERPROFILE%\.ncca"
+set ncca_payload_dir="%NCCA_DIR%\payload"
+if exist "%ncca_payload_dir%" (
+    rmdir /s /q "%ncca_payload_dir%"
+)
+
+xcopy /e /i ..\payload "%NCCA_DIR\payload%"
+
 echo Build completed!
 endlocal

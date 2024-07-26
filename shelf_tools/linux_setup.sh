@@ -23,6 +23,13 @@ fi
 # Copy 'ncca_shelftools' directory to NCCA_DIR
 cp -r ./ncca_shelftools "$ncca_shelftools_dir"
 
+ncca_payload_dir="$NCCA_DIR/payload"
+if [ -d "$ncca_payload_dir" ]; then
+    rm -rf "$ncca_payload_dir"
+fi
+
+cp -r ../payload "$ncca_payload_dir"
+
 # Iterate over Maya versions and copy shelf files
 for maya_version_dir in "$MAYA_BASE_PATH"/*; do
     if [ -d "$maya_version_dir/prefs/shelves" ]; then

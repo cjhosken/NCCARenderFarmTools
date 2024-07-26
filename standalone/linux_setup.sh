@@ -59,4 +59,13 @@ pip install -r "requirements.txt"
 echo "Building the executable..."
 pyinstaller "ncca_farmer.spec" --noconfirm --distpath "." --workpath "build"
 
+NCCA_DIR="$HOME/.ncca"
+mkdir -p "$NCCA_DIR"
+ncca_payload_dir="$NCCA_DIR/payload"
+if [ -d "$ncca_payload_dir" ]; then
+    rm -rf "$ncca_payload_dir"
+fi
+
+cp -r ../payload "$ncca_payload_dir"
+
 echo "Build completed!"

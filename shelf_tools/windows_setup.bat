@@ -13,13 +13,20 @@ if not exist "%NCCA_DIR%" (
 )
 
 REM Remove existing 'ncca_shelftools' directory in NCCA_DIR if it exists
-set ncca_shelftools_dir=%NCCA_DIR%\ncca_shelftools
+set ncca_shelftools_dir="%NCCA_DIR%\ncca_shelftools"
 if exist "%ncca_shelftools_dir%" (
     rmdir /s /q "%ncca_shelftools_dir%"
 )
 
 REM Copy 'ncca_shelftools' directory to NCCA_DIR
 xcopy /e /i .\ncca_shelftools "%ncca_shelftools_dir%"
+
+set ncca_payload_dir="%NCCA_DIR%\payload"
+if exist "%ncca_payload_dir%" (
+    rmdir /s /q "%ncca_payload_dir%"
+)
+
+xcopy /e /i ..\payload "%NCCA_DIR\payload%"
 
 REM Copy shelf files into each Maya version directory under %USERPROFILE%\Documents\maya
 for /d %%d in ("%MAYA_BASE_PATH%\*") do (
