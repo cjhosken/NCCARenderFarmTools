@@ -25,7 +25,7 @@ if exist "%ncca_payload_dir%" (
 )
 
 REM Copy 'payload' directory to NCCA_DIR
-xcopy /e /i ..\payload "%NCCA_DIR\payload%"
+xcopy /e /i ..\payload "%NCCA_DIR%\payload"
 
 REM Check if pyenv is installed
 if not exist "%USERPROFILE%\.pyenv" (
@@ -65,7 +65,7 @@ set PATH=%USERPROFILE%\.pyenv\pyenv-win\bin;%PATH%
 REM ead the Python version from the .python-version file. Ideally, this should be kept up to date with the vfx reference platform.
 set PYTHON_VERSION=
 setlocal enabledelayedexpansion
-for /f "tokens=*" %%i in (".python-version") do (
+for /f "tokens=*" %%i in (.python-version) do (
     set PYTHON_VERSION=%%i
 )
 endlocal & set PYTHON_VERSION=%PYTHON_VERSION%

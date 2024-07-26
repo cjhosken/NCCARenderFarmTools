@@ -38,7 +38,7 @@ if exist "%ncca_payload_dir%" (
 )
 
 REM Copy 'payload' directory to NCCA_DIR
-xcopy /e /i ..\payload "%NCCA_DIR\payload%"
+xcopy /e /i ..\payload "%NCCA_DIR%\payload"
 
 REM Iterate over Maya versions and copy shelf files
 for /d %%d in ("%MAYA_BASE_PATH%\*") do (
@@ -65,7 +65,6 @@ for /d %%d in ("%HOUDINI_SHELF_BASE_PATH%\houdini20.*.*") do (
 
 REM Install required Python packages using mayapy
 for /d %%d in (""%MAYAPY_BASE_PATH%\Maya*"") do (
-    echo "%%d\bin\mayapy.exe"
     if exist "%%d\bin\mayapy.exe" (
         echo Installing Requirements for mayapy: %%d
         "%%d\bin\mayapy.exe" -m pip install --upgrade pip
@@ -75,7 +74,6 @@ for /d %%d in (""%MAYAPY_BASE_PATH%\Maya*"") do (
 
 REM Install required Python packages using hython
 for /d %%d in (""%HYTHON_BASE_PATH%\Houdini*"") do (
-    echo "%%d\bin\hython.exe"
     if exist "%%d\bin\hython.exe" (
         echo Installing Requirements for hython: %%d
         "%%d\bin\hython.exe" -m pip install --upgrade pip
