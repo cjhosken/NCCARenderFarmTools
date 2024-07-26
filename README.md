@@ -10,7 +10,7 @@ The shelf tools can be run from inside DCCs (Digital Content Creators).
 
 
 ### Installation
-To install the shelf tools, navigate to `/shelf_tools` and run either `linux_setup.sh` or `windows_setup.sh`. The tools should then install into all Houdini and Maya distributions.
+To install the shelf tools, navigate to `shelf_tools/` and run either `linux_setup.sh` or `windows_setup.sh`. The tools should then install into all Houdini and Maya distributions.
 
 
 ### Usage
@@ -21,9 +21,9 @@ To install the shelf tools, navigate to `/shelf_tools` and run either `linux_set
 The standalone application allows users to manage their renderfarm. They can submit projects, download files, and structure their farm however they want.
 
 ### Installation
-To install the standalone application, navigate to `/standalone` and run either `linux_setup.sh` or `windows_setup.sh`. The app should then install. 
+To install the standalone application, navigate to `standalone/` and run either `linux_setup.sh` or `windows_setup.sh`. The app should then install. 
 
-To run the app, navigate to `/standalone/dist/main` and run the `main` executable.
+To run the app, navigate to `standalone/ncca_farmer/` and run the `main` executable.
 
 ### Usage
 //TODO
