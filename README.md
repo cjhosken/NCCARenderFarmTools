@@ -3,13 +3,13 @@ The NCCA Renderfarm Tools allow users to interact with the NCCA Renderfarm. The 
 
  - Maya
     - Maya Software Render
-    - Arnold CPU (Watermarked)
-    - Renderman CPU (Outdated)
-    - VRay CPU (License Errors)
+    - ~~Arnold (CPU)~~ (Watermarked)
+    - ~~Renderman (CPU)~~ (Outdated)
+    - ~~VRay (CPU)~~ (License Errors)
 
  - Houdini
     - Mantra
-    - Karma CPU
+    - Karma (CPU)
 
 
 ## Installation
