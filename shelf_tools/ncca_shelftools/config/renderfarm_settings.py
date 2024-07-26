@@ -7,3 +7,4 @@ MAX_CPUS = 8
 DEFAULT_CPU_USAGE = 2
 
 HOUDINI_FARM_PATH = "/path/to/houdini"
+MAYA_FARM_PATH = "/path/to/maya"
