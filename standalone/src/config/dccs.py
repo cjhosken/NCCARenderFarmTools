@@ -5,20 +5,26 @@
 from .config import *
 
 # Local paths on the users machine to be used with the app.
-# TODO: The logic behind this code could be simplified, all the paths could be stored in one list (or json object)?
+LOCAL_HYTHON_PATH = {
+    "windows": "C:/Program Files/Side Effects Software/Houdini 20.0.506/bin/hython.exe",
+    "linux":"/opt/hfs19.5.605/bin/hython"
+}
 
-# For Linux
-LOCAL_HYTHON_PATH = "/opt/hfs19.5.605/bin/hython"
-LOCAL_MAYAPY_PATH = "/opt/autodesk/maya2023/bin/mayapy"
-LOCAL_NUKEX_PATH = "/opt/Nuke14.0v5/Nuke14.0"
-LOCAL_KATANA_PATH="/opt/Katana6.0v2/katana"
+LOCAL_MAYAPY_PATH = {
+    "windows":"C:/Program Files/Autodesk/Maya2023/bin/mayapy.exe",
+    "linux":"/opt/autodesk/maya2023/bin/mayapy"
+}
 
-#For Windows
-if OPERATING_SYSTEM == "windows":
-    LOCAL_NUKEX_PATH="C:/Program Files/Nuke14.0v4/Nuke14.0.exe"
-    LOCAL_KATANA_PATH = "C:/Program Files/Katana3.1v5/bin/katanaBin.exe"
-    LOCAL_HYTHON_PATH = "C:/Program Files/Side Effects Software/Houdini 20.0.506/bin/hython.exe"
-    LOCAL_MAYAPY_PATH = "C:/Program Files/Autodesk/Maya2023/bin/mayapy.exe"
+LOCAL_NUKEX_PATH = {
+    "windows":"C:/Program Files/Nuke14.0v4/Nuke14.0.exe",
+    "linux":"/opt/Nuke14.0v5/Nuke14.0"
+}
+
+LOCAL_KATANA_PATH = {
+    "windows":"C:/Program Files/Katana3.1v5/bin/katanaBin.exe",
+    "linux":"/opt/Katana6.0v2/katana"
+}
+
 
 # For the Renderfarm (not sure if these are needed as the source.sh could set the bins?)
 HOUDINI_PATH="/opt/software/hfs20.0.506"
@@ -91,20 +97,24 @@ BLENDER_FILE_EXTENSIONS = {
 # This section contains the configuration variables that relate specfically to Qube.
 # It's important to set this correctly or the application will not run
 
-# EXTERNAL APPLICATIONS
-QUBE_LAUNCHER_PATH = "/public/bin/2023/goQube"
-QUBE_PYTHON_BIN = "/public/devel/2022/pfx/qube/api/python/"
+# Qube
 
-if OPERATING_SYSTEM == "windows":
-    QUBE_LAUNCHER_PATH = "C:/Program Files (x86)/pfx/qube/bin/qube.exe"
-    QUBE_PYTHON_BIN = "C:/Program Files/pfx/qube/api/python"
+QUBE_PYPATH = {
+    "windows" : "C:/Program Files/pfx/qube/api/python",
+    "linux" : "/public/devel/2022/pfx/qube/api/python/"
+}
+
+QUBE_EXE_PATH = {
+    "windows": "C:/Program Files (x86)/pfx/qube/bin/qube.exe",
+    "linux" : "/public/bin/2023/goQube"
+}
 
 QB_IMPORT_ERROR = ""
 
 # Before displaying the GUI, the application will try to import qb. If it cant, the app will show a fatal error. (the other part of this is in gui/ncca_loginwindow.py)
 # This is probably not best practice, so if someone wants to improve it, they can.
 try:
-    sys.path.append(QUBE_PYTHON_BIN)
+    sys.path.append(QUBE_PYPATH.get(OPERATING_SYSTEM))
     import qb
 except Exception as e:
     traceback_info = traceback.format_exc()

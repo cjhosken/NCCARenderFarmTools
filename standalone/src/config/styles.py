@@ -5,6 +5,56 @@ from .app import *
 from .config import *
 from resources import *
 
+# COLORS
+APP_BACKGROUND_COLOR = "#FFFFFF"
+APP_FOREGROUND_COLOR = "#2D2D2D"
+APP_PRIMARY_COLOR="#d81476"
+APP_HOVER_BACKGROUND="#f5f5f5"
+APP_GREY_COLOR="#aeaaa8"
+APP_WARNING_COLOR="#FF0000"
+
+# STYLESHEET GLOBALS
+STANDARD_PADDING = "5px"
+APP_BORDER_RADIUS="10px"
+BORDER_THICKNESS="2px"
+FONT_SIZE="16px"
+STANDARD_HEIGHT="20px"
+
+# APP CONTROLS
+SCROLL_MARGIN = 50
+MARGIN_DEFAULT=25
+APP_NAVBAR_HEIGHT = 64
+
+# ICONS AND IMAGES
+ICON_SIZE = QSize(24, 24)
+ICON_BUTTON_SIZE = QSize(48, 48)
+BROWSER_ICON_SIZE = QSize(32, 32)
+
+NO_CONNECTION_IMAGE_SIZE = QSize(256, 256)
+
+# FONTS
+TITLE_FONT = QFont()
+TITLE_FONT.setPointSize(18)
+TITLE_FONT.setBold(True)
+
+TEXT_FONT = QFont()
+TEXT_FONT.setPointSize(15)
+
+SMALL_FONT = QFont()
+SMALL_FONT.setPointSize(12)
+
+# WINDOW SIZES
+MAIN_WINDOW_SIZE = QSize(800, 800)
+LOGIN_WINDOW_SIZE = QSize(400, 500)
+SETTINGS_WINDOW_SIZE = QSize(500, 500)
+SUBMIT_WINDOW_SIZE = QSize(500, 600)
+IMAGE_WINDOW_SIZE = QSize(1280, 720 + APP_NAVBAR_HEIGHT)
+LARGE_MESSAGE_BOX_SIZE = QSize(300, 400)
+MEDIUM_MESSAGE_BOX_SIZE = QSize(300, 400)
+SMALL_MESSAGE_BOX_SIZE = QSize(300, 400)
+QDIALOG_BUTTON_DEFAULT_SIZE=QSize(125, 35)
+IMAGE_WINDOW_DISPLAY_IMAGE_SIZE=QSize(900, 300)
+LOGIN_WINDOW_WIDGET_SIZES=QSize(300, 50)
 
 NCCA_DIALOG_STYLESHEET=f"""
             NCCA_QDialog {{
@@ -13,7 +63,7 @@ NCCA_DIALOG_STYLESHEET=f"""
             #NCCA_QDialogRootWidget {{
                 background: {APP_BACKGROUND_COLOR};
                 border-radius: {APP_BORDER_RADIUS};
-                border: 2px solid {APP_GREY_COLOR};
+                border: {BORDER_THICKNESS} solid {APP_GREY_COLOR};
             }}
         """
 
@@ -23,7 +73,7 @@ NCCA_QTREEVIEW_STYLESHEET=f"""
                 border: none;
                 background: transparent;
                 outline: 0;
-                font-size: 16px;
+                font-size: {FONT_SIZE};
             }}
             """
 
@@ -36,7 +86,7 @@ NCCA_QTREEVIEW_MENU_STYLESHEET=f"""
 
             QMenu::item {{
                 margin: 0px;
-                padding: 5px; /* Remove padding */
+                padding: {STANDARD_PADDING} /* Remove padding */
             }}
 
             QMenu::item:selected {{
@@ -50,7 +100,7 @@ NCCA_QTREEVIEW_MENU_STYLESHEET=f"""
 NCCA_QMAINWINDOW_ROOT_STYLESHEET=f"""#NCCA_QRootWidget{{
                 background: {APP_BACKGROUND_COLOR};
                 border-radius: {APP_BORDER_RADIUS};
-                border: 2px solid {APP_GREY_COLOR};
+                border: {BORDER_THICKNESS} solid {APP_GREY_COLOR};
             }}
             """
 
@@ -70,13 +120,13 @@ NCCA_QMESSAGEBOX_SCROLL_AREA_STYLESHEET=f"""
                 }}
                 QScrollBar:vertical {{
                     background: {APP_BACKGROUND_COLOR};  /* Background color of the scroll bar */
-                    width: 5px;  /* Width of the scroll bar */
+                    width: {STANDARD_PADDING};  /* Width of the scroll bar */
                     margin: 0px;  /* Margin */
                 }}
                 QScrollBar::handle:vertical {{
                     background: {APP_PRIMARY_COLOR};  /* Color of the scroll bar handle */
-                    border-radius: 2px;  /* Border radius of the scroll bar handle */
-                    min-height: 20px;  /* Minimum height of the scroll bar handle */
+                    border-radius: {BORDER_THICKNESS};  /* Border radius of the scroll bar handle */
+                    min-height: {STANDARD_HEIGHT};  /* Minimum height of the scroll bar handle */
                 }}
                 QScrollBar::handle:vertical:hover {{
                     background: {APP_HOVER_BACKGROUND};  /* Color of the scroll bar handle when hovered */
@@ -90,11 +140,11 @@ NCCA_QMESSAGEBOX_SCROLL_AREA_STYLESHEET=f"""
 
 NCCA_QCHECKBOX_STYLESHEET=f"""
             NCCA_QCheckBox::indicator {{
-                width: 20px;
-                height: 20px;
-                border-radius: 5px;
+                width: {STANDARD_HEIGHT};
+                height: {STANDARD_HEIGHT};
+                border-radius: {STANDARD_PADDING};
                 border-style: solid;
-                border-width: 2px;
+                border-width: {BORDER_THICKNESS};
                 color: white;
                 border-color: {APP_GREY_COLOR};
             }}
@@ -114,22 +164,22 @@ NCCA_QCHECKBOX_STYLESHEET=f"""
 
 NCCA_QCOMBOBOX_STYLESHEET=f"""
             NCCA_QComboBox {{
-                border: 2px solid {APP_GREY_COLOR};
-                border-radius: 10px;
-                padding: 5px;
+                border: {BORDER_THICKNESS} solid {APP_GREY_COLOR};
+                border-radius: {APP_BORDER_RADIUS};
+                padding: {STANDARD_PADDING};
                 background-color: {APP_BACKGROUND_COLOR};
                 color: {APP_FOREGROUND_COLOR};
             }}
 
             NCCA_QComboBox:hover {{
-                border: 2px solid {APP_PRIMARY_COLOR};
+                border: {BORDER_THICKNESS} solid {APP_PRIMARY_COLOR};
                 background-color: {APP_HOVER_BACKGROUND};
             }}
 
             NCCA_QComboBox::drop-down {{
                 subcontrol-origin: padding;
                 subcontrol-position: top right;
-                width: 20px;
+                width: {STANDARD_HEIGHT};
                 image: url({DROPDOWN_ICON_PATH});
             }}
 
@@ -154,8 +204,8 @@ NCCA_QFLATBUTTON_STYLESHEET=f"""
             NCCA_QFlatButton {{
                 background-color: {APP_PRIMARY_COLOR};
                 color: {APP_BACKGROUND_COLOR};
-                border: 2px solid transparent;
-                border-radius: 10px;
+                border: {BORDER_THICKNESS} solid transparent;
+                border-radius: {APP_BORDER_RADIUS};
             }}
             
             /* Hovered style */
@@ -179,9 +229,9 @@ NCCA_QICONBUTTON_STYLESHEET=f"""
 
 NCCA_QINPUT_STYLESHEET=f"""
             NCCA_QInput {{
-                border: 2px solid {APP_GREY_COLOR};
-                border-radius: 10px;
-                padding: 10px;
+                border: {BORDER_THICKNESS} solid {APP_GREY_COLOR};
+                border-radius: {APP_BORDER_RADIUS};
+                padding: {APP_BORDER_RADIUS};
                 color: {APP_FOREGROUND_COLOR};
             }}
             NCCA_QInput:hover {{
@@ -197,9 +247,9 @@ NCCA_QINPUT_STYLESHEET=f"""
 
 NCCA_QINPUT_ERROR_STYLESHEET=f"""
             NCCA_QInput {{
-                border: 2px solid {APP_WARNING_COLOR};
-                border-radius: 10px;
-                padding: 10px;
+                border: {BORDER_THICKNESS} solid {APP_WARNING_COLOR};
+                border-radius: {APP_BORDER_RADIUS};
+                padding: {APP_BORDER_RADIUS};
             }}
             NCCA_QInput:hover {{
                 background-color: {APP_HOVER_BACKGROUND};
@@ -226,12 +276,12 @@ NCCA_QPROGRESSDIALOG_QPROGRESS_STYLESHEET=f"""
             QProgressDialog {{
                 background-color: {APP_BACKGROUND_COLOR};
                 border-radius: {APP_BORDER_RADIUS};
-                font-size: 18px;
+                font-size: {FONT_SIZE};
             }}
 
             QProgressDialog QProgressBar {{
                 background-color: {APP_HOVER_BACKGROUND};
-                border: 1px solid {APP_GREY_COLOR};
+                border: {BORDER_THICKNESS} solid {APP_GREY_COLOR};
                 color: transparent;
             }}
 

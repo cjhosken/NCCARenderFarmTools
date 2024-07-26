@@ -12,13 +12,18 @@ MAYA_SHELF_PATH = {
     "linux": f"{HOME_DIR}/maya/2023/prefs/shelves",
 }
 
+# All available render engines for Maya
+#
+# Some render engines are excluded as the NCCA does not use them. (they also don't work)
+# "Hardware Renderer" : "hw2"
+# "Vector Renderer" : "vr"
+#
 MAYA_RENDERERS = {
     "Set by file": "file",
     "Arnold": "arnold",
     "VRay": "vray",
     "Renderman": "renderman",
-    "Maya Software": "sw",
-    "Maya Hardware 2.0": "hw2"
+    "Maya Software": "sw"
 }
 
 MAYA_FILE_EXTENSIONS = {
@@ -31,11 +36,11 @@ MAYA_FILE_EXTENSIONS = {
 }
 
 QUBE_PYPATH = {
-    "windows" : f"/path/to/qb",
-    "linux" : f"/path/to/qb"
+    "windows" : "C:/Program Files/pfx/qube/api/python",
+    "linux" : "/public/devel/2022/pfx/qube/api/python/"
 }
 
 QUBE_EXE_PATH = {
-    "windows" : f"/path/to/qube",
-    "linux" : f"/path/to/qube"
+    "windows": "C:/Program Files (x86)/pfx/qube/bin/qube.exe",
+    "linux" : "/public/bin/2023/goQube"
 }

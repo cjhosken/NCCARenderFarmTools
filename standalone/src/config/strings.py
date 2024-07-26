@@ -7,7 +7,6 @@
 #
 
 # Message Boxes
-
 MESSAGEBOX_DEFAULT_TITLE="NCCA Message Box"
 MESSAGEBOX_OK_DEFAULT_TEXT="Ok"
 MESSAGEBOX_YES_DEFAULT_TEXT="Yes"
@@ -32,12 +31,13 @@ MESSAGE_OVERRIDE_YES_TEXT="Yes"
 MESSAGE_OVERRIDE_NO_TEXT="No"
 MESSAGE_OVERRIDE_CANCEL_TEXT="Cancel"
 
+
 # Custom Labels
 MESSAGE_QUBE_LABEL = "Qube"
 QB_IMPORT_ERROR_MESSAGE = "Make sure that you have installed Qube 7.5.2 (Client Only) from Apps Anywhere before starting the application." 
 
-# Local DCC Errors:
 
+# Local DCC Errors:
 NO_HOUDINI_TITLE="Houdini"
 NO_HOUDINI_LABEL="Hython could not be found on this machine. Proceeding without Houdini scene info."
 
@@ -56,27 +56,20 @@ UNSUPPORTED_SOFTWARE_LABEL="{} is not supported. Please choose a supported softw
 MESSAGE_CONTACT_LABEL = "If this issue persists, please report a bug at https://github.com/cjhosken/NCCARenderFarmTools/issues, or contact a member of the NCCA."
 
 
-
-
 # Dialog Labels
-
 RENAME_PLACEHOLDER = "Rename"
 RENAME_EXISTING_TITLE = "Rename"
 RENAME_EXISTING_LABEL = "{} already exists."
 
-
 WIPED_TITLE="Wiped"
 WIPED_LABEL = "{} has been wiped!"
-
 
 UPLOAD_FOLDERS_TITLE="Select folder(s) to upload"
 UPLOAD_FILES_TITLE="Select file(s) to upload"
 
-
 DELETE_CONFIRM_TITLE="Confirm Deletion"
 DELETE_CONFIRM_LABEL="Are you sure you want to wipe {}? This will delete ALL files."
 DELETE_CONFIRM_GENERAL_LABEL="Are you sure you want to delete the select item(s)"
-
 
 DOWNLOAD_DESTINATION_TITLE="Select destination folder for download"
 DOWNLOAD_DESTINATION_CAPTION=""
@@ -86,11 +79,9 @@ PATH_EXISTING_TITLE="Path"
 PATH_EXISTING_LABEL="{} already exists."
 PATH_EXISTING_OVERRIDE_LABEL="{} already exists. What do you want to do?"
 
-
 MOVE_CONFIRM_TITLE="Move"
 MOVE_CONFIRM_LABEL="Are you suree you want to move {} to {}?"
 MOVE_CONFIRM_GENERAL_LABEL="Are you sure you want move the selected items to {}?"
-
 
 
 # File Browsers
@@ -126,29 +117,23 @@ WIPE_ACTION_LABEL="Wipe farm"
 
 
 # Login
-
 LOGIN_WINDOW_SUBTITLE="Sign in to access your farm."
 LOGIN_WINDOW_USERNAME_PLACEHOLDER="Username"
 LOGIN_WINDOW_PASSWORD_PLACEHOLDER="Password"
 LOGIN_WINDOW_KEEP_DETAILS_LABEL="Remember me"
 LOGIN_WINDOW_LOGIN_BUTTON_TEXT="Login"
 
-
 INVALID_CREDENTIALS_WARNING_TEXT="Invalid username or password."
-
+NCCA_CONNECTION_ERROR_MESSAGE= "Unable to connect to the NCCA Renderfarm. Try again later."
 
 # Widgets
-
-
 QFLATBUTTON_DEFAULT_TEXT="Button"
 
 QINPUT_PLACEHOLDER=INPUT_DIALOG_PLACEHOLDER
 QINPUT_DEFAULT_TEXT=INPUT_DIALOG_DEFAULT
 
 
-
 # Submit
-
 QSUBMIT_DEFAULT_NAME="Submit Job"
 
 SUBMIT_JOB_NAME_LABEL="Job Name"
@@ -165,23 +150,23 @@ SUBMIT_FRAME_STEP_LABEL="Frame Step"
 SUBMIT_EXTRA_COMMANDS_LABEL="Extra Commands"
 SUBMIT_EXTRA_COMMANDS_PLACEHOLDER="Enter extra commands."
 
-# DCC Jobs
 
+# DCC Jobs
 BLENDER_JOB_TITLE="Submit Blender Job"
 HOUDINI_JOB_TITLE="Submit Houdini Job"
 MAYA_JOB_TITLE="Submit Maya Job"
 NUKEX_JOB_TITLE="Submit NukeX Job"
 KATANA_JOB_TITLE="Submit Katana Job"
 
-# Renderer and output
 
+# Renderer and output
 JOB_RENDERER_LABEL="Renderer"
 JOB_OUTPUT_LABEL="Output Path"
 JOB_OUTPUT_PLACEHOLDER="Output Path"
 JOB_OUTPUT_DEFAULT="/output/frame_####.exr"
 
-# Custom DCC Widgets
 
+# Custom DCC Widgets
 HOUDINI_JOB_ROP_LABEL="ROP Node Path"
 HOUDINI_JOB_ROP_PLACEHOLDER="Rop Node Path"
 HODUINI_JOB_ROP_DEFAULT="/stage/usdrender_rop1"
@@ -203,7 +188,6 @@ RENDERFARM_ERROR_LABEL=f"Unable to submit job."
 
 
 # Renderfarm Dialogs
-
 RENDERFARM_COUNTING_FILES_LABEL="Counting files..."
 
 RENDERFARM_PROGRESS_UPLOAD_TITLE="Upload"
