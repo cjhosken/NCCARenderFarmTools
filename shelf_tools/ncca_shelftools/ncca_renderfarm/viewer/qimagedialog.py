@@ -40,5 +40,3 @@ class QImageDialog(QDialog):
             self.image_label.setPixmap(pixmap.scaledToWidth(800))  # Scale the image to fit within 800 pixels width
         else:
             self.image_label.setText(IMAGE_LOAD_ERROR)  # Display an error message if image loading fails
-
-# End of QImageDialog class

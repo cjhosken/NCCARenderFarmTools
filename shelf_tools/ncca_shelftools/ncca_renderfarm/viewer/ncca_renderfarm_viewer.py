@@ -183,5 +183,3 @@ class NCCA_RenderFarmViewer(QMainWindow):
 
         if reply == QMessageBox.Yes:
             sftp_delete(file_path)  # Delete file using SFTP
-
-# End of NCCA_RenderFarmViewer class

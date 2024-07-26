@@ -37,5 +37,3 @@ class QFarmSystemModel(QFileSystemModel):
             return False  # Right is directory, left is not (right should come first)
 
         return super(QFarmSystemModel, self).lessThan(left, right)  # Call superclass method for default comparison
-
-# End of QFarmSystemModel class
