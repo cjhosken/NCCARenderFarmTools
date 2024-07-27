@@ -13,7 +13,7 @@ OPERATING_SYSTEM = platform.system().lower()
 
 # On linux, home will default to /home/user/
 # On windows, home will default to C:\Users\user\
-# On windows in the NCCA Labs, home will default to H:\\bournemouth.ac.uk\data\student\home\FMC\user 
+# On windows in the NCCA Labs, home will default to H:\\bournemouth.ac.uk\data\student\home\FMC\user\ 
 
 homeshare = os.getenv("HOMESHARE")
 
