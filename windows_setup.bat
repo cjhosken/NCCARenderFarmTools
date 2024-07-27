@@ -11,10 +11,12 @@ cd %SCRIPT_DIR%
 
 REM Set variables (adjust paths as needed)
 set NCCA_DIR="%USERPROFILE%\.ncca"
-set MAYA_BASE_PATH="%HOMESHARE%\Maya"
+REM set MAYA_BASE_PATH="%HOMESHARE%\Maya" FOR LAB MACHINES
+set MAYA_BASE_PATH="%USERPROFILE%\Documents\maya"
 set MAYAPY_BASE_PATH="C:\Program Files\Autodesk"
 set HYTHON_BASE_PATH="C:\Program Files\Side Effects Software"
-set HOUDINI_SHELF_BASE_PATH="%HOMESHARE%"
+REM set HOUDINI_SHELF_BASE_PATH="%HOMESHARE%" FOR LAB MACHINES
+HOUDINI_SHELF_BASE_PATH="%USERPROFILE%\Documents"
 
 REM Create NCCA_DIR if it doesn't exist
 if not exist "%NCCA_DIR%" (
@@ -32,14 +34,27 @@ xcopy /e /i .\ncca_shelftools "%ncca_shelftools_dir%"
 
 REM Iterate over Maya versions and copy shelf files
 for /d %%d in ("%MAYA_BASE_PATH%\*") do (
-    if exist "%%d\Projects\2023\Prefs\shelves" (
-        echo Copying to Maya directory: %%d
-        if exist "%%d\Projects\2023\Prefs\shelves\shelf_NCCA.mel" (
-            del "%%d\Projects\2023\Prefs\shelves\shelf_NCCA.mel"
-        )
+    REM FOR LAB MACHINES
+    REM if exist "%%d\Projects\2023\Prefs\shelves" (
+    REM    echo Copying to Maya directory: %%d
+    REM    if exist "%%d\Projects\2023\Prefs\shelves\shelf_NCCA.mel" (
+    REM        del "%%d\Projects\2023\Prefs\shelves\shelf_NCCA.mel"
+    REM    )
+    REM
+    REM    copy "%ncca_shelftools_dir%\ncca_for_maya\shelf_NCCA.mel" "%%d\Projects\2023\Prefs\shelves\shelf_NCCA.mel"
+    REM)
 
-        copy "%ncca_shelftools_dir%\ncca_for_maya\shelf_NCCA.mel" "%%d\Projects\2023\Prefs\shelves\shelf_NCCA.mel"
+
+    if exist "%%d\prefs\shelves" (
+        echo Copying to Maya directory: %%d
+        if exist "%%d\prefs\shelves\shelf_NCCA.mel" (
+            del "%%d\prefs\shelves\shelf_NCCA.mel"
+        )
+    
+        copy "%ncca_shelftools_dir%\ncca_for_maya\shelf_NCCA.mel" "%%d\prefs\shelves\shelf_NCCA.mel"
     )
+    
+
 )
 
 REM Iterate over Houdini versions and copy shelf files
