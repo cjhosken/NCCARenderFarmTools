@@ -28,8 +28,6 @@
 
 # Licenses
 
-RENDERMAN_VERSION="24.1"
-RENDERMAN_PYTHON_VERSION="3.9"
 ARNOLD_LICENSE_FILE="@havant.bournemouth.ac.uk"
 VRAY_LICENSE_FILE="/render/chroot/.ChaosGroup/vrlclient.xml"
 
@@ -37,11 +35,7 @@ GLOBAL_ENVIRONMENT_VARIABLES = f"""
 export ADSKFLEX_LICENSE_FILE="%ARNOLD_LICENSE_FILE%";
 export VRAY_AUTH_CLIENT_FILE_PATH="%VRAY_LICENSE_FILE%";
 
-export RMAN_VERSION="%RMAN_VERSION%";
-export RMAN_PYTHON_VERSION="%RMAN_PYTHON_VERSION%";
-export PXR_PATH="/opt/software/pixar";
-export RMANTREE="$PXR_PATH/RenderManProServer-$RMAN_VERSION";
-""".replace("%RMAN_VERSION%", RENDERMAN_VERSION).replace("%RMAN_PYTHON_VERSION%", RENDERMAN_PYTHON_VERSION).replace("%ARNOLD_LICENSE_FILE%", ARNOLD_LICENSE_FILE).replace("%VRAY_LICENSE_FILE%", VRAY_LICENSE_FILE)
+""".replace("%ARNOLD_LICENSE_FILE%", ARNOLD_LICENSE_FILE).replace("%VRAY_LICENSE_FILE%", VRAY_LICENSE_FILE)
 
 
 # For LD_LIBRARY_PATH, /usr/lib and /lib might be symlinks. If they are, remove /usr/lib (same applies for lib64)
@@ -52,8 +46,8 @@ export MAYA_BIN="$MAYA_PATH/bin";
 
 export ARNOLD_MAYA_PATH="/opt/autodesk/arnold/maya$MAYA_VERSION";
 
-export PATH="$MAYA_BIN:$RMANTREE/bin:$VRAY_MAYA/bin:$VRAY_MAYA/bin/hostbin:$PATH";
-export PYTHONPATH="$RMANTREE/bin:$RFMTREE/scripts:$VRAY_MAYA/scripts:$ARNOLD_MAYA_PATH/scripts:$VRAY_APPSDK/scripts:$PYTHONPATH";
+export PATH="$MAYA_BIN:$VRAY_MAYA/bin:$VRAY_MAYA/bin/hostbin:$PATH";
+export PYTHONPATH="$VRAY_MAYA/scripts:$ARNOLD_MAYA_PATH/scripts:$VRAY_APPSDK/scripts:$PYTHONPATH";
 export LD_LIBRARY_PATH="$MAYA_PATH/lib:/usr/lib:/usr/lib64:/lib:/lib64:$LD_LIBRARY_PATH";
 
 export VRAY_ROOT="/opt/software/ChaosGroup/V-Ray/Maya%MAYA_VERSION%-x64";
@@ -69,26 +63,19 @@ export PXR_PLUGINPATH_NAME="$VRAY_MAYA/usdplugins:$PXR_PLUGINPATH_NAME";
 export VRAY_OSL_PATH_MAYA%MAYA_VERSION%="$VRAY_ROOT/vray/opensl";
 
 export MAYA_MODULE_PATH="$MAYA_PATH/modules:$MAYA_MODULE_PATH";
-export MAYA_PLUG_IN_PATH="$MAYA_PATH/plug-ins:$RFMTREE/plug-ins:$ARNOLD_MAYA_PATH/plug-ins:$VRAY_MAYA/plug-ins:$MAYA_PLUG_IN_PATH";
-export MAYA_SCRIPT_PATH="$MAYA_PATH/scripts:$ARNOLD_MAYA_PATH/scripts:$RFMTREE/scripts:$VRAY_MAYA/scripts:$MAYA_SCRIPT_PATH";
-export MAYA_RENDER_DESC_PATH="$ARNOLD_MAYA_PATH:$RFMTREE/etc:$VRAY_MAYA/rendererDesc:$MAYA_RENDER_DESC_PATH";
-export MAYA_CUSTOM_TEMPLATE_PATH="$RFMTREE/scripts/NETemplates:$VRAY_MAYA/scripts:$ARNOLD_MAYA_PATH/scripts/mtoa/ui/templates:$MAYA_CUSTOM_TEMPLATE_PATH";
-export XBMLANGPATH="$RFMTREE/icons:$VRAY_MAYA/icons/%B:$ARNOLD_MAYA_PATH/icons/%B:";
-export MAYA_PLUG_IN_RESOURCE_PATH="$RFMTREE/resources:$VRAY_MAYA/resources:$ARNOLD_MAYA_PATH/resources";
-export MAYA_PRESET_PATH="$RFMTREE/presets:$VRAY_MAYA/presets:$ARNOLD_MAYA_PATH/presets";
+export MAYA_PLUG_IN_PATH="$MAYA_PATH/plug-ins:$ARNOLD_MAYA_PATH/plug-ins:$VRAY_MAYA/plug-ins:$MAYA_PLUG_IN_PATH";
+export MAYA_SCRIPT_PATH="$MAYA_PATH/scripts:$ARNOLD_MAYA_PATH/scripts:$VRAY_MAYA/scripts:$MAYA_SCRIPT_PATH";
+export MAYA_RENDER_DESC_PATH="$ARNOLD_MAYA_PATH:$VRAY_MAYA/rendererDesc:$MAYA_RENDER_DESC_PATH";
+export MAYA_CUSTOM_TEMPLATE_PATH="$VRAY_MAYA/scripts:$ARNOLD_MAYA_PATH/scripts/mtoa/ui/templates:$MAYA_CUSTOM_TEMPLATE_PATH";
+export XBMLANGPATH="$VRAY_MAYA/icons/%B:$ARNOLD_MAYA_PATH/icons/%B:";
+export MAYA_PLUG_IN_RESOURCE_PATH="$VRAY_MAYA/resources:$ARNOLD_MAYA_PATH/resources";
+export MAYA_PRESET_PATH="$VRAY_MAYA/presets:$ARNOLD_MAYA_PATH/presets";
 export MAYA_TOOLCLIPS_PATH="$VRAY_MAYA/toolclips:$MAYA_TOOLCLIPS_PATH";
 env;
 """
 
 HOUDINI_ENVIRONMENT_VARIABLES = f"""{GLOBAL_ENVIRONMENT_VARIABLES}
 export HOUDINI_VERSION="%HOUDINI_VERSION%";
-
-export RFMTREE="$PXR_PATH/RenderManForMaya-$RMAN_VERSION";
-export RFM_VERSION="$RMAN_VERSION";
-export RFM_MAYA_VERSION="$MAYA_VERSION";
-
-export RFHTREE="$PXR_PATH/RenderManForHoudini-$RMAN_VERSION";
-export RMAN_PROCEDURALPATH="$RFMTREE/$RMAN_PYTHON_VERSION/$HOUDINI_VERSION/openvdb";
 env;
 """
 
@@ -100,12 +87,6 @@ env;
 # Vray
 # https://docs.chaos.com/display/VMAYA/Portable+Installation
 # https://docs.chaos.com/display/VMAYA/Environment+Variables
-
-# Renderman
-# https://renderman.pixar.com/resources/RenderMan_20/env_vars.html
-# https://renderman.pixar.com/resources/RenderMan_20/rmsWelcome.html
-# https://renderman.pixar.com/resources/RenderMan_20/rfkInstallation.html
-# https://www.sidefx.com/docs/houdini20.0/render/renderman
 
 # Maya & Arnold
 # https://help.autodesk.com/view/ARNOL/ENU/?guid=arnold_for_maya_getting_started_am_Licensing_Arnold_html
