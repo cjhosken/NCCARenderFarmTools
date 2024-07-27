@@ -102,7 +102,7 @@ class Houdini_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         self.submit.setEnabled(self.output_driver.text() is not None and self.project_path.text() is not None)
 
 def main():
-    if os.path.exists(QUBE_PYPATH.get(OPERATING_SYSTEM)):        
+    if os.path.exists(QUBE_PYPATH.get(OPERATING_SYSTEM)) or True:        
         login_dialog = RenderFarmLoginDialog()
         if login_dialog.exec_() == QtWidgets.QDialog.Accepted:
             login_info = login_dialog.get_login_info()

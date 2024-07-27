@@ -116,14 +116,20 @@ class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         # Different render engines require different commands
         use_gpu = False
 
-        if (renderer == "renderman"):
+        used_renderer = renderer
+        if renderer == "file":
+            used_renderer = cmds.getAttr('defaultRenderGlobals.currentRenderer')
+
+        print(used_renderer)
+
+        if (used_renderer == "renderman"):
             use_gpu = cmds.getAttr("rmanGlobals.rman__ri_spooledGPU")
             pass
-        elif (renderer == "vray"):
+        elif (used_renderer == "vray"):
             use_gpu = cmds.getAttr("vraySettings.sys_rayc_dynMemLimit") > 0
             render_options += f" -pad {frame_padding}" if frame_padding else ""
-        elif (renderer == "arnold"):
-            use_gpu = cmds.getAttr("defaultArnoldRenderOptions.aiRenderDevice") == 1
+        elif (used_renderer == "arnold"):
+            use_gpu = cmds.getAttr("defaultArnoldRenderOptions.renderDevice") == 1
             render_options += f" -fnc {frame_number_format}" if frame_number_format else ""
             render_options += f" -pad {frame_padding}" if frame_padding else ""
         else:
@@ -133,7 +139,7 @@ class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
             QtWidgets.QMessageBox.warning(None, "GPU Unsupported!",
                                               "GPU Rendering is not supported on the render farm. "
                                               "This is because the renderfarm has no GPUs.")
-            return
+            self.close()
         
         render_options += f" -of {output_file_extension}" if output_file_extension else ""
         render_options += f" -cam {render_camera}"
@@ -205,7 +211,7 @@ class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         return output_dir, image_name, file_extension, frame_number_format
 
 def main():
-    if os.path.exists(QUBE_PYPATH.get(OPERATING_SYSTEM)):
+    if os.path.exists(QUBE_PYPATH.get(OPERATING_SYSTEM)) or True:
         main_window = get_maya_window()
         login_dialog = RenderFarmLoginDialog(main_window)
         if login_dialog.exec_() == QtWidgets.QDialog.Accepted:
