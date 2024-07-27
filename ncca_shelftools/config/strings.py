@@ -1,5 +1,7 @@
+# This file contains the text used for error dialogs, labels, and tooltips. 
+# If you see a typo in any of those elements, it can be fixed here.
 
-# Error Messages
+# ERROR DIALOG MESSAGES
 
 NCCA_ERROR = {
     "title" : "NCCA Error",
@@ -32,7 +34,7 @@ IMAGE_ERROR = {
 }
 
 
-# Dialog Messages
+# NON-ERROR DIALOG MESSAGES
 
 NCCA_SUBMIT_MESSAGE = {
     "title" : "NCCA",
@@ -50,7 +52,8 @@ DELETE_DIALOG = {
 }
 
 
-# Labels
+# LABELS
+# These are the Labels that go alongside certain elements
 NCCA_LOGIN_DIALOG_TITLE = "NCCA Renderfarm Login"
 NCCA_LOGIN_USERNAME_LABEL = "Username:"
 NCCA_LOGIN_PASSWORD_LABEL = "Password:"
@@ -86,22 +89,22 @@ NCCA_MAYASUBMIT_EXTRA_LABEL = "Extra Commands"
 NCCA_HOUSUBMIT_DIALOG_TITLE = "NCCA Renderfarm Houdini Submit Tool"
 NCCA_HOUSUBMIT_ROP_LABEL = "Select ROP"
 
-# Tooltips
+# TOOLTIPS
+# Tooltips are the messages that are displayed when you hover over something. They're often used to give a desecription of what something does.
 NCCA_SUBMIT_PROJECTNAME_TOOLTIP = "The name of the project as it will appear on the Qube GUI."
 NCCA_SUBMIT_CPUCOUNT_TOOLTIP = "Number of CPUs to use, please be respectful of others and only use high numbers if farm is empty."
 NCCA_SUBMIT_PROJECTFOLDER_TOOLTIP = "Select the project folder to upload. Make sure all the files needed for rendering are relatively referenced by the file in this folder."
 NCCA_SUBMIT_STARTFRAME_TOOLTIP = "Start frame for rendering, set from settings but can be changed here."
 NCCA_SUBMIT_ENDFRAME_TOOLTIP = "End frame for rendering, set from settings but can be changed here."
-NCCA_SUBMIT_BYFRAME_TOOLTIP = "Frame Step for rendering, set from settings but can be changed here."
+NCCA_SUBMIT_BYFRAME_TOOLTIP = "Frame step for rendering, set from settings but can be changed here."
 NCCA_SUBMIT_CLOSE_TOOLTIP = "Close the submit dialog."
 NCCA_SUBMIT_SUBMIT_TOOLTIP = "Submit job to the NCCA Renderfarm."
 
-
-# Maya Submit Tooltips
+# MAYA TOOLTIPS
 NCCA_MAYASUBMIT_RENDERER_TOOLTIP = "The active renderer to use on the farm."
 NCCA_MAYASUBMIT_CAMERA_TOOLTIP = "The camera used for rendering."
 NCCA_MAYASUBMIT_OUTPUT_TOOLTIP = "The file path in which rendered frames will be saved as. This will be saved on the farm."
 NCCA_MAYASUBMIT_EXTRA_TOOLTIP = "Extra commands to be added verbatim to the render call."
 
-# Houdini Submit Tooltips
+# HOUDINI TOOLTIPS
 NCCA_HOUSUBMIT_ROP_TOOLTIP = "Select the output ROP to render, these will be either in the /shop or /stage level"

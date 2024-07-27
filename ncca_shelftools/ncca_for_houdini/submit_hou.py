@@ -1,3 +1,5 @@
+# The Houdini submit dialog allows users to submit jobs to the NCCA renderfarm from a Houdini client.
+
 import hou
 from PySide2 import QtCore, QtWidgets
 

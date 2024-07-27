@@ -1,3 +1,5 @@
+# The Maya submit dialog allows users to submit jobs to the NCCA renderfarm from a Maya client.
+
 import maya.cmds as cmds
 from PySide2 import QtCore, QtWidgets
 import re

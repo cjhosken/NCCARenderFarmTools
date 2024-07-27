@@ -1,3 +1,5 @@
+# RenderFarmSubmitDialog is the parent class that other submitters extend from.
+
 from PySide2.QtWidgets import QMainWindow, QWidget, QMessageBox
 import sys
 

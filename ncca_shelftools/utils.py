@@ -1,3 +1,7 @@
+# This file is used to hold extra functions needed in the tools. 
+# It also contains all the SFTP functions needed for the renderfarm as well as EXR to PNG conversion.
+
+
 from config import * 
 from shiboken2 import wrapInstance 
 import OpenEXR, Imath  
