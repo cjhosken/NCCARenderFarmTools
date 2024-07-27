@@ -137,17 +137,10 @@ class NCCA_RenderFarmViewer(QMainWindow):
         - file_path (str): Path of the file to open.
         """
         file_name = os.path.basename(file_path)  # Get filename from file path
-        file_name_without_ext, file_ext = os.path.splitext(file_name)  # Split filename and extension
 
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_file_path = os.path.join(temp_dir, file_name)  # Create temporary file path
             shutil.copy(file_path, temp_file_path)  # Copy file to temporary location
-
-            if (file_ext.lower() in SUPPORTED_EXR_IMAGE_FORMATS):
-                alt_file_name = file_name_without_ext + ".png"  # Generate alternative PNG file name
-                alt_file_path = os.path.join(temp_dir, alt_file_name)  # Create alternative file path
-                exr_to_png(temp_file_path, alt_file_path)  # Convert EXR to PNG
-                temp_file_path = alt_file_path  # Update temporary file path to PNG
 
             dialog = QImageDialog(temp_file_path)  # Create QImageDialog instance
             dialog.exec_()  # Execute the image dialog

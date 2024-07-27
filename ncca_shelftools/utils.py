@@ -70,7 +70,7 @@ def exr_to_png(input_file, output_file):
         image.save(output_file)
     
     except Exception as e:
-        QtWidgets.QMessageBox.warning(None, NCCA_GENERAL_ERROR_TITLE, CONVERT_IMAGE_ERROR.format(input_file, str(e)))
+        QtWidgets.QMessageBox.warning(None, NCCA_ERROR.get("title"), IMAGE_ERROR.get("message").format(input_file, str(e)))
 
 
 def sftp_exists(sftp=None, remote_path=""):

@@ -31,4 +31,4 @@ def main():
             QtWidgets.QMessageBox.warning(None, NCCA_ERROR.get("title"), NCCA_ERROR.get("message").format(e))
     else:
         # Display a warning message box if the executable path does not exist
-        QtWidgets.QMessageBox.warning(None, QUBE_EXE_ERROR.get("title"), QUBE_EXE_ERROR.get("messaage"))
+        QtWidgets.QMessageBox.warning(None, QUBE_EXE_ERROR.get("title"), QUBE_EXE_ERROR.get("message"))
