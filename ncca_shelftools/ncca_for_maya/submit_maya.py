@@ -140,6 +140,7 @@ class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
                                               "GPU Rendering is not supported on the render farm. "
                                               "This is because the renderfarm has no GPUs.")
             self.close()
+            return
         
         render_options += f" -of {output_file_extension}" if output_file_extension else ""
         render_options += f" -cam {render_camera}"

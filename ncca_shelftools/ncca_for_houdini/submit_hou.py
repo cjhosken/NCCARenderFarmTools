@@ -50,15 +50,16 @@ class Houdini_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         houdini_farm_path_edit = os.path.join(os.path.dirname(HOUDINI_FARM_PATH), "")
         pre_render = f"cd {houdini_farm_path_edit}; source houdini_setup_bash;"
 
-        driver = self.output_driver
+        rop = hou.node(self.output_driver.text())
 
-        if driver.type().name() == "karma":
-            if driver.parm("renderdevice").eval() == "XPU":
+        if rop.type().name() == "usdrender_rop":
+            if rop.parm("renderer").eval() == "BRAY_HdKarmaXPU":
                 QtWidgets.QMessageBox.warning(self, "GPU Unsupported!", "XPU Rendering is not supported on the render farm. This is because the renderfarm has no GPUs.")
+                self.close()
                 return
 
         render_command = f"hython $HB/hrender.py -F QB_FRAME_NUMBER"
-        render_command += f" -d {driver.text()}"
+        render_command += f" -d {rop}"
         render_command += f" {render_path}"
 
         source_command = HOUDINI_ENVIRONMENT_VARIABLES.replace("%HOUDINI_VERSION%", houdini_version)

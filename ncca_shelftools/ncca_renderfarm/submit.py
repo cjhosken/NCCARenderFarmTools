@@ -115,6 +115,7 @@ class RenderFarmSubmitDialog(QMainWindow):
         except Exception as e: 
             QtWidgets.QMessageBox.warning(None, NCCA_ERROR.get("title"), NCCA_ERROR.get("message").format(e))
             self.close()
+            return
 
         job = {}
         job['name'] = self.project_name.text()
