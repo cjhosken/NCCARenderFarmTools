@@ -52,8 +52,6 @@ class Houdini_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
 
         rop = hou.node(self.output_driver.text())
 
-        print(rop.parm("renderer").eval())
-
         if rop.type().name() == "usdrender_rop":
             if rop.parm("renderer").eval() == "BRAY_HdKarmaXPU":
                 QtWidgets.QMessageBox.warning(self, "GPU Unsupported!", "XPU Rendering is not supported on the render farm. This is because the renderfarm has no GPUs.")

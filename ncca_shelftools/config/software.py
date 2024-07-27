@@ -21,7 +21,6 @@ MAYA_RENDERERS = {
     "Set by file": "file",
     "Arnold": "arnold",
     "VRay": "vray",
-    "Renderman": "renderman",
     "Maya Software": "sw"
 }
 

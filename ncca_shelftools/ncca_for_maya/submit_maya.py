@@ -122,11 +122,8 @@ class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
 
         print(used_renderer)
 
-        if (used_renderer == "renderman"):
-            use_gpu = cmds.getAttr("rmanGlobals.rman__ri_spooledGPU")
-            pass
-        elif (used_renderer == "vray"):
-            use_gpu = cmds.getAttr("vraySettings.sys_rayc_dynMemLimit") > 0
+        if (used_renderer == "vray"):
+            use_gpu = cmds.getAttr("vraySettings.productionEngine") > 0
             render_options += f" -pad {frame_padding}" if frame_padding else ""
         elif (used_renderer == "arnold"):
             use_gpu = cmds.getAttr("defaultArnoldRenderOptions.renderDevice") == 1
