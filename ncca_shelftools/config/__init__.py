@@ -12,9 +12,12 @@ from .environment import *
 OPERATING_SYSTEM = platform.system().lower()
 
 # On linux, home will default to /home/user/
-# On windows, home will default to C:/Users/user/
-# On windows in the NCCA Labs, home will default to H:/user TODO// CHECK THIS
-HOME_DIR = os.path.expanduser("~")
+# On windows, home will default to C:\Users\user\
+# On windows in the NCCA Labs, home will default to H:\\bournemouth.ac.uk\data\student\home\FMC\user 
+
+homeshare = os.getenv("HOMESHARE")
+
+HOME_DIR = homeshare if homeshare is not None else os.path.expanduser("~")
 
 # The NCCA_DIR is the where all the scripts are located
 NCCA_DIR = os.path.join(HOME_DIR, ".ncca")
