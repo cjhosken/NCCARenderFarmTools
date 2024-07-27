@@ -1,11 +1,11 @@
-# ncca_renderfarm/crypt.py contains all the necessary functions for loading, saving, and removing encrypted login details.
+# /ncca_shelftools/ncca_renderfarm/crypt.py contains all the necessary functions for loading, saving, and removing encrypted login details.
 # It stores the encrypted environment variables (username, password) in NCCA_ENV_PATH
 # The encryption key is stored in NCCA_KEY_PATH
-# NCCA_ENV_PATH and NCCA_KEY_PATH can be found in config
+# NCCA_ENV_PATH and NCCA_KEY_PATH can be found in /ncca_shelftools/config/__init__.py
 
-from config import *
 import json
 from cryptography.fernet import Fernet
+from config import *
 
 def load_saved_credentials(key):
     """

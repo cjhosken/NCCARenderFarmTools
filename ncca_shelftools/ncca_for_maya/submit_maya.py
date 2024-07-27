@@ -1,10 +1,11 @@
-from config import *
-
 import maya.cmds as cmds
+from PySide2 import QtCore, QtWidgets
+import re
+
+from config import *
 
 from ncca_renderfarm.submit import RenderFarmSubmitDialog
 from ncca_renderfarm.login import RenderFarmLoginDialog
-
 from utils import get_maya_window
 
 class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
@@ -208,4 +209,4 @@ def main():
             dialog = Maya_RenderFarmSubmitDialog(info=login_info, parent=main_window)
             dialog.show()
     else:
-        QtWidgets.QMessageBox.warning(None, QUBE_ERROR_TITLE, QUBE_PYTHON_ERROR_MESSAGE)
+        QtWidgets.QMessageBox.warning(None, QUBE_PY_ERROR.get("title"), QUBE_PY_ERROR.get("message"))

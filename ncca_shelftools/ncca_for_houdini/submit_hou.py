@@ -1,6 +1,7 @@
-from config import *
-
 import hou
+from PySide2 import QtCore, QtWidgets
+
+from config import *
 from ncca_renderfarm.login import RenderFarmLoginDialog
 from ncca_renderfarm.submit import RenderFarmSubmitDialog
 
@@ -97,9 +98,7 @@ class Houdini_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         self.submit.setEnabled(self.output_driver.text() is not None and self.project_path.text() is not None)
 
 def main():
-    if os.path.exists(QUBE_PYPATH.get(OPERATING_SYSTEM)):
-        #Create and show the login dialog
-        
+    if os.path.exists(QUBE_PYPATH.get(OPERATING_SYSTEM)):        
         login_dialog = RenderFarmLoginDialog()
         if login_dialog.exec_() == QtWidgets.QDialog.Accepted:
             login_info = login_dialog.get_login_info()
@@ -107,4 +106,4 @@ def main():
             dialog.setParent(hou.qt.mainWindow(), QtCore.Qt.Window)
             dialog.show()
     else:
-        QtWidgets.QMessageBox.warning(None, QUBE_ERROR_TITLE, QUBE_PYTHON_ERROR_MESSAGE)
+        QtWidgets.QMessageBox.warning(None, QUBE_PY_ERROR.get("title"), QUBE_PY_ERROR.get("message"))

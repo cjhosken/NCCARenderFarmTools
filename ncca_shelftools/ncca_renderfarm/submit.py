@@ -1,6 +1,8 @@
+from PySide2.QtWidgets import QMainWindow, QWidget, QMessageBox
+import sys
+
 from config import *
 from utils import *
-from PySide2.QtWidgets import QMainWindow, QWidget, QMessageBox
 
 class RenderFarmSubmitDialog(QMainWindow):
     """"""
@@ -109,7 +111,7 @@ class RenderFarmSubmitDialog(QMainWindow):
             sys.path.append(QUBE_PYPATH.get(OPERATING_SYSTEM))
             import qb
         except Exception as e: 
-            QtWidgets.QMessageBox.warning(None, NCCA_GENERAL_ERROR_TITLE, f"{e}")
+            QtWidgets.QMessageBox.warning(None, NCCA_ERROR.get("title"), NCCA_ERROR.get("message").format(e))
             self.close()
 
         job = {}
@@ -141,15 +143,15 @@ class RenderFarmSubmitDialog(QMainWindow):
             id_list = []
             for job in listOfSubmittedJobs:
                 id_list.append(job['id'])
-            QtWidgets.QMessageBox.warning(None, NCCA_GENERAL_TITLE, NCCA_SUBMIT_MESSAGE.format(self.project_name.text(), id_list))
+            QtWidgets.QMessageBox.warning(None, NCCA_SUBMIT_MESSAGE.get("title"), NCCA_SUBMIT_MESSAGE.get("message").format(self.project_name.text(), id_list))
         except Exception as e:
-            QtWidgets.QMessageBox.warning(None, NCCA_GENERAL_ERROR_TITLE, f"{e}")
+            QtWidgets.QMessageBox.warning(None, NCCA_ERROR.get("title"), NCCA_ERROR.get("message").format(e))
         
         self.close()
 
     def confirm_override(self, file_path):
-        reply = QMessageBox.question(None, NCCA_OVERRIDE_TITLE, 
-            NCCA_OVERRIDE_MESSAGE.format(file_path), 
+        reply = QMessageBox.question(None, OVERRIDE_DIALOG.get("title"), 
+            OVERRIDE_DIALOG.get("message").format(file_path), 
             QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         return reply == QMessageBox.Yes
 

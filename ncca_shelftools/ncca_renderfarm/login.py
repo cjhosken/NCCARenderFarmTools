@@ -1,5 +1,12 @@
-from config import *  
+# In order to use the tools, the user must sign-in to the renderfarm. The username and password is the same as their student sign in details.
+# Users have the option to remember their user info. 
+# The user info is saved and encrypted into NCCA_ENV_PATH and NCCA_KEY_PATH, which can be found in /ncca_shelftools/config/__init__.py
+# The script uses paramiko to connect the renderfarm's SFTP server. 
+# The server address, address port, and connection attempts can be found in /ncca_shelftools/config/renderfarm.py
+
+from PySide2 import QtWidgets
 import paramiko, socket  
+from config import *  
 from .crypt import * 
 
 class NCCA_ConnectionFailedException(Exception):
@@ -87,29 +94,26 @@ class RenderFarmLoginDialog(QtWidgets.QDialog):
         password = self.password_input.text()  # Get entered password
         save_info = self.save_info_checkbox.isChecked()  # Check if save info checkbox is checked
         
-        if not username or not password:
-            QtWidgets.QMessageBox.warning(self, NCCA_LOGIN_ERROR_TITLE, NCCA_LOGIN_EMPTY_MESSAGE)
-        else:
-            for attempt in range(MAX_CONNECTION_ATTEMPTS):  # Try to connect multiple times
-                try:
-                    # Attempt to establish SFTP connection here
+        for attempt in range(MAX_CONNECTION_ATTEMPTS):  # Try to connect multiple times
+            try:
+                # Attempt to establish SFTP connection here
                     
-                    self.sftp = None  # Initialize SFTP connection variable
-                    self.username = username  # Set class username variable
+                self.sftp = None  # Initialize SFTP connection variable
+                self.username = username  # Set class username variable
 
-                    if save_info:
-                        save_user_info(self.key, username, password)  # Save user info if checkbox is checked
-                    else:
-                        remove_user_info()  # Remove saved user info if checkbox is not checked
+                if save_info:
+                    save_user_info(self.key, username, password)  # Save user info if checkbox is checked
+                else:
+                    remove_user_info()  # Remove saved user info if checkbox is not checked
 
-                    # Close dialog on successful login
-                    return self.accept()
+                # Close dialog on successful login
+                return self.accept()
 
-                except paramiko.AuthenticationException:
-                    QtWidgets.QMessageBox.warning(self, NCCA_LOGIN_ERROR_TITLE, NCCA_LOGIN_ERROR_MESSAGE)
-                except (paramiko.SSHException, socket.gaierror):
-                    if attempt >= MAX_CONNECTION_ATTEMPTS - 1:
-                        QtWidgets.QMessageBox.warning(self, NCCA_CONNECTION_ERROR_TITLE, NCCA_CONNECTION_ERROR_MESSAGE)
+            except paramiko.AuthenticationException:
+                QtWidgets.QMessageBox.warning(self, NCCA_INVALID_LOGIN_ERROR.get("title"), NCCA_INVALID_LOGIN_ERROR.get("message"))
+            except (paramiko.SSHException, socket.gaierror):
+                if attempt >= MAX_CONNECTION_ATTEMPTS - 1:
+                    QtWidgets.QMessageBox.warning(self, NCCA_CONNECTION_ERROR.get("title"), NCCA_CONNECTION_ERROR.get("message"))
         return None  # Return None if login fails
     
     def get_login_info(self):

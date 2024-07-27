@@ -177,8 +177,8 @@ class NCCA_RenderFarmViewer(QMainWindow):
         Args:
         - file_path (str): Path of the file to delete.
         """
-        reply = QMessageBox.question(self, NCCA_DELETE_TITLE, 
-                                    NCCA_DELETE_MESSAGE.format(file_path), 
+        reply = QMessageBox.question(self, DELETE_DIALOG.get("title"), 
+                                    DELETE_DIALOG.get("message").format(file_path), 
                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)  # Confirmation dialog
 
         if reply == QMessageBox.Yes:

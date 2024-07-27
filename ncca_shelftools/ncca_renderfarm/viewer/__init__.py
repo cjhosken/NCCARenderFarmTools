@@ -1,3 +1,5 @@
+from PySide2 import QtCore, QtWidgets
+
 from config import *
 from ncca_renderfarm.login import RenderFarmLoginDialog
 from .ncca_renderfarm_viewer import NCCA_RenderFarmViewer
