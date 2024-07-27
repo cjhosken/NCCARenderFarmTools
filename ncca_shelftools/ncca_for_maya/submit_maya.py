@@ -142,9 +142,11 @@ class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
 
         maya_version = cmds.about(version=True)
 
+        source_command = MAYA_ENVIRONMENT_VARIABLES.replace("%MAYA_VERSION%", maya_version)
+
         pre_render_command = "export PATH=bin/:$PATH"
 
-        command = f"{pre_render_command} {render_command}"
+        command = f"{source_command} {pre_render_command} {render_command}"
 
         print(command)
 

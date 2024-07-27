@@ -6,6 +6,7 @@ import os, platform
 from .software import *
 from .renderfarm import *
 from .strings import *
+from .environment import *
 
 # Get the current operating system, this could be 'windows', 'linux', or 'darwin' (however darwin is not supported)
 OPERATING_SYSTEM = platform.system().lower()

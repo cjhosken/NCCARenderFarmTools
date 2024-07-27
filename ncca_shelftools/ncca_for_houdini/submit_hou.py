@@ -61,7 +61,9 @@ class Houdini_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         render_command += f" -d {driver}"
         render_command += f" {render_path}"
 
-        full_command = f"{pre_render} {render_command}"
+        source_command = HOUDINI_ENVIRONMENT_VARIABLES.replace("%HOUDINI_VERSION%", houdini_version)
+
+        full_command = f"{source_command} {pre_render} {render_command}"
 
         #print(full_command)
 

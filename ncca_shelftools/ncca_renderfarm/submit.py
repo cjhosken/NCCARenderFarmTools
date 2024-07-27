@@ -131,9 +131,8 @@ class RenderFarmSubmitDialog(QMainWindow):
             sftp_delete()
         
         sftp_upload()
-        source_command = f"source ~/.ncca/payload/farm_source.sh;"
 
-        package['cmdline'] = source_command + command
+        package['cmdline'] = command
 
         job['pacakge'] = package
             
