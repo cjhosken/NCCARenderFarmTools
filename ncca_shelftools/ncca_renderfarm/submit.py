@@ -95,7 +95,7 @@ class RenderFarmSubmitDialog(QMainWindow):
         username = self.username
 
         local_project_dir = self.project_path.text()
-        remote_project_dir = os.path.join("/home", username, "farm", "projects", os.path.basename(local_project_dir))
+        remote_project_dir = os.path.join("/home", username, "farm", "projects", os.path.basename(local_project_dir)).replace("\\", "/")
         
         if (sftp_exists(remote_project_dir)):
             if self.confirm_override(remote_project_dir):
@@ -125,12 +125,6 @@ class RenderFarmSubmitDialog(QMainWindow):
 
         package = {}
         package['shell']="/bin/bash"
-
-        # upload payload source.sh
-        if (sftp_exists()):
-            sftp_delete()
-        
-        sftp_upload()
 
         package['cmdline'] = command
 
