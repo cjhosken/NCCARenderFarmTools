@@ -50,7 +50,7 @@ class Houdini_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         houdini_farm_path_edit = os.path.join(os.path.dirname(HOUDINI_FARM_PATH), "")
         pre_render = f"cd {houdini_farm_path_edit}; source houdini_setup_bash;"
 
-        driver = self.output_driver.text()
+        driver = self.output_driver
 
         if driver.type().name() == "karma":
             if driver.parm("renderdevice").eval() == "XPU":
@@ -58,7 +58,7 @@ class Houdini_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
                 return
 
         render_command = f"hython $HB/hrender.py -F QB_FRAME_NUMBER"
-        render_command += f" -d {driver}"
+        render_command += f" -d {driver.text()}"
         render_command += f" {render_path}"
 
         source_command = HOUDINI_ENVIRONMENT_VARIABLES.replace("%HOUDINI_VERSION%", houdini_version)
