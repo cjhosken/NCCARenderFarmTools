@@ -52,6 +52,8 @@ class Houdini_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
 
         rop = hou.node(self.output_driver.text())
 
+        #print(rop.type().name())
+
         if rop.type().name() == "usdrender_rop":
             if rop.parm("renderer").eval() == "BRAY_HdKarmaXPU":
                 QtWidgets.QMessageBox.warning(self, "GPU Unsupported!", "XPU Rendering is not supported on the render farm. This is because the renderfarm has no GPUs.")
@@ -61,8 +63,10 @@ class Houdini_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
                 QtWidgets.QMessageBox.warning(self, "Arnold Unsupported!", "Arnold Rendering is not supported on the render farm. Please use another render engine.")
                 self.close()
                 return
-
-        
+        elif rop.type().name() == "arnold":
+            QtWidgets.QMessageBox.warning(self, "Arnold Unsupported!", "Arnold Rendering is not supported on the render farm. Please use another render engine.")
+            self.close()
+            return
 
         render_command = f"hython $HB/hrender.py -F QB_FRAME_NUMBER"
         render_command += f" -d {rop}"
