@@ -31,7 +31,7 @@ global proc shelf_NCCA () {
         -style "iconOnly" 
         -marginWidth 0
         -marginHeight 1
-        -command "python(\"import sys, os; sys.path.append(os.path.join(os.path.expanduser('~'), '.ncca', 'ncca_shelftools')); from ncca_renderfarm import qube; qube.main()\");"
+        -command "python(\"import sys, os; home=os.getenv('HOMESHARE'); sys.path.append(os.path.join(home if home is not None else os.path.expanduser('~'), '.ncca', 'ncca_shelftools')); from ncca_renderfarm import qube; qube.main()\");"
         -sourceType "mel" 
         -commandRepeatable 1
         -flat 1
@@ -65,7 +65,7 @@ global proc shelf_NCCA () {
         -style "iconOnly" 
         -marginWidth 0
         -marginHeight 1
-        -command "python(\"import sys, os; sys.path.append(os.path.join(os.path.expanduser('~'), '.ncca', 'ncca_shelftools')); from ncca_for_maya import submit_maya; submit_maya.main()\");"
+        -command "python(\"import sys, os; home=os.getenv('HOMESHARE'); sys.path.append(os.path.join(home if home is not None else os.path.expanduser('~'), '.ncca', 'ncca_shelftools')); from ncca_for_maya import submit_maya; submit_maya.main()\");"
         -sourceType "mel" 
         -commandRepeatable 1
         -flat 1
@@ -99,7 +99,7 @@ global proc shelf_NCCA () {
         -style "iconOnly" 
         -marginWidth 0
         -marginHeight 1
-        -command "python(\"import sys, os; sys.path.append(os.path.join(os.path.expanduser('~'), '.ncca', 'ncca_shelftools')); from ncca_renderfarm import viewer; viewer.main('maya')\");"
+        -command "python(\"import sys, os; home=os.getenv('HOMESHARE'); sys.path.append(os.path.join(home if home is not None else os.path.expanduser('~'), '.ncca', 'ncca_shelftools')); from ncca_renderfarm import viewer; viewer.main('maya')\");"
         -sourceType "mel" 
         -commandRepeatable 1
         -flat 1

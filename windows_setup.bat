@@ -1,5 +1,5 @@
 @echo off
-setlocal
+setlocal enabledelayedexpansion
 
 REM As not alot of students have strong technical knowledge, It's ideal to make installation as simple as possible.
 REM This is the linux shell script that users can run, which will copy shelf tool scripts into Maya and Houdini, as well as install the required python depencies in mayapy and hython.
@@ -11,12 +11,19 @@ cd %SCRIPT_DIR%
 
 REM Set variables (adjust paths as needed)
 set NCCA_DIR="%USERPROFILE%\.ncca"
-REM set MAYA_BASE_PATH="%HOMESHARE%\Maya" FOR LAB MACHINES
 set MAYA_BASE_PATH="%USERPROFILE%\Documents\maya"
 set MAYAPY_BASE_PATH="C:\Program Files\Autodesk"
 set HYTHON_BASE_PATH="C:\Program Files\Side Effects Software"
-REM set HOUDINI_SHELF_BASE_PATH="%HOMESHARE%" FOR LAB MACHINES
-HOUDINI_SHELF_BASE_PATH="%USERPROFILE%\Documents"
+set HOUDINI_SHELF_BASE_PATH="%USERPROFILE%\Documents"
+
+
+REM The home directory is different on the NCCA Lab Machines.
+REM The reason we dont set the paths immediately is so that users can develop on their home machines.
+IF DEFINED HOMESHARE (
+    set NCCA_DIR="%HOMESHARE%\.ncca"
+    set MAYA_BASE_PATH="%HOMESHARE%\Maya"
+    set HOUDINI_SHELF_BASE_PATH="%HOMESHARE%"
+)
 
 REM Create NCCA_DIR if it doesn't exist
 if not exist "%NCCA_DIR%" (
@@ -32,29 +39,29 @@ if exist "%ncca_shelftools_dir%" (
 REM Copy 'ncca_shelftools' directory to NCCA_DIR
 xcopy /e /i .\ncca_shelftools "%ncca_shelftools_dir%"
 
+
 REM Iterate over Maya versions and copy shelf files
 for /d %%d in ("%MAYA_BASE_PATH%\*") do (
-    REM FOR LAB MACHINES
-    REM if exist "%%d\Projects\2023\Prefs\shelves" (
-    REM    echo Copying to Maya directory: %%d
-    REM    if exist "%%d\Projects\2023\Prefs\shelves\shelf_NCCA.mel" (
-    REM        del "%%d\Projects\2023\Prefs\shelves\shelf_NCCA.mel"
-    REM    )
-    REM
-    REM    copy "%ncca_shelftools_dir%\ncca_for_maya\shelf_NCCA.mel" "%%d\Projects\2023\Prefs\shelves\shelf_NCCA.mel"
-    REM)
-
-
-    if exist "%%d\prefs\shelves" (
-        echo Copying to Maya directory: %%d
-        if exist "%%d\prefs\shelves\shelf_NCCA.mel" (
-            del "%%d\prefs\shelves\shelf_NCCA.mel"
+    set "MAYA_VERSION=%%~nd"
+    IF DEFINED HOMESHARE (
+        if exist "%%d\Projects\!MAYA_VERSION!\Prefs\shelves" (
+            echo Copying to Maya directory: %%d
+            if exist "%%d\Projects\!MAYA_VERSION!\Prefs\shelves\shelf_NCCA.mel" (
+                del "%%d\Projects\!MAYA_VERSION!\Prefs\shelves\shelf_NCCA.mel"
+            )
+    
+            copy "%ncca_shelftools_dir%\ncca_for_maya\shelf_NCCA.mel" "%%d\Projects\!MAYA_VERSION!\Prefs\shelves\shelf_NCCA.mel"
         )
-    
-        copy "%ncca_shelftools_dir%\ncca_for_maya\shelf_NCCA.mel" "%%d\prefs\shelves\shelf_NCCA.mel"
+    ) ELSE (
+        if exist "%%d\prefs\shelves" (
+            echo Copying to Maya directory: %%d
+            if exist "%%d\prefs\shelves\shelf_NCCA.mel" (
+                del "%%d\prefs\shelves\shelf_NCCA.mel"
+            )
+            
+            copy "%ncca_shelftools_dir%\ncca_for_maya\shelf_NCCA.mel" "%%d\prefs\shelves\shelf_NCCA.mel"
+        )
     )
-    
-
 )
 
 REM Iterate over Houdini versions and copy shelf files
@@ -86,6 +93,6 @@ for /d %%d in (""%HYTHON_BASE_PATH%\Houdini*"") do (
     )
 )
 
-echo Setup completed successfully! Press Enter to exit...
+echo Setup completed successfully. Press Enter to exit...
 endlocal
 pause >nul
