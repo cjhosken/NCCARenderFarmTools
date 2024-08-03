@@ -70,33 +70,47 @@ def get_exr_channels(image_path):
 
 def isolate_channel_to_qpixmap(image_path, channel="RGBA"):
     install(["opencv-python"])
-    import cv2  
-
+    import cv2
+    # Read the image using OpenCV
     image = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
     
-    alpha = None
-
+    if image is None:
+        raise ValueError(f"Unable to load image from path: {image_path}")
+    
+    # Determine if the image is RGB or RGBA
     if len(image.shape) == 3:
-        b, g, r = cv2.split(image)
-    elif len(image.shape) == 4:
-        b, g, r, a = cv2.split(image)
+        if image.shape[2] == 3:  # RGB image
+            b, g, r = cv2.split(image)
+            alpha = None
+        elif image.shape[2] == 4:  # RGBA image
+            b, g, r, alpha = cv2.split(image)
+        else:
+            raise ValueError("Unsupported image format")
+    else:
+        raise ValueError("Image does not have channels")
 
-    if (channel == "R"):
-        isolated_image = cv2.merge([r,r,r])
-    elif (channel == "G"):
+    
+    # Isolate the requested channel
+    if channel == "Image":
+        return QPixmap(image_path)
+    elif channel == "Red":
+        isolated_image = cv2.merge([r, r, r])
+    elif channel == "Green":
         isolated_image = cv2.merge([g, g, g])
-    elif (channel == "B"):
+    elif channel == "Blue":
         isolated_image = cv2.merge([b, b, b])
-    elif (channel == "A") and alpha is not None:
-        isolated_image = cv2.merge([a, a, a])
-    elif (channel == "RGBA"):
-        isolated_image = image
+    elif channel == "Alpha":
+        if alpha is not None:
+            isolated_image = cv2.merge([alpha, alpha, alpha])
+        else:
+            fully_opaque_alpha = np.full_like(image[..., 0], 255)
+            isolated_image = cv2.merge([fully_opaque_alpha, fully_opaque_alpha, fully_opaque_alpha])
     else:
         isolated_image = np.zeros_like(image)
     
-    height, width, channel = isolated_image.shape
-    bytesPerLine = 3 * width
-
-    qimg = QImage(isolated_image.data, width, height, bytesPerLine, QImage.Format_BGR888)
-
-    return QPixmap(qimg)  # Create a QPixmap from the image path
+    # Convert to QImage and QPixmap
+    height, width = isolated_image.shape[:2]
+    bytes_per_line = 3 * width
+    qimg = QImage(isolated_image.data, width, height, bytes_per_line, QImage.Format_BGR888)
+    
+    return QPixmap.fromImage(qimg)

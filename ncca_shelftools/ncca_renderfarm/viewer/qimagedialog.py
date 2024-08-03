@@ -30,7 +30,7 @@ class QImageDialog(QDialog):
         channel_row_widget.setLayout(channel_row)
 
         self.color_channels = QComboBox()
-        self.color_channels.addItems(["RGBA", "R", "G", "B", "A"])
+        self.color_channels.addItems(["Image", "Red", "Green", "Blue", "Alpha"])
 
         self.channels = QComboBox()
         self.channels.addItems(get_exr_channels(image_path))
