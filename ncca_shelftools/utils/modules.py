@@ -24,7 +24,10 @@ def install(packages):
             dialog.show()
 
             try:
-                result = subprocess.run([sys.executable, "-m", "pip", "install", package],
+                python_exe = sys.executable
+                python_exe = python_exe.replace("houdini", "hython")
+                
+                result = subprocess.run([python_exe, "-m", "pip", "install", package],
                                         shell=True
                                         )
                 if result.returncode == 0:
