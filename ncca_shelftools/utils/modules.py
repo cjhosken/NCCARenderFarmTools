@@ -2,47 +2,33 @@ import sys
 import subprocess
 from PySide2 import QtWidgets, QtCore
 import pkg_resources
+import importlib
 
 def is_package_installed(package_name):
-    """Check if a package is installed."""
+    """Check if a package is installed using pkg_resources."""
     try:
         pkg_resources.get_distribution(package_name)
         return True
     except pkg_resources.DistributionNotFound:
-        return False
+        return importlib.util.find_spec(package_name) is not None
 
 def install(packages):
-    dialog = QtWidgets.QDialog()
-    dialog.setWindowTitle('Package Installer')
-    layout = QtWidgets.QVBoxLayout(dialog)
-    label = QtWidgets.QLabel('Installing packages...')
-    layout.addWidget(label)
-    progress_bar = QtWidgets.QProgressBar(dialog)
-    progress_bar.setRange(0, len(packages))
-    layout.addWidget(progress_bar)
-    dialog.show()
-
     installed_packages = []
     for i, package in enumerate(packages):
-        if is_package_installed(package):
-            label.setText(f'{package} is already installed.')
-        else:
-            label.setText(f'Installing {package}...')
-            QtWidgets.QApplication.processEvents()
+        if not is_package_installed(package):
+            dialog = QtWidgets.QDialog()
+            dialog.setWindowTitle('Package Installer')
+            layout = QtWidgets.QVBoxLayout(dialog)
+            label = QtWidgets.QLabel(f'Installing {package}...')
+            layout.addWidget(label)
+            dialog.show()
+
             try:
-                subprocess.check_call([sys.executable, "-m", "pip", "install", package])
-                installed_packages.append(package)
+                result = subprocess.run([sys.executable, "-m", "pip", "install", package],
+                                        shell=True)
+                if result.returncode == 0:
+                    installed_packages.append(package)
             except subprocess.CalledProcessError as e:
                 QtWidgets.QMessageBox.warning(dialog, 'Error', f'Failed to install {package}: {str(e)}')
-        
-        progress_bar.setValue(i + 1)
-        QtWidgets.QApplication.processEvents()
 
-    if installed_packages:
-        QtWidgets.QMessageBox.information(dialog, 'Done', f'Installed packages: {", ".join(installed_packages)}')
-    else:
-        QtWidgets.QMessageBox.information(dialog, 'Done', 'No new packages were installed.')
-
-    QtWidgets.QApplication.processEvents()
-
-    dialog.accept()
+            dialog.accept()

@@ -2,23 +2,14 @@
 # It also contains all the SFTP functions needed for the renderfarm as well as EXR to PNG conversion.
 
 from config import * 
-from shiboken2 import wrapInstance 
 import numpy as np 
 from PIL import Image 
 from PySide2 import QtWidgets
+from PySide2.QtGui import QImage
 from .modules import *
+from PySide2.QtGui import QPixmap  
 
-def get_maya_window():
-    """
-    Returns the main Maya window as a QtWidgets.QDialog instance.
-    This function wraps the main Maya window using shiboken2's wrapInstance function.
-    """
-    import maya.OpenMayaUI as omui  # Import Maya UI module
-
-    window = omui.MQtUtil.mainWindow()  # Get the main Maya window
-    return wrapInstance(int(window), QtWidgets.QDialog)  # Wrap the Maya window instance as QDialog
-
-def exr_to_png(input_file, output_file):
+def exr_to_png(input_file, output_file, channel):
     """
     Converts an EXR file to a PNG file.
 
@@ -71,7 +62,41 @@ def exr_to_png(input_file, output_file):
         image.save(output_file)
     
     except Exception as e:
-        print(e)
         QtWidgets.QMessageBox.warning(None, NCCA_ERROR.get("title"), IMAGE_ERROR.get("message").format(input_file, str(e)))
 
 
+def get_exr_channels(image_path):
+    return ["Beauty"]
+
+def isolate_channel_to_qpixmap(image_path, channel="RGBA"):
+    install(["opencv-python"])
+    import cv2  
+
+    image = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
+    
+    alpha = None
+
+    if len(image.shape) == 3:
+        b, g, r = cv2.split(image)
+    elif len(image.shape) == 4:
+        b, g, r, a = cv2.split(image)
+
+    if (channel == "R"):
+        isolated_image = cv2.merge([r,r,r])
+    elif (channel == "G"):
+        isolated_image = cv2.merge([g, g, g])
+    elif (channel == "B"):
+        isolated_image = cv2.merge([b, b, b])
+    elif (channel == "A") and alpha is not None:
+        isolated_image = cv2.merge([a, a, a])
+    elif (channel == "RGBA"):
+        isolated_image = image
+    else:
+        isolated_image = np.zeros_like(image)
+    
+    height, width, channel = isolated_image.shape
+    bytesPerLine = 3 * width
+
+    qimg = QImage(isolated_image.data, width, height, bytesPerLine, QImage.Format_BGR888)
+
+    return QPixmap(qimg)  # Create a QPixmap from the image path
