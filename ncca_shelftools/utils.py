@@ -1,13 +1,15 @@
 # This file is used to hold extra functions needed in the tools. 
 # It also contains all the SFTP functions needed for the renderfarm as well as EXR to PNG conversion.
 
-
 from config import * 
 from shiboken2 import wrapInstance 
-import OpenEXR, Imath  
 import numpy as np 
 from PIL import Image 
-from PySide2 import QtWidgets  
+from PySide2 import QtWidgets
+import subprocess, sys
+
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
 def get_maya_window():
     """
@@ -35,6 +37,8 @@ def exr_to_png(input_file, output_file):
     converts them to uint8 format, and saves the result as a PNG image using PIL.
     """
     try:
+        install("OpenEXR")
+        import OpenEXR
         # Open the EXR file
         exr_file = OpenEXR.InputFile(input_file)
         

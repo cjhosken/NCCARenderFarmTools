@@ -75,24 +75,6 @@ for /d %%d in ("%HOUDINI_SHELF_BASE_PATH%\houdini*.*") do (
     )
 )
 
-REM Install required Python packages using mayapy
-for /d %%d in (""%MAYAPY_BASE_PATH%\Maya*"") do (
-    if exist "%%d\bin\mayapy.exe" (
-        echo Installing Requirements for mayapy: %%d
-        "%%d\bin\mayapy.exe" -m pip install --upgrade pip --user
-        "%%d\bin\mayapy.exe" -m pip install -r requirements.txt --user
-    )
-)
-
-REM Install required Python packages using hython
-for /d %%d in (""%HYTHON_BASE_PATH%\Houdini*"") do (
-    if exist "%%d\bin\hython.exe" (
-        echo Installing Requirements for hython: %%d
-        "%%d\bin\hython.exe" -m pip install --upgrade pip --user
-        "%%d\bin\hython.exe" -m pip install -r requirements.txt --user
-    )
-)
-
 echo Setup completed successfully. Press Enter to exit...
 endlocal
 pause >nul

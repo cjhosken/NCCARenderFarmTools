@@ -1,5 +1,0 @@
-# These are the python modules needed for the tools to work. It is recommended that these are updated every so often.
-paramiko==3.4.0
-Pillow==10.4.0
-numpy==1.24.4
-OpenEXR==3.2.4

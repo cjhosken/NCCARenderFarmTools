@@ -56,22 +56,4 @@ for houdini_version_dir in "$HOUDINI_BASE_PATH"*; do
     fi
 done
 
-# Install required Python packages using mayapy
-for maya_version in "$MAYAPY_BASE_PATH"/*; do
-    if [ -x "$maya_version/bin/mayapy" ]; then
-        echo Installing Requirements for mayapy: $maya_version
-        "$maya_version/bin/mayapy" -m pip install --upgrade pip
-        "$maya_version/bin/mayapy" -m pip install -r requirements.txt
-    fi
-done
-
-# Install required Python packages using hython
-for houdini_version in "$HYTHON_BASE_PATH"/*; do
-    if [ -x "$houdini_version/bin/hython" ]; then
-        echo Installing Requirements for hython: $houdini_version
-        "$houdini_version/bin/hython" -m pip install --upgrade pip
-        "$houdini_version/bin/hython" -m pip install -r requirements.txt
-    fi
-done
-
 read -p "Setup completed successfully! Press Enter to exit..."
