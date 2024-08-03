@@ -92,14 +92,13 @@ class RenderFarmSubmitDialog(QMainWindow):
 
     def submit_project(self, command=""):
         # Connect to the renderfarm
-        username = self.username
 
         local_project_dir = self.project_path.text()
-        remote_project_dir = os.path.join("/home", username, "farm", "projects", os.path.basename(local_project_dir)).replace("\\", "/")
+        remote_project_dir = os.path.join("/home", self.username, "farm", "projects", os.path.basename(local_project_dir)).replace("\\", "/")
         
-        if (sftp_exists(remote_project_dir)):
+        if (sftp_exists(self.sftp, remote_project_dir)):
             if self.confirm_override(remote_project_dir):
-                sftp_delete(remote_project_dir)
+                sftp_delete(self.sftp, remote_project_dir)
             else:
                 return
         
@@ -107,7 +106,7 @@ class RenderFarmSubmitDialog(QMainWindow):
         # Submit the job
 
         frame_range=f"{self.start_frame.value()}-{self.end_frame.value()}x{self.by_frame.value()}"
-        render_home_dir = os.path.join("/render", username).replace("\\", "/")
+        render_home_dir = os.path.join("/render", self.username).replace("\\", "/")
 
         try:
             sys.path.append(QUBE_PYPATH.get(OPERATING_SYSTEM))

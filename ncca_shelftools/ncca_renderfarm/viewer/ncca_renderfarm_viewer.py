@@ -161,7 +161,7 @@ class NCCA_RenderFarmViewer(QMainWindow):
             destination_path, _ = QFileDialog.getSaveFileName(self, NCCA_VIEWER_FILE_PROMPT, os.path.basename(file_path))  # Get save file path
          
         if destination_path:
-            sftp_download(file_path, destination_path)  # Download file using SFTP
+            sftp_download(self.sftp, file_path, destination_path)  # Download file using SFTP
 
     def delete_item(self, file_path):
         """
@@ -175,4 +175,4 @@ class NCCA_RenderFarmViewer(QMainWindow):
                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)  # Confirmation dialog
 
         if reply == QMessageBox.Yes:
-            sftp_delete(file_path)  # Delete file using SFTP
+            sftp_delete(self.sftp, file_path)  # Delete file using SFTP
