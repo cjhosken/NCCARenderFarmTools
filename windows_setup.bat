@@ -12,8 +12,6 @@ cd %SCRIPT_DIR%
 REM Set variables (adjust paths as needed)
 set NCCA_DIR="%USERPROFILE%\.ncca"
 set MAYA_BASE_PATH="%USERPROFILE%\Documents\maya"
-set MAYAPY_BASE_PATH="C:\Program Files\Autodesk"
-set HYTHON_BASE_PATH="C:\Program Files\Side Effects Software"
 set HOUDINI_SHELF_BASE_PATH="%USERPROFILE%\Documents"
 
 

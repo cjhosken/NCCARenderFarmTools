@@ -16,8 +16,6 @@ cd $SCRIPT_DIR
 # Set base paths (adjust paths as needed)
 NCCA_DIR="$HOME/.ncca"
 MAYA_BASE_PATH="$HOME/maya"
-MAYAPY_BASE_PATH="/usr/autodesk/maya"
-HYTHON_BASE_PATH="/opt"
 HOUDINI_BASE_PATH="$HOME/houdini"
 
 # Create NCCA_DIR if it doesn't exist
