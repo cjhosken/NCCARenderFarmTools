@@ -54,6 +54,7 @@ class RenderFarmSubmitDialog(QMainWindow):
         label=QtWidgets.QLabel(NCCA_SUBMIT_STARTFRAME_LABEL)
         self.gridLayout.addWidget(label,2,0,1,1)
         self.start_frame=QtWidgets.QSpinBox()
+        self.start_frame.setMinimum(-1000000)
         self.start_frame.setToolTip(NCCA_SUBMIT_STARTFRAME_TOOLTIP)
 
         self.start_frame.valueChanged.connect(self.update_frame_range)
@@ -62,6 +63,7 @@ class RenderFarmSubmitDialog(QMainWindow):
         label=QtWidgets.QLabel(NCCA_SUBMIT_ENDFRAME_LABEL)
         self.gridLayout.addWidget(label,2,2,1,1)
         self.end_frame=QtWidgets.QSpinBox()
+        self.end_frame.setMaximum(1000000)
         self.end_frame.valueChanged.connect(self.update_frame_range)
         self.end_frame.setToolTip(NCCA_SUBMIT_ENDFRAME_TOOLTIP)
 

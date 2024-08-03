@@ -18,8 +18,8 @@ class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         if (not name):
             name = "untitled.ma"
 
-        min_frame = int(cmds.playbackOptions(query=True, animationStartTime=True))
-        max_frame = int(cmds.playbackOptions(query=True, animationEndTime=True))
+        min_frame = int(cmds.playbackOptions(q=True, min=True))
+        max_frame = int(cmds.playbackOptions(q=True, max=True))
 
         self.project_name.setText(f"{self.user}_{name}")
         self.project_path.setText(os.path.dirname(cmds.file(q=True, sn=True)))
