@@ -12,10 +12,6 @@ def is_package_installed(package_name):
         return False
 
 def install(packages):
-    app = QtWidgets.QApplication.instance()
-    if not app:
-        app = QtWidgets.QApplication(sys.argv)
-
     dialog = QtWidgets.QDialog()
     dialog.setWindowTitle('Package Installer')
     layout = QtWidgets.QVBoxLayout(dialog)
@@ -46,5 +42,7 @@ def install(packages):
         QtWidgets.QMessageBox.information(dialog, 'Done', f'Installed packages: {", ".join(installed_packages)}')
     else:
         QtWidgets.QMessageBox.information(dialog, 'Done', 'No new packages were installed.')
+
+    QtWidgets.QApplication.processEvents()
 
     dialog.accept()
