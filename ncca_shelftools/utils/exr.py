@@ -9,61 +9,70 @@ from PySide2.QtGui import QImage
 from .modules import *
 from PySide2.QtGui import QPixmap  
 
-def exr_to_png(input_file, output_file, channel):
-    """
-    Converts an EXR file to a PNG file.
+def linear_to_srgb(linear_value):
+    """Convert a linear RGB value to sRGB."""
+    if linear_value <= 0.0031308:
+        return 12.92 * linear_value
+    else:
+        return 1.055 * (linear_value ** (1.0 / 2.4)) - 0.055
 
-    Args:
-    - input_file (str): Path to the input EXR file.
-    - output_file (str): Path to save the output PNG file.
-    
-    Raises:
-    - ValueError: If the channel data size does not match the expected image size.
+def exr_to_png(exr_path, png_path, channel=None):
+    install(["OpenEXR", "Imath"])
+    import OpenEXR, Imath
+    # Open the EXR file
+    exr_file = OpenEXR.InputFile(exr_path)
 
-    This function reads specific channels ('R', 'G', 'B') from the EXR file,
-    reshapes and stacks them to form an RGB image, normalizes the pixel values,
-    converts them to uint8 format, and saves the result as a PNG image using PIL.
-    """
-    try:
-        install(["OpenEXR", "Imath"])
-        import OpenEXR, Imath
-        # Open the EXR file
-        exr_file = OpenEXR.InputFile(input_file)
+    # Get the data window to determine the size of the image
+    header = exr_file.header()
+    dw = header['dataWindow']
+    width = dw.max.x - dw.min.x + 1
+    height = dw.max.y - dw.min.y + 1
+
+    # Define the channel names for the RGB and Alpha channels
+    channels = ['R', 'G', 'B', 'A']
+
+    # Check if alpha channel is present in the EXR file
+    has_alpha = 'A' in header['channels']
+
+    # Read the data for each channel
+    channel_data = []
+    for channel in channels:
+        if channel == 'A' and not has_alpha:
+            # Create a fully opaque alpha channel if it doesn't exist
+            ch_np = np.ones((height, width), dtype=np.float32)
+        else:
+            # Read the channel data as a string of floats
+            ch_str = exr_file.channel(channel, Imath.PixelType(Imath.PixelType.FLOAT))
+            
+            # Convert the string to a numpy array and reshape it
+            ch_np = np.frombuffer(ch_str, dtype=np.float32).reshape((height, width))
         
-        # Get the header to obtain channel information
-        header = exr_file.header()
-        dw = header['dataWindow']
-        size = (dw.max.x - dw.min.x + 1, dw.max.y - dw.min.y + 1)
-        
-        # Define the channels to read
-        channels = ['R', 'G', 'B']
+        channel_data.append(ch_np)
 
-        # Check if channels are present in the file
-        available_channels = exr_file.header()['channels'].keys()
-        channels = [c for c in channels if c in available_channels]
+    # Stack the channels to form an RGBA image
+    r, g, b = channel_data[:3]
+    if has_alpha:
+        a = channel_data[3]
+    else:
+        a = np.ones_like(r, dtype=np.float32)
 
-        # Read the channels
-        data = [np.frombuffer(exr_file.channel(c, Imath.PixelType(Imath.PixelType.FLOAT)), dtype=np.float32) for c in channels]
+    # Convert linear RGB to sRGB
+    r_srgb = np.vectorize(linear_to_srgb)(r)
+    g_srgb = np.vectorize(linear_to_srgb)(g)
+    b_srgb = np.vectorize(linear_to_srgb)(b)
 
-        # Ensure data size matches expected size
-        for i, d in enumerate(data):
-            if d.size != size[0] * size[1]:
-                raise ValueError(f"Channel {channels[i]} size {d.size} does not match expected size {size[0] * size[1]}")
-        
-        # Reshape data and stack channels
-        data = [np.reshape(d, (size[1], size[0])) for d in data]
-        img = np.stack(data, axis=-1)
+    # Normalize to the range 0-255
+    r_srgb = np.clip(r_srgb * 255, 0, 255).astype(np.uint8)
+    g_srgb = np.clip(g_srgb * 255, 0, 255).astype(np.uint8)
+    b_srgb = np.clip(b_srgb * 255, 0, 255).astype(np.uint8)
+    a = np.clip(a * 255, 0, 255).astype(np.uint8)
 
-        # Normalize the image data to 0-255 and convert to uint8
-        img = np.clip(img * 255.0, 0, 255).astype(np.uint8)
+    # Combine into an RGBA image
+    rgba_image = np.stack((r_srgb, g_srgb, b_srgb, a), axis=-1)
 
-        # Convert to PIL Image and save as PNG
-        image = Image.fromarray(img)
-        image.save(output_file)
-    
-    except Exception as e:
-        QtWidgets.QMessageBox.warning(None, NCCA_ERROR.get("title"), IMAGE_ERROR.get("message").format(input_file, str(e)))
-
+    # Convert the numpy array to a PIL image and save it as PNG
+    image = Image.fromarray(rgba_image, 'RGBA')
+    image.save(png_path)
 
 def get_exr_channels(image_path):
     return ["Beauty"]
