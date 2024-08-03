@@ -25,7 +25,7 @@ def install(packages):
 
             try:
                 result = subprocess.run([sys.executable, "-m", "pip", "install", package],
-                                        creationflags=subprocess.CREATE_NO_WINDOW,
+                                        shell=True
                                         )
                 if result.returncode == 0:
                     installed_packages.append(package)

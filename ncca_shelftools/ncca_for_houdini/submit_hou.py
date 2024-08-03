@@ -94,7 +94,7 @@ class Houdini_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         # work around for weird bug where window hides behind main one
         self.raise_()            
 
-        if output != None :
+        if output is not None and hou.node(output.parmTuple("f")) is not None:
             self.output_driver.setText(output)
             frame_values=hou.node(output).parmTuple("f").eval()    
             
