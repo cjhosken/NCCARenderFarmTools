@@ -17,7 +17,7 @@ def install(packages):
     for i, package in enumerate(packages):
         if not is_package_installed(package):
             dialog = QtWidgets.QDialog()
-            dialog.setWindowTitle('Package Installer')
+            dialog.setWindowTitle('NCCA Installer')
             layout = QtWidgets.QVBoxLayout(dialog)
             label = QtWidgets.QLabel(f'Installing {package}...')
             layout.addWidget(label)
