@@ -2,12 +2,14 @@
 # It also contains all the SFTP functions needed for the renderfarm as well as EXR to PNG conversion.
 
 from config import * 
-import numpy as np 
-from PIL import Image 
 from PySide2 import QtWidgets
 from PySide2.QtGui import QImage
 from .modules import *
 from PySide2.QtGui import QPixmap  
+
+install(["numpy", "Pillow"])
+import numpy as np 
+from PIL import Image 
 
 def linear_to_srgb(linear_value):
     """Convert a linear RGB value to sRGB."""

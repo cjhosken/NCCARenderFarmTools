@@ -4,10 +4,13 @@
 # The script uses paramiko to connect the renderfarm's SFTP server. 
 # The server address, address port, and connection attempts can be found in /ncca_shelftools/config/renderfarm.py
 
-from PySide2 import QtWidgets
-import paramiko, socket  
+from PySide2 import QtWidgets 
 from config import *  
 from .crypt import * 
+from utils import *
+
+install(["paramiko"])
+import paramiko, socket
 
 class NCCA_ConnectionFailedException(Exception):
     """

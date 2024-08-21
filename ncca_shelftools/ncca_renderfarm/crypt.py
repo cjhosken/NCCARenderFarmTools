@@ -4,8 +4,12 @@
 # NCCA_ENV_PATH and NCCA_KEY_PATH can be found in /ncca_shelftools/config/__init__.py
 
 import json
-from cryptography.fernet import Fernet
 from config import *
+from utils import *
+
+install(["cryptography"])
+from cryptography.fernet import Fernet
+
 
 def load_saved_credentials(key):
     """
