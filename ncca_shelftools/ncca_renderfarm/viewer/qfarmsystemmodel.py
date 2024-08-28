@@ -27,13 +27,14 @@ class QFarmSystemModel(QAbstractItemModel):
             for item in self.sftp.listdir_attr(path):
                 item_dict = {
                     'name': item.filename,
-                    'path': f"{path}/{item.filename}",
+                    'path': os.path.join(path, item.filename),
                     'is_dir': stat.S_ISDIR(item.st_mode),
                     'size': item.st_size,
                     'mtime': item.st_mtime,
                     'children': []  # Initialize as an empty list
                 }
                 items.append(item_dict)
+            print(f"Fetched directory {path}: {items}")
         except Exception as e:
             print(f"Error fetching directory {path}: {e}")
         return items
@@ -63,14 +64,18 @@ class QFarmSystemModel(QAbstractItemModel):
         return None
 
     def index(self, row, column, parent=QModelIndex()):
-        """Return the index of the item in the model specified by the given row, column and parent index."""
+        """Return the index of the item in the model specified by the given row, column, and parent index."""
         if not parent.isValid():
+            # Top-level items
             child_item = self.root_item['children'][row]
         else:
             parent_item = parent.internalPointer()
+            if row < 0 or row >= len(parent_item['children']):
+                return QModelIndex()
             child_item = parent_item['children'][row]
 
         return self.createIndex(row, column, child_item)
+
 
     def parent(self, index):
         """Return the parent of the model item with the given index."""
@@ -80,16 +85,32 @@ class QFarmSystemModel(QAbstractItemModel):
         child_item = index.internalPointer()
         parent_path = os.path.dirname(child_item['path'])
 
+        # Find the parent item recursively
+        def find_parent_item(current_item, search_path):
+            if current_item['path'] == search_path:
+                return current_item
+            for child in current_item['children']:
+                if child['is_dir']:
+                    found = find_parent_item(child, search_path)
+                    if found:
+                        return found
+            return None
+
+        # Skip root
         if parent_path == self.root_path:
             return QModelIndex()
 
-        parent_item = next(
-            (item for item in self.root_item['children'] if item['path'] == parent_path), None
-        )
-        
+        parent_item = find_parent_item(self.root_item, parent_path)
+
         if parent_item:
-            return self.createIndex(self.root_item['children'].index(parent_item), 0, parent_item)
+            grandparent_path = os.path.dirname(parent_item['path'])
+            grandparent_item = find_parent_item(self.root_item, grandparent_path)
+            if grandparent_item:
+                row = grandparent_item['children'].index(parent_item)
+                return self.createIndex(row, 0, parent_item)
+
         return QModelIndex()
+
 
     def hasChildren(self, parent=QModelIndex()):
         """Return whether the item has children (is a directory)."""
