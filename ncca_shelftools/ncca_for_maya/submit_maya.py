@@ -93,7 +93,7 @@ class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         output_path = self.output_filename.text().replace("\\", "/")
 
         local_project_dir = self.project_path.text()
-        remote_project_dir = os.path.join("/home", self.username, "farm", "projects", os.path.basename(local_project_dir)) + "/"
+        remote_project_dir = os.path.join("/home", self.username, "farm", "projects", self.project_name.text()).replace("\\", "/")
         render_path = cmds.file(q=True, sn=True).replace(local_project_dir, remote_project_dir)
 
         if (not output_path.startswith(remote_project_dir)):

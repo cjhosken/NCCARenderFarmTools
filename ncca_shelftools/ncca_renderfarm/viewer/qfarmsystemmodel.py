@@ -1,6 +1,6 @@
-from config import *
 from PySide2.QtCore import QAbstractItemModel, QModelIndex, Qt
 import stat
+import os
 
 class QFarmSystemModel(QAbstractItemModel):
     """
@@ -12,27 +12,38 @@ class QFarmSystemModel(QAbstractItemModel):
 
         self.sftp = sftp
         self.root_path = root_path
-        self.root_item = self.fetch_directory(root_path)
+        self.root_item = {
+            'name': '',
+            'path': root_path,
+            'is_dir': True,
+            'children': self.fetch_directory(root_path)  # Initialize with actual directory contents
+        }
 
     def fetch_directory(self, path):
         """Fetch and return directory contents as a list of dictionaries."""
         items = []
-        for item in self.sftp.listdir_attr(path):
-            items.append({
-                'name': item.filename,
-                'path': f"{path}/{item.filename}",
-                'is_dir': stat.S_ISDIR(item.st_mode),
-                'size': item.st_size,
-                'mtime': item.st_mtime
-            })
+        try:
+            for item in self.sftp.listdir_attr(path):
+                item_dict = {
+                    'name': item.filename,
+                    'path': f"{path}/{item.filename}",
+                    'is_dir': stat.S_ISDIR(item.st_mode),
+                    'size': item.st_size,
+                    'mtime': item.st_mtime,
+                    'children': []  # Initialize as an empty list
+                }
+                items.append(item_dict)
+        except Exception as e:
+            print(f"Error fetching directory {path}: {e}")
         return items
 
     def rowCount(self, parent=QModelIndex()):
         """Return the number of rows under the given parent."""
         if not parent.isValid():
-            return len(self.root_item)
+            return len(self.root_item['children'])
         else:
-            return len(parent.internalPointer().get('children', []))
+            item = parent.internalPointer()
+            return len(item['children'])
 
     def columnCount(self, parent=QModelIndex()):
         """Return the number of columns (fixed to 1)."""
@@ -53,7 +64,7 @@ class QFarmSystemModel(QAbstractItemModel):
     def index(self, row, column, parent=QModelIndex()):
         """Return the index of the item in the model specified by the given row, column and parent index."""
         if not parent.isValid():
-            child_item = self.root_item[row]
+            child_item = self.root_item['children'][row]
         else:
             parent_item = parent.internalPointer()
             child_item = parent_item['children'][row]
@@ -71,8 +82,12 @@ class QFarmSystemModel(QAbstractItemModel):
         if parent_path == self.root_path:
             return QModelIndex()
 
-        parent_item = next(item for item in self.root_item if item['path'] == parent_path)
-        return self.createIndex(self.root_item.index(parent_item), 0, parent_item)
+        parent_item = next(
+            (item for item in self.root_item['children'] if item['path'] == parent_path), None
+        )
+        if parent_item:
+            return self.createIndex(self.root_item['children'].index(parent_item), 0, parent_item)
+        return QModelIndex()
 
     def hasChildren(self, parent=QModelIndex()):
         """Return whether the item has children (is a directory)."""
@@ -95,3 +110,27 @@ class QFarmSystemModel(QAbstractItemModel):
 
         item = index.internalPointer()
         return item.get('path', "")
+
+    def fetchMore(self, index):
+        """Fetch more data for the given index."""
+        if not index.isValid():
+            return
+
+        item = index.internalPointer()
+        if item['children']:
+            return  # Already fetched
+
+        path = item['path']
+        item['children'] = self.fetch_directory(path)
+
+        # Notify the view that new rows have been inserted
+        self.beginInsertRows(index, 0, len(item['children']) - 1)
+        self.endInsertRows()
+
+    def canFetchMore(self, index):
+        """Return whether more data can be fetched."""
+        if not index.isValid():
+            return False
+
+        item = index.internalPointer()
+        return item['is_dir'] and not item['children']  # Fetch if children is an empty list

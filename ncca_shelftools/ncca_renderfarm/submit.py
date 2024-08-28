@@ -97,8 +97,11 @@ class RenderFarmSubmitDialog(QMainWindow):
         # Connect to the renderfarm
 
         local_project_dir = self.project_path.text()
-        remote_project_dir = os.path.join("/home", self.username, "farm", "projects", os.path.basename(local_project_dir.rstrip(os.path.sep))).replace("\\", "/")
+        remote_project_dir = os.path.join("/home", self.username, "farm", "projects", self.project_name.text()).replace("\\", "/")
         
+        print(local_project_dir)
+        print(remote_project_dir)
+
         if (sftp_exists(self.sftp, remote_project_dir)):
             if self.confirm_override(remote_project_dir):
                 sftp_delete(self.sftp, remote_project_dir)

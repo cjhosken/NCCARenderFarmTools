@@ -76,7 +76,7 @@ def sftp_download(sftp=None, remote_path="", local_path=""):
             
             # List contents of the remote directory
             for item in sftp.listdir(remote_path):
-                remote_item_path = os.path.join(remote_path, item)
+                remote_item_path = os.path.join(remote_path, item).replace("\\", "/")
                 local_item_path = os.path.join(local_path, item)
                 
                 # Recursively download each item
