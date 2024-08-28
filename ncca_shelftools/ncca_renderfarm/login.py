@@ -123,7 +123,6 @@ class RenderFarmLoginDialog(QtWidgets.QDialog):
                     QtWidgets.QMessageBox.warning(self, NCCA_CONNECTION_ERROR.get("title"), NCCA_CONNECTION_ERROR.get("message"))
                     return None
         
-        self.reject()
         return None  # Return None if login fails
     
     def get_login_info(self):
