@@ -30,6 +30,8 @@ class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
 
         self.update_frame_range()
 
+        self.check_for_submit()
+
     def init_ui(self):
         super().init_ui()
 
@@ -119,9 +121,6 @@ class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         used_renderer = renderer
         if renderer == "file":
             used_renderer = cmds.getAttr('defaultRenderGlobals.currentRenderer')
-
-        print(used_renderer)
-
         if (used_renderer == "vray"):
             use_gpu = cmds.getAttr("vraySettings.productionEngine") > 0
             render_options += f" -pad {frame_padding}" if frame_padding else ""
@@ -209,7 +208,7 @@ class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         return output_dir, image_name, file_extension, frame_number_format
 
 def main():
-    if os.path.exists(QUBE_PYPATH.get(OPERATING_SYSTEM)) or True:
+    if os.path.exists(QUBE_PYPATH.get(OPERATING_SYSTEM)):
         main_window = get_maya_window()
         login_dialog = RenderFarmLoginDialog(main_window)
         if login_dialog.exec_() == QtWidgets.QDialog.Accepted:

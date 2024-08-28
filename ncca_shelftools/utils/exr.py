@@ -5,11 +5,7 @@ from config import *
 from PySide2 import QtWidgets
 from PySide2.QtGui import QImage
 from .modules import *
-from PySide2.QtGui import QPixmap  
-
-install(["numpy", "Pillow"])
-import numpy as np 
-from PIL import Image 
+from PySide2.QtGui import QPixmap
 
 def linear_to_srgb(linear_value):
     """Convert a linear RGB value to sRGB."""
@@ -19,8 +15,10 @@ def linear_to_srgb(linear_value):
         return 1.055 * (linear_value ** (1.0 / 2.4)) - 0.055
 
 def exr_to_png(exr_path, png_path, channel=None):
-    install(["OpenEXR", "Imath"])
-    import OpenEXR, Imath
+    install(["OpenEXR", "Imath", "numpy", "Pillow"])
+    import OpenEXR, Imath 
+    import numpy as np
+    from PIL import Image 
     # Open the EXR file
     exr_file = OpenEXR.InputFile(exr_path)
 
@@ -80,8 +78,9 @@ def get_exr_channels(image_path):
     return ["Beauty"]
 
 def isolate_channel_to_qpixmap(image_path, channel="RGBA"):
-    install(["opencv-python"])
+    install(["opencv-python", "numpy"])
     import cv2
+    import numpy as np
     # Read the image using OpenCV
     image = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
     

@@ -1,3 +1,5 @@
+import os, stat
+
 def sftp_exists(sftp=None, remote_path=""):
     """
     Check if a file or directory exists on the remote SFTP server.
@@ -11,7 +13,11 @@ def sftp_exists(sftp=None, remote_path=""):
 
     This is a placeholder function that always returns True.
     """
-    return True  # Placeholder function that always returns True
+    try:
+        sftp.stat(remote_path)
+    except:
+        return False
+    return True
 
 def sftp_isdir(sftp=None, remote_path=""):
     """
@@ -26,7 +32,10 @@ def sftp_isdir(sftp=None, remote_path=""):
 
     This is a placeholder function that always returns False.
     """
-    return False  # Placeholder function that always returns False
+    try:
+        return stat.S_ISDIR(sftp.stat(remote_path).st_mode)
+    except FileNotFoundError:
+        return False
 
 def sftp_isfile(sftp=None, remote_path=""):
     """
@@ -41,7 +50,10 @@ def sftp_isfile(sftp=None, remote_path=""):
 
     This is a placeholder function that always returns False.
     """
-    return False  # Placeholder function that always returns False
+    try:
+        return stat.S_ISREG(sftp.stat(remote_path).st_mode)
+    except FileNotFoundError:
+        return False
 
 def sftp_download(sftp=None, remote_path="", local_path=""):
     """
@@ -54,32 +66,59 @@ def sftp_download(sftp=None, remote_path="", local_path=""):
 
     This is a placeholder function that does nothing (pass statement).
     """
-    pass  # Placeholder function for downloading files via SFTP (does nothing)
+    sftp.get(remote_path, local_path)
 
 def sftp_upload(sftp=None, local_path="", remote_path=""):
     """
-    Upload a file from the local machine to the remote SFTP server.
+    Recursively upload a file or directory from the local machine to the remote SFTP server.
 
     Args:
-    - sftp: SFTP connection object (not used in this placeholder function).
-    - local_path (str): Path to the local file.
-    - remote_path (str): Path to save the uploaded file on the remote server.
-
-    This is a placeholder function that does nothing (pass statement).
+    - sftp: SFTP connection object.
+    - local_path (str): Path to the local file or directory.
+    - remote_path (str): Path to save the uploaded file or directory on the remote server.
     """
-    pass  # Placeholder function for uploading files via SFTP (does nothing)
+    # Check if the local path is a directory
+    if os.path.isdir(local_path):
+        # Ensure the remote directory exists
+        try:
+            sftp.mkdir(remote_path)
+        except IOError:
+            # Directory already exists or error occurred (skip creating)
+            pass
 
-def sftp_delete(sftp=None, remote_path=""):
+        # Iterate over the directory contents
+        for item in os.listdir(local_path):
+            local_item_path = os.path.join(local_path, item)
+            remote_item_path = os.path.join(remote_path, item).replace("\\", "/")
+
+            # Recursively upload each file or directory
+            sftp_upload(sftp, local_item_path, remote_item_path)
+    else:
+        # Upload the file
+        sftp.put(local_path, remote_path)
+
+def sftp_delete(sftp, remote_path):
     """
-    Delete a file or directory on the remote SFTP server.
+    Recursively delete a file or directory on the remote SFTP server.
 
     Args:
-    - sftp: SFTP connection object (not used in this placeholder function).
+    - sftp: SFTP connection object.
     - remote_path (str): Path to the remote file or directory to delete.
-
-    This is a placeholder function that does nothing (pass statement).
     """
-    pass  # Placeholder function for deleting files via SFTP (does nothing)
+    try:
+        if sftp_isdir(sftp, remote_path):
+            # If it's a directory, list all its contents
+            for item in sftp.listdir(remote_path):
+                item_path = remote_path + "/" + item
+                sftp_delete(sftp, item_path)  # Recursively delete each item
+            
+            # After all contents are deleted, remove the directory itself
+            sftp.rmdir(remote_path)
+        else:
+            # If it's a file, delete it
+            sftp.remove(remote_path)
+    except IOError as e:
+        print(f"Failed to delete {remote_path}: {e}")
 
 
 
@@ -119,15 +158,12 @@ def sftp_setup(sftp=None, username=""):
 
     # Check if the farm directory exists, and create it if it does not
     if not sftp_exists(FARM_DIR):
-        # create FARM_DIR 
-        pass
+        sftp.mkdir(FARM_DIR)
 
     # Check if the project directory exists, and create it if it does not
     if not sftp_exists(PROJECT_DIR):
-        # create PROJECT DIR
-        pass
+        sftp.mkdir(PROJECT_DIR)
     
     # Check if the output directory exists, and create it if it does not
     if not sftp_exists(OUTPUT_DIR):
-        # create OUTPUT DIR
-        pass
+        sftp.mkdir(OUTPUT_DIR)

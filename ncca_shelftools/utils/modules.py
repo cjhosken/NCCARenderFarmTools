@@ -3,6 +3,7 @@ import subprocess
 from PySide2 import QtWidgets, QtCore
 import pkg_resources
 import importlib
+from config import *
 
 def is_package_installed(package_name):
     """Check if a package is installed using pkg_resources."""
@@ -25,11 +26,14 @@ def install(packages):
 
             try:
                 python_exe = sys.executable
-                python_exe = python_exe.replace("houdini", "hython")
-                python_exe = python_exe.replace("maya.bin", "mayapy")
 
-                print(python_exe)
-                
+                if OPERATING_SYSTEM == "windows":
+                    python_exe = python_exe.replace("houdini.exe", "hython.exe")
+                    python_exe = python_exe.replace("maya.exe", "mayapy.exe")
+                else:
+                    python_exe = python_exe.replace("houdini", "hython")
+                    python_exe = python_exe.replace("maya.bin", "mayapy")
+
                 result = subprocess.run([python_exe, "-m", "pip", "install", package])
                 if result.returncode == 0:
                     installed_packages.append(package)

@@ -1,7 +1,7 @@
 # RenderFarmSubmitDialog is the parent class that other submitters extend from.
 
 from PySide2.QtWidgets import QMainWindow, QWidget, QMessageBox
-import sys
+import sys, traceback
 
 from config import *
 from utils import *
@@ -16,6 +16,7 @@ class RenderFarmSubmitDialog(QMainWindow):
         self.finish_ui()
 
         self.sftp = info["sftp"]
+        print(self.sftp)
         self.username = info["username"]
 
     def init_ui(self):
@@ -96,25 +97,30 @@ class RenderFarmSubmitDialog(QMainWindow):
         # Connect to the renderfarm
 
         local_project_dir = self.project_path.text()
-        remote_project_dir = os.path.join("/home", self.username, "farm", "projects", os.path.basename(local_project_dir)).replace("\\", "/")
+        remote_project_dir = os.path.join("/home", self.username, "farm", "projects", os.path.dirname(local_project_dir)).replace("\\", "/")
         
         if (sftp_exists(self.sftp, remote_project_dir)):
             if self.confirm_override(remote_project_dir):
                 sftp_delete(self.sftp, remote_project_dir)
             else:
                 return
-        
-        sftp_upload(remote_project_dir, local_project_dir)
+        print(local_project_dir)
+        print(remote_project_dir)
+        sftp_upload(self.sftp, local_project_dir, remote_project_dir)
         # Submit the job
 
         frame_range=f"{self.start_frame.value()}-{self.end_frame.value()}x{self.by_frame.value()}"
         render_home_dir = os.path.join("/render", self.username).replace("\\", "/")
 
         try:
+            print(QUBE_PYPATH.get(OPERATING_SYSTEM))
             sys.path.append(QUBE_PYPATH.get(OPERATING_SYSTEM))
             import qb
         except Exception as e: 
-            QtWidgets.QMessageBox.warning(None, NCCA_ERROR.get("title"), NCCA_ERROR.get("message").format(e))
+            traceback_info = traceback.format_exc()
+            print(traceback_info)
+            print(e)
+            QtWidgets.QMessageBox.warning(None, QUBE_PY_ERROR.get("title"), QUBE_PY_ERROR.get("message").format(e))
             self.close()
             return
 

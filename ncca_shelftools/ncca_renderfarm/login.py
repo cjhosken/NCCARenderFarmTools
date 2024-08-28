@@ -100,8 +100,11 @@ class RenderFarmLoginDialog(QtWidgets.QDialog):
         for attempt in range(MAX_CONNECTION_ATTEMPTS):  # Try to connect multiple times
             try:
                 # Attempt to establish SFTP connection here
-                    
-                self.sftp = None  # Initialize SFTP connection variable
+                
+                transport = paramiko.Transport((RENDERFARM_ADDRESS, RENDERFARM_PORT))
+                transport.connect(None, username, password)
+
+                self.sftp = paramiko.SFTPClient.from_transport(transport)  # Initialize SFTP connection variable
                 self.username = username  # Set class username variable
 
                 if save_info:
@@ -114,9 +117,11 @@ class RenderFarmLoginDialog(QtWidgets.QDialog):
 
             except paramiko.AuthenticationException:
                 QtWidgets.QMessageBox.warning(self, NCCA_INVALID_LOGIN_ERROR.get("title"), NCCA_INVALID_LOGIN_ERROR.get("message"))
+                return None
             except (paramiko.SSHException, socket.gaierror):
                 if attempt >= MAX_CONNECTION_ATTEMPTS - 1:
                     QtWidgets.QMessageBox.warning(self, NCCA_CONNECTION_ERROR.get("title"), NCCA_CONNECTION_ERROR.get("message"))
+                return None
         return None  # Return None if login fails
     
     def get_login_info(self):
