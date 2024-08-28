@@ -104,4 +104,39 @@ global proc shelf_NCCA () {
         -commandRepeatable 1
         -flat 1
     ;
+
+
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 32
+        -enable 1
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Info" 
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "Qube" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "info.png" 
+        -image1 "info.png" 
+        -style "iconOnly" 
+        -marginWidth 0
+        -marginHeight 1
+        -command "python(\"import sys, os; home=os.getenv('HOMESHARE'); sys.path.append(os.path.join(home if home is not None else os.path.expanduser('~'), '.ncca', 'ncca_shelftools')); from ncca_renderfarm import info; info.main()\");"
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
 }

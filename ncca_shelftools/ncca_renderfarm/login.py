@@ -9,9 +9,6 @@ from config import *
 from .crypt import * 
 from utils import *
 
-install(["paramiko"])
-import paramiko, socket
-
 class NCCA_ConnectionFailedException(Exception):
     """
     Custom exception for connection failures to NCCA Renderfarm.
@@ -99,6 +96,8 @@ class RenderFarmLoginDialog(QtWidgets.QDialog):
         
         for attempt in range(MAX_CONNECTION_ATTEMPTS):  # Try to connect multiple times
             try:
+                install(["paramiko"])
+                import paramiko, socket
                 # Attempt to establish SFTP connection here
                 
                 transport = paramiko.Transport((RENDERFARM_ADDRESS, RENDERFARM_PORT))

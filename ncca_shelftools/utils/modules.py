@@ -34,8 +34,6 @@ def install(packages):
                     python_exe = python_exe.replace("houdini", "hython")
                     python_exe = python_exe.replace("maya.bin", "mayapy")
 
-                print(python_exe)
-
                 result = subprocess.run([python_exe, "-m", "pip", "install", package])
                 if result.returncode == 0:
                     installed_packages.append(package)

@@ -108,3 +108,9 @@ NCCA_MAYASUBMIT_EXTRA_TOOLTIP = "Extra commands to be added verbatim to the rend
 
 # HOUDINI TOOLTIPS
 NCCA_HOUSUBMIT_ROP_TOOLTIP = "Select the output ROP to render, these will be either in the /shop or /stage level"
+
+
+
+# LINKS
+
+INFO_WEB_LINK = "https://github.com/cjhosken/NCCARenderFarmTools"

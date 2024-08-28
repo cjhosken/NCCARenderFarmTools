@@ -4,6 +4,7 @@
     <memberTool name="ncca_qubeui"/>
     <memberTool name="ncca_submit_renderfarm_job"/>
     <memberTool name="ncca_view_renderfarm"/>
+    <memberTool name="ncca_info"/>
 
   </toolshelf>
 
@@ -20,6 +21,11 @@
 
   <tool name="ncca_view_renderfarm" label="View Farm" icon="BUTTONS_internet">
     <script scriptType="python"><![CDATA[import sys, os; home=os.getenv('HOMESHARE'); sys.path.append(os.path.join(home if home is not None else os.path.expanduser('~'), ".ncca", "ncca_shelftools")); from ncca_renderfarm import viewer; viewer.main('houdini')]]>
+    </script>
+  </tool>
+
+  <tool name="ncca_info" label="Info" icon="BUTTONS_info">
+    <script scriptType="python"><![CDATA[import sys, os; home=os.getenv('HOMESHARE'); sys.path.append(os.path.join(home if home is not None else os.path.expanduser('~'), ".ncca", "ncca_shelftools")); from ncca_renderfarm import info; info.main()]]>
     </script>
   </tool>
 </shelfDocument>

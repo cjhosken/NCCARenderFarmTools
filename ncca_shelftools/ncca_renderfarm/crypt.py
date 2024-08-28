@@ -7,9 +7,6 @@ import json
 from config import *
 from utils import *
 
-install(["cryptography"])
-from cryptography.fernet import Fernet
-
 
 def load_saved_credentials(key):
     """
@@ -51,6 +48,8 @@ def decrypt_credentials(key, encrypted_credentials):
     Returns:
         bytes: The decrypted data.
     """
+    install(["cryptography"])
+    from cryptography.fernet import Fernet
     # Initialize the Fernet cipher suite with the provided key
     cipher_suite = Fernet(key)
     # Decrypt the encrypted credentials
@@ -93,6 +92,8 @@ def encrypt_credentials(key, username, password):
     Returns:
         bytes: The encrypted data.
     """
+    install(["cryptography"])
+    from cryptography.fernet import Fernet
     # Initialize the Fernet cipher suite with the provided key
     cipher_suite = Fernet(key)
     # Create a dictionary of the user credentials
@@ -110,6 +111,8 @@ def generate_key():
     """
     Generate a new encryption key and save it to the specified path.
     """
+    install(["cryptography"])
+    from cryptography.fernet import Fernet
     
     # Check if the key file already exists
     if not os.path.exists(NCCA_KEY_PATH):
