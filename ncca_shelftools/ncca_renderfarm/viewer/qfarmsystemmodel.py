@@ -18,6 +18,7 @@ class QFarmSystemModel(QAbstractItemModel):
             'is_dir': True,
             'children': self.fetch_directory(root_path)  # Initialize with actual directory contents
         }
+        self.fetched_directories = set()  # To track fetched directories
 
     def fetch_directory(self, path):
         """Fetch and return directory contents as a list of dictionaries."""
@@ -117,9 +118,12 @@ class QFarmSystemModel(QAbstractItemModel):
             return
 
         item = index.internalPointer()
-        if item['children']:
+        if item['path'] in self.fetched_directories:
             return  # Already fetched
 
+        # Mark this directory as fetched
+        self.fetched_directories.add(item['path'])
+        
         path = item['path']
         item['children'] = self.fetch_directory(path)
 
@@ -133,4 +137,4 @@ class QFarmSystemModel(QAbstractItemModel):
             return False
 
         item = index.internalPointer()
-        return item['is_dir'] and not item['children']  # Fetch if children is an empty list
+        return item['is_dir'] and item['path'] not in self.fetched_directories  # Fetch if not already fetched

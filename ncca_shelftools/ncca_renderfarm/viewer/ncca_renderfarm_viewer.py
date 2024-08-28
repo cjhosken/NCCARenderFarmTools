@@ -56,9 +56,9 @@ class NCCA_RenderFarmViewer(QMainWindow):
         self.tree_view.setColumnHidden(3, True)  # Show last modified date column
 
         # Resize columns to fit content
-        self.tree_view.header().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)
-        self.tree_view.header().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeToContents)
-        self.tree_view.header().setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeToContents)
+        #self.tree_view.header().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)
+        #self.tree_view.header().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeToContents)
+        #self.tree_view.header().setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeToContents)
 
         self.layout.addWidget(self.tree_view)  # Add tree view to layout
 
