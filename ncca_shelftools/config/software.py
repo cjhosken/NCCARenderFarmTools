@@ -39,12 +39,12 @@ MAYA_FILE_EXTENSIONS = {
 # See /ncca_shelftools/ncca_renderfarm/submit.py for more info.
 QUBE_PYPATH = {
     "windows" : "C:/Program Files/pfx/qube/api/python",
-    "linux" : "/public/devel/2022/pfx/qube/api/python"
+    "linux" : "/usr/local/pfx/qube/api/python"
 }
 
 # QUBE_EXE_PATH contains the path to the Qube executable. Be aware that on Windows you must install Qube from Apps Anywhere before running.
 # See /ncca_shelftools/ncca_renderfarm/qube.py for more info.
 QUBE_EXE_PATH = {
     "windows": "C:/Program Files (x86)/pfx/qube/bin/qube.exe",
-    "linux" : "/public/bin/2023/goQube"
+    "linux" : "/usr/local/pfx/qube/qubeui/qubeui"
 }
