@@ -86,6 +86,7 @@ class QFarmSystemModel(QAbstractItemModel):
         parent_item = next(
             (item for item in self.root_item['children'] if item['path'] == parent_path), None
         )
+        
         if parent_item:
             return self.createIndex(self.root_item['children'].index(parent_item), 0, parent_item)
         return QModelIndex()
