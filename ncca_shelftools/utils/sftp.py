@@ -57,16 +57,35 @@ def sftp_isfile(sftp=None, remote_path=""):
 
 def sftp_download(sftp=None, remote_path="", local_path=""):
     """
-    Download a file from the remote SFTP server to the local machine.
+    Download a file or directory from the remote SFTP server to the local machine.
 
     Args:
-    - sftp: SFTP connection object (not used in this placeholder function).
-    - remote_path (str): Path to the remote file.
-    - local_path (str): Path to save the downloaded file locally.
-
-    This is a placeholder function that does nothing (pass statement).
+    - sftp: SFTP connection object.
+    - remote_path (str): Path to the remote file or directory.
+    - local_path (str): Path to save the downloaded file or directory locally.
     """
-    sftp.get(remote_path, local_path)
+    # Ensure the SFTP connection object is valid
+    if sftp is None:
+        raise ValueError("SFTP connection object cannot be None.")
+
+    try:
+        # Check if the remote path is a directory
+        if sftp_isdir(sftp, remote_path):  # Directory mode check
+            # If it's a directory, create the local directory
+            os.makedirs(local_path, exist_ok=True)
+            
+            # List contents of the remote directory
+            for item in sftp.listdir(remote_path):
+                remote_item_path = os.path.join(remote_path, item)
+                local_item_path = os.path.join(local_path, item)
+                
+                # Recursively download each item
+                sftp_download(sftp, remote_item_path, local_item_path)
+        else:
+            # If it's a file, download it
+            sftp.get(remote_path, local_path)
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
 
 def sftp_upload(sftp=None, local_path="", remote_path=""):
     """
@@ -119,8 +138,6 @@ def sftp_delete(sftp, remote_path):
             sftp.remove(remote_path)
     except IOError as e:
         print(f"Failed to delete {remote_path}: {e}")
-
-
 
 def sftp_setup(sftp=None, username=""):
     """

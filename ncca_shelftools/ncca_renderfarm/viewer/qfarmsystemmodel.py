@@ -1,39 +1,97 @@
 from config import *
-from PySide2.QtWidgets import QFileSystemModel 
+from PySide2.QtCore import QAbstractItemModel, QModelIndex, Qt
+import stat
 
-class QFarmSystemModel(QFileSystemModel):
+class QFarmSystemModel(QAbstractItemModel):
     """
     Custom QFileSystemModel subclass for the NCCA Renderfarm Viewer.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, sftp, root_path="/home", parent=None):
+        super(QFarmSystemModel, self).__init__(parent)
+
+        self.sftp = sftp
+        self.root_path = root_path
+        self.root_item = self.fetch_directory(root_path)
+
+    def fetch_directory(self, path):
+        """Fetch and return directory contents as a list of dictionaries."""
+        items = []
+        for item in self.sftp.listdir_attr(path):
+            items.append({
+                'name': item.filename,
+                'path': f"{path}/{item.filename}",
+                'is_dir': stat.S_ISDIR(item.st_mode),
+                'size': item.st_size,
+                'mtime': item.st_mtime
+            })
+        return items
+
+    def rowCount(self, parent=QModelIndex()):
+        """Return the number of rows under the given parent."""
+        if not parent.isValid():
+            return len(self.root_item)
+        else:
+            return len(parent.internalPointer().get('children', []))
+
+    def columnCount(self, parent=QModelIndex()):
+        """Return the number of columns (fixed to 1)."""
+        return 1
+
+    def data(self, index, role=Qt.DisplayRole):
+        """Return the data for the given role and section in the model."""
+        if not index.isValid():
+            return None
+
+        item = index.internalPointer()
+
+        if role == Qt.DisplayRole:
+            return item['name']
+
+        return None
+
+    def index(self, row, column, parent=QModelIndex()):
+        """Return the index of the item in the model specified by the given row, column and parent index."""
+        if not parent.isValid():
+            child_item = self.root_item[row]
+        else:
+            parent_item = parent.internalPointer()
+            child_item = parent_item['children'][row]
+
+        return self.createIndex(row, column, child_item)
+
+    def parent(self, index):
+        """Return the parent of the model item with the given index."""
+        if not index.isValid():
+            return QModelIndex()
+
+        child_item = index.internalPointer()
+        parent_path = os.path.dirname(child_item['path'])
+
+        if parent_path == self.root_path:
+            return QModelIndex()
+
+        parent_item = next(item for item in self.root_item if item['path'] == parent_path)
+        return self.createIndex(self.root_item.index(parent_item), 0, parent_item)
+
+    def hasChildren(self, parent=QModelIndex()):
+        """Return whether the item has children (is a directory)."""
+        if not parent.isValid():
+            return True
+        return parent.internalPointer()['is_dir']
+
+    def filePath(self, index):
         """
-        Initialize QFarmSystemModel instance.
+        Return the file path for the given index.
 
         Args:
-        - *args: Variable length argument list.
-        - **kwargs: Arbitrary keyword arguments.
-        """
-        super(QFarmSystemModel, self).__init__(*args, **kwargs)  # Call superclass constructor
-
-    def lessThan(self, left, right):
-        """
-        Compare two QModelIndex objects to determine order in the view.
-
-        Args:
-        - left (QModelIndex): Left index to compare.
-        - right (QModelIndex): Right index to compare.
+            index (QModelIndex): The index of the item.
 
         Returns:
-        - bool: True if left should go before right; False otherwise.
+            str: The file path of the item.
         """
-        left_file_info = self.fileInfo(left)  # Get file info for left index
-        right_file_info = self.fileInfo(right)  # Get file info for right index
+        if not index.isValid():
+            return ""
 
-        # Directories should come before files
-        if left_file_info.isDir() and not right_file_info.isDir():
-            return True  # Left is directory, right is not (left should come first)
-        if not left_file_info.isDir() and right_file_info.isDir():
-            return False  # Right is directory, left is not (right should come first)
-
-        return super(QFarmSystemModel, self).lessThan(left, right)  # Call superclass method for default comparison
+        item = index.internalPointer()
+        return item.get('path', "")

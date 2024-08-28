@@ -26,6 +26,7 @@ class NCCA_RenderFarmViewer(QMainWindow):
         self.resize(300, 600)  # Set initial window size
         
         self.sftp = info["sftp"]  # Initialize SFTP connection from info dictionary
+
         self.username = info["username"]  # Initialize username from info dictionary
 
         # Central widget for main layout
@@ -35,18 +36,17 @@ class NCCA_RenderFarmViewer(QMainWindow):
         self.layout = QVBoxLayout(central_widget)  # Create a vertical layout for central widget
 
         # Initialize custom file system model
-        self.file_system_model = QFarmSystemModel()  # Create an instance of QFarmSystemModel
-        self.file_system_model.setRootPath(QDir.rootPath())  # Set root path for the model
-        self.file_system_model.setFilter(QDir.AllDirs | QDir.NoDotAndDotDot | QDir.Files)  # Set filters for the model
+        self.file_system_model = QFarmSystemModel(info["sftp"], os.path.join("/home", self.username, "farm").replace("\\", "/"), None)  # Create an instance of QFarmSystemModel
+        #self.file_system_model.setFilter(QDir.AllDirs | QDir.NoDotAndDotDot | QDir.Files)  # Set filters for the model
 
         # Configure the file system model to display only certain columns
-        self.file_system_model.setNameFilters(["*"])
-        self.file_system_model.setNameFilterDisables(False)
+        #self.file_system_model.setNameFilters(["*"])
+        #self.file_system_model.setNameFilterDisables(False)
 
         # Initialize tree view
         self.tree_view = QTreeView()  # Create a QTreeView widget
         self.tree_view.setModel(self.file_system_model)  # Set model for the tree view
-        self.tree_view.setRootIndex(self.file_system_model.index(QDir.rootPath()))  # Set root index
+        #self.tree_view.setRootIndex(self.file_system_model.index(QDir.rootPath()))  # Set root index
         self.tree_view.setSortingEnabled(True)  # Enable sorting
 
         # Set the columns to display
@@ -140,7 +140,7 @@ class NCCA_RenderFarmViewer(QMainWindow):
 
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_file_path = os.path.join(temp_dir, file_name)  # Create temporary file path
-            shutil.copy(file_path, temp_file_path)  # Copy file to temporary location
+            sftp_download(self.sftp, file_path, temp_file_path)
 
             dialog = QImageDialog(temp_file_path)  # Create QImageDialog instance
             dialog.exec_()  # Execute the image dialog
