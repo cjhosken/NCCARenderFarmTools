@@ -1,25 +1,36 @@
-# Development for the NCCARenderFarm
-You're interested in development, good on you! This program should be a good challenge for you to work on, and hopefully you'll be able to make it grow.
+# Development Guide for NCCA RenderFarm Tools
 
-## Rules
-1. Be respectful of others, this is a chance for you all to learn.
-2. Don't leave broken code. If you break something, fix it! Or undo the changes you've made.
-3. Try to document!
+Welcome to the development side of the NCCA RenderFarm Tools! Your interest in contributing to this project is highly valued, and we hope this guide will help you get started and contribute effectively.
 
-## Documentation
-I've tried to make the code as well documented as possible, and I plead you do the same (for the sake of others). If you get stuck understanding a concept, ChatGPT is extremely useful.
+## Contribution Guidelines
 
-## Where do I start? / Github Issue Page
-If you're new to development and want to help, but don't know what to do, a good place to start would be looking at the [issues page](https://github.com/cjhosken/NCCARenderFarmTools/issues) on the [GitHub repository](https://github.com/cjhosken/NCCARenderFarmTools).
+### 1. Respect and Collaboration
+- **Be Respectful**: Collaboration is key to the success of this project. Always maintain a respectful and supportive attitude towards other contributors.
+  
+### 2. Maintain Code Integrity
+- **No Broken Code**: Avoid leaving the repository in a broken state. If your changes introduce a bug, either fix it immediately or revert the changes.
+  
+### 3. Documentation is Key
+- **Document Your Work**: Proper documentation is crucial for ensuring that others can understand and build upon your work. Please make an effort to document your code and any changes you make.
 
-There likely will be issues with the software that users need solving. Labels may need to be assigned to different issues, but hopefully users will figure that out.
+## Getting Started
 
-All problems labelled ```low-priority-task``` are ones that should be simple fixes. If you want to challenge yourself, look at issues labelled `bug` or `feature`. Anything labelled `waiting-on-it` are things that IT needs to deal with. Sending an email to IT about it is a good place to get started on that.
+### Where to Begin?
+If you're new to the project and unsure where to start, the [issues page](https://github.com/cjhosken/NCCARenderFarmTools/issues) is a great place to find tasks that need attention.
 
-## IT Issues
-When you come across issues with IT, such as not having the correct software versions installed, and similar things like that, please be patient with them. It may take a while for them to fufill your requests.
+- **Low Priority Tasks**: Issues labeled as `low-priority-task` are typically straightforward and a good starting point for newcomers.
+- **Bugs and Features**: For a more challenging experience, consider tackling issues labeled as `bug` or `feature`.
+- **IT-Related Issues**: Issues labeled as `waiting-on-it` require interaction with IT. These tasks might involve requesting software updates or other IT-related support. Initiating contact with IT via email is often the first step.
 
-## Support
-If you get very stuck, the lecturers are bound to help you with your coding problems. Otherwise, Google and ChatGPT are very viable options for writing you code.
+## Working with IT
 
-If you want to get in contact with the original author, Christopher Hosken, you can do so [here](mailto:hoskenchristopher@gmail.com).
+When dealing with IT-related issues, such as requesting software installations or addressing compatibility problems, please exercise patience. IT may take some time to fulfill requests, and clear communication can help expedite the process.
+
+## Support and Resources
+
+### Stuck? Here’s What to Do
+- **Ask for Help**: If you're struggling with a coding issue, don't hesitate to reach out to your lecturers—they're here to help.
+- **Use Online Resources**: Google and ChatGPT are excellent tools for troubleshooting and generating code solutions.
+  
+### Contact the Original Author
+If you need to contact the original author of this project, Christopher Hosken, you can email [hoskenchristopher@gmail.com](mailto:hoskenchristopher@gmail.com).

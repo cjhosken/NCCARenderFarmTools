@@ -1,73 +1,91 @@
 # NCCA RenderFarm Tools
-The NCCA Renderfarm Tools allow users to interact with the NCCA Renderfarm. The shelf tools can be run from inside DCCs (Digital Content Creators). Currently, the shelf tools only support:
 
- - Maya
-    - Maya Software Render
-    - ~~Arnold (CPU)~~ (Watermarked)
-    - ~~VRay (CPU)~~ (License Errors)
+The NCCA RenderFarm Tools provide seamless integration with the NCCA Renderfarm, allowing users to submit and manage rendering tasks directly from their preferred Digital Content Creation (DCC) software. Currently, these tools support:
 
- - Houdini
-    - Mantra
-    - Karma (CPU)
+### Supported Software
+- **Maya**
+  - Maya Software Render
+  - ~~Arnold (CPU)~~ (Watermarked)
+  - ~~VRay (CPU)~~ (License Issues)
 
+- **Houdini**
+  - Mantra
+  - Karma (CPU)
 
 ## Installation
-To install the shelf tools, navigate to `shelf_tools/` and run either `linux_setup.sh` or `windows_setup.sh`. The tools should then install into all Houdini and Maya distributions.
 
-*Be aware that if you're using Houdini on windows, you'll need to run the setup script each time you install Houdini from Apps Anywhere.*
+To install the shelf tools:
+
+1. Navigate to the `shelf_tools/` directory.
+2. Run the appropriate setup script:
+   - **Linux**: `linux_setup.sh`
+   - **Windows**: `windows_setup.sh`
+
+The tools will be installed across all Houdini and Maya distributions on your system.
+
+> **Note:** If you're using Houdini on Windows, you must run the setup script each time you install Houdini via Apps Anywhere.
 
 ## Usage
-There are 3 tools in the shelf tools. For some of the tools you will be prompted with a login page. Enter your Bournemouth University ID and password. You can also choose to save your info so you don't have to retype it each time you use the tools.
 
-### Launch Qube!
-This launches Qube, a graphical interface that lets you see jobs that have been submitted to the NCCA Renderfarm. It's recommended to launch Qube after you submit a job to see if everything is working correctly.
+### Overview
+The NCCA RenderFarm Tools include three primary tools. For certain operations, you may be prompted to log in using your Bournemouth University ID and password. You can opt to save your credentials to avoid re-entering them each time.
 
-### Submit Job
-Submitting a job will submit the current project you have open in either Houdini or Maya. 
+### Tool Descriptions
 
-Project Name: The name of your project that will be seen on the renderfarm.
-CPU Count: How many CPUs to use for rendering. You can use all, but please be considerate of others using the renderfarm.
-Project Folder: The folder that will be uploaded to the renderfarm. Make sure that all your files (including the one you have open) are located inside the project folder. You cannot submit a job without specifying a project folder.
+#### 1. Launch Qube!
+This tool launches the Qube! graphical interface, which allows you to monitor jobs submitted to the NCCA Renderfarm. It is recommended to launch Qube! after submitting a job to ensure everything is functioning correctly.
 
-Start, End, Step Frames: Specify what frame to start and end at. Frame stepping will render every nth frame.
+#### 2. Submit Job
+This tool submits your current project from either Houdini or Maya to the renderfarm.
 
-#### Maya:
+- **Project Name**: The name that will identify your project on the renderfarm.
+- **CPU Count**: The number of CPUs to allocate for rendering. While you may use all available CPUs, please be considerate of others using the renderfarm.
+- **Project Folder**: The directory containing all files related to your project. Ensure all necessary files, including the one currently open, are within this folder. A project folder must be specified to submit a job.
+- **Frame Range**:
+  - **Start Frame**: The frame to begin rendering.
+  - **End Frame**: The frame to end rendering.
+  - **Step Frames**: The interval at which frames will be rendered (e.g., every 2nd frame).
 
-Active Renderer: Specify what render engine to use. "file" will use the one specified by the opened file.
-Render Camera: Specify what camera to use for rendering.
+**Maya-Specific Options:**
 
-Output file: The output file path. The path begins at your farm folder.
+- **Active Renderer**: The render engine to use. Selecting "file" will default to the renderer specified in the open file.
+- **Render Camera**: The camera to be used for rendering.
+- **Output File**: The output path for rendered files, relative to your farm folder.
+- **Extra Commands**: Additional commands for advanced render control.
 
-Extra Commands: Extra commands to use for controlling your renders.
+**Houdini-Specific Options:**
 
-#### Houdini:
+- **Select ROP**: The ROP node to use for rendering.
 
-Select ROP: Select the ROP node to use for rendering.
+#### 3. View Farm
+This tool opens the farm viewer, allowing you to manage your files on the NCCA Renderfarm. You can download, delete, or view files directly.
 
+- **Actions**:
+  - **Right-click**: Opens a context menu with available actions for the selected item.
+  - **Double-click**: Views images, including support for EXR files.
 
-### View Farm
-Launching the farm viewer will let you see your files on the NCCA Renderfarm. You can download and delete files. 
+> **Tip:** You can also access your files from Linux. Check out the tutorial videos by Jon Macey for more details.
 
-Right click on an item to action it.
-Double click on images to view them. EXR files are supported.
+## Troubleshooting
 
-*You can also access your files from Linux. See the videos by Jon Macey on how to do that.*
+The tools may occasionally encounter bugs or performance issues. If you experience slowdowns or unexpected behavior:
 
-## Issues
-The app can be buggy at times, so do be patient. If you feel that It's slowing down or something unusual is happening. Try restarting. If it keeps happening, report a bug either through the UI or at https://github.com/cjhosken/NCCARenderFarmTools/issues.
+1. **Restart the Tool**: This often resolves minor issues.
+2. **Report Bugs**: If problems persist, please report them at [NCCA RenderFarm Tools Issues](https://github.com/cjhosken/NCCARenderFarmTools/issues).
 
-It's very important you report any bugs you face otherwise they likely will never get fixed. When you report a bug, try and assign a label to it. Do not create any new labels.
+> **Important:** Reporting bugs ensures they are addressed in future updates. When submitting a bug report, please assign an appropriate label. Avoid creating new labels.
 
 ## Development
-This project is open source, which means anyone can participate in development! I hope that this tool will be passed along by students, and maintained by them while they're at University.
 
-If you wish to get involved with development, read [DEVEL.md](DEVEL.md)
+The NCCA RenderFarm Tools is an open-source project, inviting contributions from the community. Students are encouraged to maintain and improve the tools during their time at Bournemouth University.
+
+If you're interested in contributing, please refer to [DEVEL.md](DEVEL.md) for guidelines and instructions.
 
 ## Contributors
-This software was first developed by Christopher Hosken in the summer of 2024.
 
-Other Contributors include:
-- Jon Macey (Insipred Code)
+This project was initiated by Christopher Hosken during the summer of 2024.
 
+**Other Contributors**:
+- Jon Macey (Inspired Code)
 
-*If you have contributed to the project, feel free to add yourself to the list of contributors.*
+If you've contributed to this project, feel free to add your name to the list of contributors.

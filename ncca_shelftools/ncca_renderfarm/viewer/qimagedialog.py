@@ -36,7 +36,7 @@ class QImageDialog(QDialog):
         self.channels.addItems(get_exr_channels(image_path))
 
         channel_row.addWidget(self.color_channels)
-        channel_row.addWidget(self.channels)
+        #channel_row.addWidget(self.channels) Commented out for the time being, as it doesnt work properly yet
 
         layout.addWidget(channel_row_widget)
 
