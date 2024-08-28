@@ -33,4 +33,4 @@ When dealing with IT-related issues, such as requesting software installations o
 - **Use Online Resources**: Google and ChatGPT are excellent tools for troubleshooting and generating code solutions.
   
 ### Contact the Original Author
-If you need to contact the original author of this project, Christopher Hosken, you can email [hoskenchristopher@gmail.com](mailto:hoskenchristopher@gmail.com).
+If you need to contact the original author of this project, Christopher Hosken, you can email him at [hoskenchristopher@gmail.com](mailto:hoskenchristopher@gmail.com).
