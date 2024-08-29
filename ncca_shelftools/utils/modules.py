@@ -15,22 +15,17 @@ def is_package_installed(package_name):
 
 def install(packages):
     installed_packages = []
-    
     for i, package in enumerate(packages):
         if not is_package_installed(package):
             dialog = QtWidgets.QDialog()
             dialog.setWindowTitle('NCCA Installer')
             layout = QtWidgets.QVBoxLayout(dialog)
-            label = QtWidgets.QLabel(f'Installing {packages}... \n You may need to relaunch your application for the tool to work correctly.')
+            label = QtWidgets.QLabel(f'{package} is required! \n You may need to relaunch your application for the tool to work correctly.')
+            ok_button = QtWidgets.QPushButton(f'Install {package}')
+            ok_button.clicked.connect(dialog.accept)
             layout.addWidget(label)
-            dialog.show()
-            # Ensure the dialog is fully rendered before continuing
-            dialog.repaint()
-            QtWidgets.QApplication.processEvents()
-
-            # Short delay to allow the UI to update
-            QtCore.QTimer.singleShot(100, lambda: None)
-            QtWidgets.QApplication.processEvents()
+            layout.addWidget(ok_button)
+            dialog.exec_()
 
             try:
                 python_exe = sys.executable
