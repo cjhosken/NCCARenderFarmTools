@@ -194,71 +194,9 @@ class NCCA_RenderFarmViewer(QMainWindow):
             sftp_delete(self.sftp, file_path)  # Delete file using SFTP
             self.refresh()
 
-    def store_expanded_paths(self):
-        """Store the paths of all expanded items."""
-        self.expanded_paths.clear()
-        self._store_expanded_paths(self.tree_view.rootIndex())
-        print(f"Stored expanded paths: {self.expanded_paths}")
-
-    def _store_expanded_paths(self, index):
-        """Recursively store the paths of expanded items."""
-        if index == self.tree_view.rootIndex() or self.tree_view.isExpanded(index):
-            item = index.internalPointer()
-            if item and 'path' in item and item["is_dir"]:
-                self.expanded_paths.add(item['path'])
-            # Recursively visit children
-            for row in range(self.file_system_model.rowCount(index)):
-                child_index = self.file_system_model.index(row, 0, index)
-                self._store_expanded_paths(child_index)
-
-    def restore_expanded_paths(self):
-        """Restore the previously stored expanded state."""
-        print(f"Expanding paths: {self.expanded_paths}")
-
-        sorted_expanded_paths = sorted(self.expanded_paths, key=lambda p: p.count('/'))
-
-        for path in sorted_expanded_paths:
-            index = self._find_index_by_path(self.file_system_model.root_item, path)
-            if index.isValid():
-                self.tree_view.setExpanded(index, True)
-                item = index.internalPointer()
-                print(item)
-                item["children"] = self.file_system_model.fetch_directory(path)
-                print(f"Expanded: {path}")
-            else:
-                print(f"Path not found in model: {path}")
-        print(f"Finished restoring expanded paths")
-
-    def _find_index_by_path(self, current_item, path):
-        """Find the QModelIndex for the item with the given path."""
-        if current_item['path'] == path:
-            # This is the item we are looking for
-            parent_path = current_item['parent'] if 'parent' in current_item else ''
-            print(parent_path)
-            parent_index = self._find_index_by_path(self.file_system_model.root_item, parent_path)
-            row_count = self.file_system_model.rowCount(parent_index)
-            for row in range(row_count):
-                child_index = self.file_system_model.index(row, 0, parent_index)
-                child_item = child_index.internalPointer()
-                if child_item['path'] == path:
-                    return child_index
-
-        # Recursively search through children
-        for child in current_item['children']:
-            if child['is_dir']:
-                found_index = self._find_index_by_path(child, path)
-                if found_index.isValid():
-                    return found_index
-
-        return QModelIndex()  # Return an invalid index if not found
-
     def refresh(self):
-        self.store_expanded_paths()
-
         self.file_system_model.fetched_directories.clear()
         self.file_system_model.root_item['children'] = self.file_system_model.fetch_directory(self.file_system_model.root_path)
 
         self.file_system_model.beginResetModel()
         self.file_system_model.endResetModel()
-
-        self.restore_expanded_paths()
