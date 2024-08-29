@@ -85,32 +85,41 @@ class QFarmSystemModel(QAbstractItemModel):
         child_item = index.internalPointer()
         parent_path = os.path.dirname(child_item['path'])
 
-        # Find the parent item recursively
-        def find_parent_item(current_item, search_path):
-            if current_item['path'] == search_path:
-                return current_item
-            for child in current_item['children']:
-                if child['is_dir']:
-                    found = find_parent_item(child, search_path)
-                    if found:
-                        return found
-            return None
-
-        # Skip root
         if parent_path == self.root_path:
             return QModelIndex()
 
-        parent_item = find_parent_item(self.root_item, parent_path)
+        parent_item = self._find_parent_item(self.root_item, parent_path)
 
         if parent_item:
             grandparent_path = os.path.dirname(parent_item['path'])
-            grandparent_item = find_parent_item(self.root_item, grandparent_path)
+            grandparent_item = self._find_parent_item(self.root_item, grandparent_path)
             if grandparent_item:
                 row = grandparent_item['children'].index(parent_item)
                 return self.createIndex(row, 0, parent_item)
 
         return QModelIndex()
 
+    def _find_parent_item(self, current_item, search_path):
+        """
+        Recursively find the parent item of the given path.
+
+        Args:
+            current_item (dict): The current item to search.
+            search_path (str): The path of the parent item to find.
+
+        Returns:
+            dict: The parent item dictionary if found, otherwise None.
+        """
+        if current_item['path'] == search_path:
+            return current_item
+
+        for child in current_item['children']:
+            if child['is_dir']:
+                found = self._find_parent_item(child, search_path)
+                if found:
+                    return found
+
+        return None
 
     def hasChildren(self, parent=QModelIndex()):
         """Return whether the item has children (is a directory)."""
