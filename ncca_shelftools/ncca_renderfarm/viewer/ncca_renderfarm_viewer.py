@@ -224,26 +224,23 @@ class NCCA_RenderFarmViewer(QMainWindow):
         Returns:
             QModelIndex: The index of the item if found, otherwise an invalid QModelIndex.
         """
-        def search_index(index, target_path):
-            """Recursively search for the index in the given parent index."""
+        stack = [self.root_index]
+        
+        while stack:
+            index = stack.pop()
+            
             # Check if the current index matches the target path
-            if self.file_system_model.filePath(index) == target_path:
+            if self.file_system_model.filePath(index) == path:
                 return index
             
-            # Check all children of the current index
+            # Add all children of the current index to the stack
             for row in range(self.file_system_model.rowCount(index)):
                 child_index = self.file_system_model.index(row, 0, index)
-                
-                # Recursively search in the child index
-                result = search_index(child_index, target_path)
-                if result.isValid():
-                    return result
-            
-            # Return an invalid index if not found
-            return QModelIndex()
+                stack.append(child_index)
         
-        # Start searching from the root index
-        return search_index(self.root_index, path)
+        print("INVALIDDD")
+        # Return an invalid index if not found
+        return QModelIndex()
 
     def restore_expanded(self, expanded_paths):
         for path in expanded_paths:
@@ -256,9 +253,15 @@ class NCCA_RenderFarmViewer(QMainWindow):
         expanded_paths = self.get_expanded()
         print(expanded_paths)
 
-        self.file_system_model.fetched_directories = set()
+        sorted_expanded_paths = sorted(
+            expanded_paths,
+            key=lambda p: (p.count("/"))
+        )
+
         self.file_system_model.beginResetModel()
         self.file_system_model.parent_root_item["children"] = self.file_system_model.fetch_directory(self.file_system_model.parent_root_path)
         self.file_system_model.endResetModel()
 
-        self.restore_expanded(expanded_paths)
+        self.file_system_model.fetched_directories = set()
+
+        self.restore_expanded(sorted_expanded_paths)
