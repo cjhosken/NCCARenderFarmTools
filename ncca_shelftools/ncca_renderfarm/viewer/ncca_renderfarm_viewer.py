@@ -35,9 +35,10 @@ class NCCA_RenderFarmViewer(QMainWindow):
 
         self.layout = QVBoxLayout(central_widget)  # Create a vertical layout for central widget
         
+        self.root_path = os.path.join("/home", self.username, "farm").replace("\\", "/")
 
         # Initialize custom file system model
-        self.file_system_model = QFarmSystemModel(info["sftp"], os.path.join("/home", self.username, "farm").replace("\\", "/"), None)  # Create an instance of QFarmSystemModel
+        self.file_system_model = QFarmSystemModel(info["sftp"], self.username, self.root_path, None)  # Create an instance of QFarmSystemModel
         #self.file_system_model.setFilter(QDir.AllDirs | QDir.NoDotAndDotDot | QDir.Files)  # Set filters for the model
 
         # Configure the file system model to display only certain columns
@@ -80,7 +81,12 @@ class NCCA_RenderFarmViewer(QMainWindow):
         self.tree_view.setContextMenuPolicy(Qt.CustomContextMenu)
         self.tree_view.customContextMenuRequested.connect(self.on_custom_context_menu)
 
-        self.expanded_paths = set() 
+        self.expanded_paths = set()
+
+        self.root_index = self.file_system_model.index(0, 0, QModelIndex())
+        print(self.root_index.internalPointer())
+
+        self.tree_view.expand(self.file_system_model.index(0, 0, QModelIndex()))
 
     def on_double_click(self, index):
         """
@@ -136,9 +142,10 @@ class NCCA_RenderFarmViewer(QMainWindow):
         download_action.triggered.connect(lambda: self.download_item(file_path))  # Connect action to download_item method
         context_menu.addAction(download_action)  # Add action to context menu
 
-        delete_action = QAction(NCCA_VIEWER_ACTION_DELETE_LABEL, self)  # Create action to delete the file
-        delete_action.triggered.connect(lambda: self.delete_item(file_path))  # Connect action to delete_item method
-        context_menu.addAction(delete_action)  # Add action to context menu
+        if (file_path != self.root_path):
+            delete_action = QAction(NCCA_VIEWER_ACTION_DELETE_LABEL, self)  # Create action to delete the file
+            delete_action.triggered.connect(lambda: self.delete_item(file_path))  # Connect action to delete_item method
+            context_menu.addAction(delete_action)  # Add action to context menu
 
         context_menu.exec_(self.tree_view.viewport().mapToGlobal(point))  # Execute context menu at global point
 
@@ -186,17 +193,72 @@ class NCCA_RenderFarmViewer(QMainWindow):
         Args:
         - file_path (str): Path of the file to delete.
         """
-        reply = QMessageBox.question(self, DELETE_DIALOG.get("title"), 
-                                    DELETE_DIALOG.get("message").format(file_path), 
-                                    QMessageBox.Yes | QMessageBox.No, QMessageBox.No)  # Confirmation dialog
+        if (file_path != self.root_path):
+            reply = QMessageBox.question(self, DELETE_DIALOG.get("title"), 
+                                        DELETE_DIALOG.get("message").format(file_path), 
+                                        QMessageBox.Yes | QMessageBox.No, QMessageBox.No)  # Confirmation dialog
 
-        if reply == QMessageBox.Yes:
-            sftp_delete(self.sftp, file_path)  # Delete file using SFTP
-            self.refresh()
+            if reply == QMessageBox.Yes:
+                sftp_delete(self.sftp, file_path)  # Delete file using SFTP
+                self.refresh()
+
+    def get_expanded(self):
+        expanded_paths = set()
+        def traverse(node_index):
+            if self.tree_view.isExpanded(node_index):
+                path = self.file_system_model.filePath(node_index)  # Implement this method
+                expanded_paths.add(path)
+            for row in range(self.file_system_model.rowCount(node_index)):
+                child_index = self.file_system_model.index(row, 0, node_index)
+                traverse(child_index)
+        traverse(self.root_index)
+        return expanded_paths
+
+    def find_index(self, path):
+        """
+        Find and return the QModelIndex corresponding to the given path.
+        
+        Args:
+            path (str): The path of the item to find.
+
+        Returns:
+            QModelIndex: The index of the item if found, otherwise an invalid QModelIndex.
+        """
+        def search_index(index, target_path):
+            """Recursively search for the index in the given parent index."""
+            # Check if the current index matches the target path
+            if self.file_system_model.filePath(index) == target_path:
+                return index
+            
+            # Check all children of the current index
+            for row in range(self.file_system_model.rowCount(index)):
+                child_index = self.file_system_model.index(row, 0, index)
+                
+                # Recursively search in the child index
+                result = search_index(child_index, target_path)
+                if result.isValid():
+                    return result
+            
+            # Return an invalid index if not found
+            return QModelIndex()
+        
+        # Start searching from the root index
+        return search_index(self.root_index, path)
+
+    def restore_expanded(self, expanded_paths):
+        for path in expanded_paths:
+            index = self.find_index(path)
+            if index.isValid():
+                print(f"EXPANDED {expanded_paths}" )
+                self.tree_view.expand(index)
 
     def refresh(self):
-        self.file_system_model.fetched_directories.clear()
-        self.file_system_model.root_item['children'] = self.file_system_model.fetch_directory(self.file_system_model.root_path)
+        expanded_paths = self.get_expanded()
+        print(expanded_paths)
 
+        self.file_system_model.fetched_directories = set()
         self.file_system_model.beginResetModel()
+        self.file_system_model.parent_root_item["children"] = self.file_system_model.fetch_directory(self.file_system_model.parent_root_path)
         self.file_system_model.endResetModel()
+
+        self.restore_expanded(expanded_paths)

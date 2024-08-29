@@ -7,16 +7,18 @@ class QFarmSystemModel(QAbstractItemModel):
     Custom QFileSystemModel subclass for the NCCA Renderfarm Viewer.
     """
 
-    def __init__(self, sftp, root_path="/home", parent=None):
+    def __init__(self, sftp, username, root_path="/home/user", parent=None):
         super(QFarmSystemModel, self).__init__(parent)
 
         self.sftp = sftp
+        self.username = username
+        self.parent_root_path = os.path.dirname(root_path)
         self.root_path = root_path
-        self.root_item = {
+        self.parent_root_item = {
             'name': '',
-            'path': root_path,
+            'path': self.parent_root_path,
             'is_dir': True,
-            'children': self.fetch_directory(root_path)  # Initialize with actual directory contents
+            'children': self.fetch_directory(self.parent_root_path)  # Initialize with actual directory contents
         }
         self.fetched_directories = set()  # To track fetched directories
 
@@ -26,34 +28,35 @@ class QFarmSystemModel(QAbstractItemModel):
         try:
             for item in self.sftp.listdir_attr(path):
                 item_path = os.path.join(path, item.filename).replace("\\", "/")
-                item_dict = {
-                    'name': item.filename,
-                    'path': item_path,
-                    'is_dir': stat.S_ISDIR(item.st_mode),
-                    'size': item.st_size,
-                    'mtime': item.st_mtime,
-                    'parent': path,
-                    'children': []  # Initialize as an empty list
-                }
-                
-                # If the item is a directory, fetch its children (grandchildren of the current directory)
-                if item_dict['is_dir']:
-                    try:
-                        grandchildren = self.sftp.listdir_attr(item_path)
-                        item_dict['children'] = [
-                            {
-                                'name': grandchild.filename,
-                                'path': os.path.join(item_path, grandchild.filename).replace("\\", "/"),
-                                'is_dir': stat.S_ISDIR(grandchild.st_mode),
-                                'size': grandchild.st_size,
-                                'mtime': grandchild.st_mtime,
-                                'parent': item_path,
-                                'children': []  # Grandchildren are not fetched, maintaining semi-lazy loading
-                            }
-                            for grandchild in grandchildren
-                        ]
-                    except Exception as e:
-                        print(f"Error fetching grandchildren for {item_path}: {e}")
+                if item_path.startswith(self.root_path):
+                    item_dict = {
+                        'name': item.filename,
+                        'path': item_path,
+                        'is_dir': stat.S_ISDIR(item.st_mode),
+                        'size': item.st_size,
+                        'mtime': item.st_mtime,
+                        'parent': path,
+                        'children': []  # Initialize as an empty list
+                    }
+                    
+                    # If the item is a directory, fetch its children (grandchildren of the current directory)
+                    if item_dict['is_dir']:
+                        try:
+                            grandchildren = self.sftp.listdir_attr(item_path)
+                            item_dict['children'] = [
+                                {
+                                    'name': grandchild.filename,
+                                    'path': os.path.join(item_path, grandchild.filename).replace("\\", "/"),
+                                    'is_dir': stat.S_ISDIR(grandchild.st_mode),
+                                    'size': grandchild.st_size,
+                                    'mtime': grandchild.st_mtime,
+                                    'parent': item_path,
+                                    'children': []  # Grandchildren are not fetched, maintaining semi-lazy loading
+                                }
+                                for grandchild in grandchildren
+                            ]
+                        except Exception as e:
+                            print(f"Error fetching grandchildren for {item_path}: {e}")
 
                 items.append(item_dict)
             items.sort(key=lambda x: x['name'].lower())
@@ -65,7 +68,7 @@ class QFarmSystemModel(QAbstractItemModel):
     def rowCount(self, parent=QModelIndex()):
         """Return the number of rows under the given parent."""
         if not parent.isValid():
-            return len(self.root_item['children'])
+            return len(self.parent_root_item['children'])
         else:
             item = parent.internalPointer()
             return len(item['children'])
@@ -82,7 +85,12 @@ class QFarmSystemModel(QAbstractItemModel):
         item = index.internalPointer()
 
         if role == Qt.DisplayRole:
-            return item['name']
+
+            name = item["name"]
+
+            if item["path"] == self.root_path:
+                name = self.username
+            return name
 
         return None
 
@@ -90,7 +98,7 @@ class QFarmSystemModel(QAbstractItemModel):
         """Return the index of the item in the model specified by the given row, column, and parent index."""
         if not parent.isValid():
             # Top-level items
-            child_item = self.root_item['children'][row]
+            child_item = self.parent_root_item['children'][row]
         else:
             parent_item = parent.internalPointer()
             if row < 0 or row >= len(parent_item['children']):
@@ -108,14 +116,14 @@ class QFarmSystemModel(QAbstractItemModel):
         child_item = index.internalPointer()
         parent_path = os.path.dirname(child_item['path'])
 
-        if parent_path == self.root_path:
+        if parent_path == self.parent_root_path:
             return QModelIndex()
 
-        parent_item = self._find_parent_item(self.root_item, parent_path)
+        parent_item = self._find_parent_item(self.parent_root_item, parent_path)
 
         if parent_item:
             grandparent_path = os.path.dirname(parent_item['path'])
-            grandparent_item = self._find_parent_item(self.root_item, grandparent_path)
+            grandparent_item = self._find_parent_item(self.parent_root_item, grandparent_path)
             if grandparent_item:
                 row = grandparent_item['children'].index(parent_item)
                 return self.createIndex(row, 0, parent_item)
