@@ -21,24 +21,46 @@ class QFarmSystemModel(QAbstractItemModel):
         self.fetched_directories = set()  # To track fetched directories
 
     def fetch_directory(self, path):
-        """Fetch and return directory contents as a list of dictionaries."""
+        """Fetch and return directory contents along with one level of grandchildren."""
         items = []
         try:
             for item in self.sftp.listdir_attr(path):
+                item_path = os.path.join(path, item.filename).replace("\\", "/")
                 item_dict = {
                     'name': item.filename,
-                    'path': os.path.join(path, item.filename).replace("\\", "/"),
+                    'path': item_path,
                     'is_dir': stat.S_ISDIR(item.st_mode),
                     'size': item.st_size,
                     'mtime': item.st_mtime,
                     'parent': path,
                     'children': []  # Initialize as an empty list
                 }
+                
+                # If the item is a directory, fetch its children (grandchildren of the current directory)
+                if item_dict['is_dir']:
+                    try:
+                        grandchildren = self.sftp.listdir_attr(item_path)
+                        item_dict['children'] = [
+                            {
+                                'name': grandchild.filename,
+                                'path': os.path.join(item_path, grandchild.filename).replace("\\", "/"),
+                                'is_dir': stat.S_ISDIR(grandchild.st_mode),
+                                'size': grandchild.st_size,
+                                'mtime': grandchild.st_mtime,
+                                'parent': item_path,
+                                'children': []  # Grandchildren are not fetched, maintaining semi-lazy loading
+                            }
+                            for grandchild in grandchildren
+                        ]
+                    except Exception as e:
+                        print(f"Error fetching grandchildren for {item_path}: {e}")
+
                 items.append(item_dict)
             items.sort(key=lambda x: x['name'].lower())
         except Exception as e:
             print(f"Error fetching directory {path}: {e}")
         return items
+
 
     def rowCount(self, parent=QModelIndex()):
         """Return the number of rows under the given parent."""
@@ -126,7 +148,7 @@ class QFarmSystemModel(QAbstractItemModel):
         """Return whether the item has children (is a directory)."""
         if not parent.isValid():
             return True
-        return parent.internalPointer()['is_dir']
+        return parent.internalPointer()['is_dir'] and len(parent.internalPointer()["children"]) > 0
 
     def filePath(self, index):
         """
@@ -157,6 +179,7 @@ class QFarmSystemModel(QAbstractItemModel):
         self.fetched_directories.add(item['path'])
         
         path = item['path']
+        # Fetch children and their children (grandchildren)
         item['children'] = self.fetch_directory(path)
 
         item['children'].sort(key=lambda x: x['name'].lower())
