@@ -31,6 +31,7 @@ class QFarmSystemModel(QAbstractItemModel):
                     'is_dir': stat.S_ISDIR(item.st_mode),
                     'size': item.st_size,
                     'mtime': item.st_mtime,
+                    'parent': path,
                     'children': []  # Initialize as an empty list
                 }
                 items.append(item_dict)
