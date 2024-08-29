@@ -34,6 +34,7 @@ class QFarmSystemModel(QAbstractItemModel):
                     'children': []  # Initialize as an empty list
                 }
                 items.append(item_dict)
+            items.sort(key=lambda x: x['name'].lower())
         except Exception as e:
             print(f"Error fetching directory {path}: {e}")
         return items
@@ -147,6 +148,8 @@ class QFarmSystemModel(QAbstractItemModel):
         
         path = item['path']
         item['children'] = self.fetch_directory(path)
+
+        item['children'].sort(key=lambda x: x['name'].lower())
 
         # Notify the view that new rows have been inserted
         self.beginInsertRows(index, 0, len(item['children']) - 1)

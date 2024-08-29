@@ -1,5 +1,5 @@
 from config import * 
-from PySide2.QtWidgets import QMainWindow, QTreeView, QVBoxLayout, QMenu, QAction, QMessageBox, QFileDialog, QPushButton
+from PySide2.QtWidgets import QMainWindow, QTreeView, QVBoxLayout, QMenu, QAction, QMessageBox, QFileDialog, QPushButton, QHBoxLayout
 from PySide2.QtCore import QDir, Qt, QModelIndex
 import tempfile, shutil
 
@@ -34,6 +34,7 @@ class NCCA_RenderFarmViewer(QMainWindow):
         self.setCentralWidget(central_widget)  # Set central widget
 
         self.layout = QVBoxLayout(central_widget)  # Create a vertical layout for central widget
+        
 
         # Initialize custom file system model
         self.file_system_model = QFarmSystemModel(info["sftp"], os.path.join("/home", self.username, "farm").replace("\\", "/"), None)  # Create an instance of QFarmSystemModel
@@ -60,11 +61,16 @@ class NCCA_RenderFarmViewer(QMainWindow):
         #self.tree_view.header().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeToContents)
         #self.tree_view.header().setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeToContents)
 
+        h_layout = QHBoxLayout()
 
-        self.refresh_button = QPushButton("Refresh")
+        self.refresh_button = QPushButton("↻")
         self.refresh_button.clicked.connect(self.refresh)
+        self.refresh_button.setFixedSize(25, 25)
 
-        self.layout.addWidget(self.refresh_button)
+        h_layout.addStretch()
+        h_layout.addWidget(self.refresh_button)
+
+        self.layout.addLayout(h_layout)
         self.layout.addWidget(self.tree_view)  # Add tree view to layout
 
         # Connect double-click event to handle file selection
@@ -207,19 +213,26 @@ class NCCA_RenderFarmViewer(QMainWindow):
 
     def restore_expanded_paths(self):
         """Restore the previously stored expanded state."""
+        print(f"Expanding paths: {self.expanded_paths}")
         for path in self.expanded_paths:
             index = self._find_index_by_path(self.file_system_model.root_item, path)
             if index.isValid():
                 self.tree_view.setExpanded(index, True)
-        print(f"Restored expanded paths")
+                item = index.internalPointer()
+                item["children"] = self.file_system_model.fetch_directory(path)
+                print(f"Expanded: {path}")
+            else:
+                print(f"Path not found in model: {path}")
+        print(f"Finished restoring expanded paths")
 
     def _find_index_by_path(self, current_item, path):
-        """Find the index of the item with the given path."""
+        """Find the QModelIndex for the item with the given path."""
         if current_item['path'] == path:
-            # This is the item we're looking for; find its QModelIndex
-            parent_index = self.file_system_model.index(current_item['parent']) if 'parent' in current_item else QModelIndex()
-            row = 0
-            for row in range(self.file_system_model.rowCount(parent_index)):
+            # This is the item we are looking for
+            parent_path = current_item['parent'] if 'parent' in current_item else ''
+            parent_index = self._find_index_by_path(self.file_system_model.root_item, parent_path)
+            row_count = self.file_system_model.rowCount(parent_index)
+            for row in range(row_count):
                 child_index = self.file_system_model.index(row, 0, parent_index)
                 child_item = child_index.internalPointer()
                 if child_item['path'] == path:
@@ -233,7 +246,6 @@ class NCCA_RenderFarmViewer(QMainWindow):
                     return found_index
 
         return QModelIndex()  # Return an invalid index if not found
-
 
     def refresh(self):
         self.store_expanded_paths()
