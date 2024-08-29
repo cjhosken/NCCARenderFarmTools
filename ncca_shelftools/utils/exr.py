@@ -20,7 +20,12 @@ def exr_to_png(exr_path, png_path, channel=None):
     import numpy as np
     from PIL import Image 
     # Open the EXR file
-    exr_file = OpenEXR.InputFile(exr_path)
+
+    try:
+        exr_file = OpenEXR.InputFile(exr_path)
+    except Exception as e:
+        print(f"Failed to open {exr_path}: ", e)
+        return
 
     # Get the data window to determine the size of the image
     header = exr_file.header()

@@ -30,7 +30,7 @@ QUBE_PY_ERROR = {
 
 IMAGE_ERROR = {
     "title" : "Image Error",
-    "message" : "Error converting {} to .png: {}"
+    "message" : "Error converting {} to .png"
 }
 
 

@@ -1,6 +1,6 @@
 from config import * 
-from PySide2.QtWidgets import QMainWindow, QTreeView, QVBoxLayout, QMenu, QAction, QMessageBox, QFileDialog
-from PySide2.QtCore import QDir, Qt
+from PySide2.QtWidgets import QMainWindow, QTreeView, QVBoxLayout, QMenu, QAction, QMessageBox, QFileDialog, QPushButton
+from PySide2.QtCore import QDir, Qt, QModelIndex
 import tempfile, shutil
 
 from .qfarmsystemmodel import QFarmSystemModel 
@@ -60,6 +60,11 @@ class NCCA_RenderFarmViewer(QMainWindow):
         #self.tree_view.header().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeToContents)
         #self.tree_view.header().setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeToContents)
 
+
+        self.refresh_button = QPushButton("Refresh")
+        self.refresh_button.clicked.connect(self.refresh)
+
+        self.layout.addWidget(self.refresh_button)
         self.layout.addWidget(self.tree_view)  # Add tree view to layout
 
         # Connect double-click event to handle file selection
@@ -68,6 +73,8 @@ class NCCA_RenderFarmViewer(QMainWindow):
         # Connect custom context menu
         self.tree_view.setContextMenuPolicy(Qt.CustomContextMenu)
         self.tree_view.customContextMenuRequested.connect(self.on_custom_context_menu)
+
+        self.expanded_paths = set() 
 
     def on_double_click(self, index):
         """
@@ -142,8 +149,11 @@ class NCCA_RenderFarmViewer(QMainWindow):
             temp_file_path = os.path.join(temp_dir, file_name)  # Create temporary file path
             sftp_download(self.sftp, file_path, temp_file_path)
 
-            dialog = QImageDialog(temp_file_path)  # Create QImageDialog instance
-            dialog.exec_()  # Execute the image dialog
+            if os.path.exists(temp_file_path):
+                dialog = QImageDialog(temp_file_path)  # Create QImageDialog instance
+                dialog.exec_()  # Execute the image dialog
+            else:
+                print(f"{temp_file_path} Does not exist: ")
 
     def download_item(self, file_path):
         """
@@ -176,3 +186,64 @@ class NCCA_RenderFarmViewer(QMainWindow):
 
         if reply == QMessageBox.Yes:
             sftp_delete(self.sftp, file_path)  # Delete file using SFTP
+            self.refresh()
+
+    def store_expanded_paths(self):
+        """Store the paths of all expanded items."""
+        self.expanded_paths.clear()
+        self._store_expanded_paths(self.tree_view.rootIndex())
+        print(f"Stored expanded paths: {self.expanded_paths}")
+
+    def _store_expanded_paths(self, index):
+        """Recursively store the paths of expanded items."""
+        if index == self.tree_view.rootIndex() or self.tree_view.isExpanded(index):
+            item = index.internalPointer()
+            if item and 'path' in item:
+                self.expanded_paths.add(item['path'])
+            # Recursively visit children
+            for row in range(self.file_system_model.rowCount(index)):
+                child_index = self.file_system_model.index(row, 0, index)
+                self._store_expanded_paths(child_index)
+
+    def restore_expanded_paths(self):
+        """Restore the previously stored expanded state."""
+        for path in self.expanded_paths:
+            index = self._find_index_by_path(self.file_system_model.root_item, path)
+            if index.isValid():
+                self.tree_view.setExpanded(index, True)
+        print(f"Restored expanded paths")
+
+    def _find_index_by_path(self, current_item, path):
+        """Find the index of the item with the given path."""
+        if current_item['path'] == path:
+            # This is the item we're looking for; find its QModelIndex
+            parent_index = self.file_system_model.index(current_item['parent']) if 'parent' in current_item else QModelIndex()
+            row = 0
+            for row in range(self.file_system_model.rowCount(parent_index)):
+                child_index = self.file_system_model.index(row, 0, parent_index)
+                child_item = child_index.internalPointer()
+                if child_item['path'] == path:
+                    return child_index
+
+        # Recursively search through children
+        for child in current_item['children']:
+            if child['is_dir']:
+                found_index = self._find_index_by_path(child, path)
+                if found_index.isValid():
+                    return found_index
+
+        return QModelIndex()  # Return an invalid index if not found
+
+
+    def refresh(self):
+        self.store_expanded_paths()
+        print(f"Before refresh, expanded paths: {self.expanded_paths}")
+
+        self.file_system_model.fetched_directories.clear()
+        self.file_system_model.root_item['children'] = self.file_system_model.fetch_directory(self.file_system_model.root_path)
+
+        self.file_system_model.beginResetModel()
+        self.file_system_model.endResetModel()
+
+        self.restore_expanded_paths()
+        print(f"After refresh, expanded paths: {self.expanded_paths}")

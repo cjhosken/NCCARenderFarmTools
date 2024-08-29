@@ -69,7 +69,7 @@ class QImageDialog(QDialog):
             pixmap = isolate_channel_to_qpixmap(image_path, color_channel)
             self.image_label.setPixmap(pixmap.scaledToWidth(800))  # Scale the image to fit within 800 pixels width
         else:
-            self.image_label.setText(IMAGE_ERROR.get("message"))  # Display an error message if image loading fails
+            self.image_label.setText(IMAGE_ERROR.get("message").replace(image_path))  # Display an error message if image loading fails
     
     def on_channel_change(self, index):
         """

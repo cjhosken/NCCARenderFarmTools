@@ -121,7 +121,7 @@ class RenderFarmSubmitDialog(QMainWindow):
             traceback_info = traceback.format_exc()
             print(traceback_info)
             print(e)
-            QtWidgets.QMessageBox.warning(None, QUBE_PY_ERROR.get("title"), QUBE_PY_ERROR.get("message").format(e))
+            QtWidgets.QMessageBox.warning(None, QUBE_PY_ERROR.get("title"), QUBE_PY_ERROR.get("message").format(traceback_info + e))
             self.close()
             return
 
