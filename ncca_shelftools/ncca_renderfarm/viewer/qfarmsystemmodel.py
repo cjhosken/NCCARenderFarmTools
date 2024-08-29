@@ -27,14 +27,13 @@ class QFarmSystemModel(QAbstractItemModel):
             for item in self.sftp.listdir_attr(path):
                 item_dict = {
                     'name': item.filename,
-                    'path': os.path.join(path, item.filename),
+                    'path': os.path.join(path, item.filename).replace("\\", "/"),
                     'is_dir': stat.S_ISDIR(item.st_mode),
                     'size': item.st_size,
                     'mtime': item.st_mtime,
                     'children': []  # Initialize as an empty list
                 }
                 items.append(item_dict)
-            print(f"Fetched directory {path}: {items}")
         except Exception as e:
             print(f"Error fetching directory {path}: {e}")
         return items

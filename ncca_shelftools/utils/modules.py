@@ -15,15 +15,14 @@ def is_package_installed(package_name):
 
 def install(packages):
     installed_packages = []
+    dialog = QtWidgets.QDialog()
+    dialog.setWindowTitle('NCCA Installer')
+    layout = QtWidgets.QVBoxLayout(dialog)
+    label = QtWidgets.QLabel(f'Installing {packages}...')
+    layout.addWidget(label)
+    dialog.show()
     for i, package in enumerate(packages):
         if not is_package_installed(package):
-            dialog = QtWidgets.QDialog()
-            dialog.setWindowTitle('NCCA Installer')
-            layout = QtWidgets.QVBoxLayout(dialog)
-            label = QtWidgets.QLabel(f'Installing {package}...')
-            layout.addWidget(label)
-            dialog.show()
-
             try:
                 python_exe = sys.executable
 
@@ -40,4 +39,4 @@ def install(packages):
             except subprocess.CalledProcessError as e:
                 QtWidgets.QMessageBox.warning(dialog, 'Error', f'Failed to install {package}: {str(e)}')
 
-            dialog.accept()
+    dialog.accept()
