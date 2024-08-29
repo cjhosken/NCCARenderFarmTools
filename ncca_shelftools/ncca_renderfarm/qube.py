@@ -16,7 +16,10 @@ def main():
     qube_exe_path = QUBE_EXE_PATH.get(OPERATING_SYSTEM)
     if os.path.exists(qube_exe_path):
         # Run Qube in a subprocess. We can't check for errors as that would freeze up the main application.
-        subprocess.call(f"unset PYTHONHOME; {qube_exe_path} &",shell=True)
+        if (OPERATING_SYSTEM == "windows"):
+            subprocess.Popen(QUBE_EXE_PATH.get(OPERATING_SYSTEM), shell=True)
+        else:
+            subprocess.call(f"unset PYTHONHOME; {qube_exe_path} &",shell=True)
     else:
         # Display a warning message box if the executable path does not exist
         QtWidgets.QMessageBox.warning(None, QUBE_EXE_ERROR.get("title"), QUBE_EXE_ERROR.get("message"))

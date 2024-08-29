@@ -1,4 +1,4 @@
-from PySide2.QtCore import QAbstractItemModel, QModelIndex, Qt
+from PySide2.QtCore import QAbstractItemModel, QModelIndex, Qt, QTimer
 import stat
 import os
 
