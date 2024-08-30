@@ -1,6 +1,6 @@
 from .modules import *
 from .exr import *
-from .sftp import *
+from .sftp_utils import *
 
 from PySide2 import QtWidgets, QtCore
 from shiboken2 import wrapInstance 
