@@ -40,6 +40,15 @@ def install(packages):
                 result = subprocess.run([python_exe, "-m", "pip", "install", package])
                 if result.returncode == 0:
                     installed_packages.append(package)
+
+                    try:
+                        if package in sys.modules:
+                            del sys.modules[package]
+                        importlib.invalidate_caches()
+                        importlib.import_module(package)
+                    except ImportError as e:
+                        QtWidgets.QMessageBox.warning(dialog, 'Error', f'Failed to import {package} after installation: {str(e)}. Try re-running the application.')
+
             except subprocess.CalledProcessError as e:
                 QtWidgets.QMessageBox.warning(dialog, 'Error', f'Failed to install {package}: {str(e)}')
 
