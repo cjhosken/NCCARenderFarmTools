@@ -206,18 +206,18 @@ class NCCA_RenderFarmViewer(QMainWindow):
         expanded_paths = []
 
         def traverse(item):
-            if item is None:
+            if item is None or "path" not in item:
                 return
 
             index = self.file_system_model.findIndex(item["path"])
             if index.isValid() and self.tree_view.isExpanded(index):
                 expanded_paths.append(item["path"])
 
-            if item['children'] is None:
-                return
+                if item['children'] is None:
+                    return
 
-            for child in item["children"]:
-                traverse(child)
+                for child in item["children"]:
+                    traverse(child)
     
         root_item = self.root_index.internalPointer()
         traverse(root_item)
