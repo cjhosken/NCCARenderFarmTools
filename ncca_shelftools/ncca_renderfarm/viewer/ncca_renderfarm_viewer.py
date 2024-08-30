@@ -202,66 +202,39 @@ class NCCA_RenderFarmViewer(QMainWindow):
                 sftp_delete(self.sftp, file_path)  # Delete file using SFTP
                 self.refresh()
 
-    def get_expanded(self):
-        expanded_paths = set()
-        def traverse(node_index):
-            if self.tree_view.isExpanded(node_index):
-                path = self.file_system_model.filePath(node_index)  # Implement this method
-                expanded_paths.add(path)
-            for row in range(self.file_system_model.rowCount(node_index)):
-                child_index = self.file_system_model.index(row, 0, node_index)
-                traverse(child_index)
-        traverse(self.root_index)
+    def get_expanded_paths(self):
+        expanded_paths = []
+
+        def traverse(item):
+            if item is None:
+                return
+
+            index = self.file_system_model.findIndex(item["path"])
+            if index.isValid() and self.tree_view.isExpanded(index):
+                expanded_paths.append(item["path"])
+
+            if item['children'] is None:
+                return
+
+            for child in item["children"]:
+                traverse(child)
+    
+        root_item = self.root_index.internalPointer()
+        traverse(root_item)
+
         return expanded_paths
-
-    def find_index(self, path):
-        """
-        Find and return the QModelIndex corresponding to the given path.
-        
-        Args:
-            path (str): The path of the item to find.
-
-        Returns:
-            QModelIndex: The index of the item if found, otherwise an invalid QModelIndex.
-        """
-        stack = [self.root_index]
-        
-        while stack:
-            index = stack.pop()
-            
-            # Check if the current index matches the target path
-            if self.file_system_model.filePath(index) == path:
-                return index
-            
-            # Add all children of the current index to the stack
-            for row in range(self.file_system_model.rowCount(index)):
-                child_index = self.file_system_model.index(row, 0, index)
-                stack.append(child_index)
-        
-        print("INVALIDDD")
-        # Return an invalid index if not found
-        return QModelIndex()
 
     def restore_expanded(self, expanded_paths):
         for path in expanded_paths:
-            index = self.find_index(path)
+            index = self.file_system_model.findIndex(path)
             if index.isValid():
-                print(f"EXPANDED {expanded_paths}" )
                 self.tree_view.expand(index)
 
     def refresh(self):
-        expanded_paths = self.get_expanded()
-        print(expanded_paths)
-
-        sorted_expanded_paths = sorted(
-            expanded_paths,
-            key=lambda p: (p.count("/"))
-        )
+        expanded_paths = self.get_expanded_paths()
 
         self.file_system_model.beginResetModel()
-        self.file_system_model.parent_root_item["children"] = self.file_system_model.fetch_directory(self.file_system_model.parent_root_path)
+        self.file_system_model.rootItem["children"] = None
         self.file_system_model.endResetModel()
 
-        self.file_system_model.fetched_directories = set()
-
-        self.restore_expanded(sorted_expanded_paths)
+        self.restore_expanded(expanded_paths)

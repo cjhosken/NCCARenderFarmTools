@@ -1,6 +1,7 @@
 from PySide2.QtCore import QAbstractItemModel, QModelIndex, Qt, QTimer
 import stat
 import os
+from utils import *
 
 class QFarmSystemModel(QAbstractItemModel):
     """
@@ -12,66 +13,58 @@ class QFarmSystemModel(QAbstractItemModel):
 
         self.sftp = sftp
         self.username = username
-        self.parent_root_path = os.path.dirname(root_path)
-        self.root_path = root_path
-        self.parent_root_item = {
-            'name': '',
-            'path': self.parent_root_path,
-            'is_dir': True,
-            'children': self.fetch_directory(self.parent_root_path)  # Initialize with actual directory contents
-        }
-        self.fetched_directories = set()  # To track fetched directories
+        self.home_path=root_path
+        self.rootItem = self.create_item(os.path.dirname(self.home_path), None)
 
-    def fetch_directory(self, path):
-        """Fetch and return directory contents along with one level of grandchildren."""
-        items = []
-        try:
-            for item in self.sftp.listdir_attr(path):
-                item_path = os.path.join(path, item.filename).replace("\\", "/")
-                if item_path.startswith(self.root_path):
-                    item_dict = {
-                        'name': item.filename,
-                        'path': item_path,
-                        'is_dir': stat.S_ISDIR(item.st_mode),
-                        'size': item.st_size,
-                        'mtime': item.st_mtime,
-                        'parent': path,
-                        'children': []  # Initialize as an empty list
-                    }
-                    
-                    # If the item is a directory, fetch its children (grandchildren of the current directory)
-                    if item_dict['is_dir']:
-                        try:
-                            grandchildren = self.sftp.listdir_attr(item_path)
-                            item_dict['children'] = [
-                                {
-                                    'name': grandchild.filename,
-                                    'path': os.path.join(item_path, grandchild.filename).replace("\\", "/"),
-                                    'is_dir': stat.S_ISDIR(grandchild.st_mode),
-                                    'size': grandchild.st_size,
-                                    'mtime': grandchild.st_mtime,
-                                    'parent': item_path,
-                                    'children': []  # Grandchildren are not fetched, maintaining semi-lazy loading
-                                }
-                                for grandchild in grandchildren
-                            ]
-                        except Exception as e:
-                            print(f"Error fetching grandchildren for {item_path}: {e}")
+    def populateChildren(self, parent_item):
+        """Recursively populate children for a given parent item."""
+        parent_path = parent_item['path']
+        
+        # Only load children if the parent item does not have placeholder children
+        if parent_item['children'] is None or parent_item['children'] == [None]:
+            parent_item['children'] = [None]  # Placeholder item indicating the directory is not loaded yet
+        else:
+            return  # Children are already loaded, no need to populate again
+        
+        # If the parent item represents a directory, populate its children
+        if sftp_isdir(self.sftp, parent_path):
+            children = sftp_listdir(self.sftp, parent_path)
+            parent_item['children'] = [self.create_item(os.path.join(parent_path, child).replace("\\", "/"), parent_item) for child in children]
+            self.sort_children(parent_item['children'], Qt.DescendingOrder)
 
-                items.append(item_dict)
-            items.sort(key=lambda x: x['name'].lower())
-        except Exception as e:
-            print(f"Error fetching directory {path}: {e}")
-        return items
+    def create_item(self, path, parent):
+        """Creates a custom item to be shown in the file browser"""
+        return {'path': path, 'parent': parent, 'children': None}
 
 
     def rowCount(self, parent=QModelIndex()):
-        """Return the number of rows under the given parent."""
+        """
+        Returns the number of rows under the given parent. When the parent is valid, 
+        it means returning the number of children of the parent.
+        """
         if not parent.isValid():
-            return len(self.parent_root_item['children'])
+            parent_item = self.rootItem
+            # If it's the root item, include it in the count
         else:
-            item = parent.internalPointer()
-            return len(item['children'])
+            parent_item = parent.internalPointer()
+
+        if not parent_item['children']:
+            parent_path = parent_item['path']
+
+            # Check if parent_path is a directory
+            try:
+                if sftp_isdir(self.sftp, parent_path):
+                    children = sftp_listdir(self.sftp, parent_path)
+                    parent_item['children'] = [self.create_item(os.path.join(parent_path, child).replace("\\", "/"), parent_item) for child in children]
+                    self.sort_children(parent_item['children'], Qt.AscendingOrder)
+                else:
+                    # If it's not a directory, return 0 as it has no children
+                    return 0
+            except FileNotFoundError:
+                # Handle cases where the parent_path does not exist
+                return 0
+
+        return len(parent_item['children'])
 
     def columnCount(self, parent=QModelIndex()):
         """Return the number of columns (fixed to 1)."""
@@ -85,78 +78,72 @@ class QFarmSystemModel(QAbstractItemModel):
         item = index.internalPointer()
 
         if role == Qt.DisplayRole:
-
-            name = item["name"]
-
-            if item["path"] == self.root_path:
-                name = self.username
-            return name
+            if item["path"] == self.home_path:
+                return self.username
+            return os.path.basename(item["path"])
 
         return None
 
     def index(self, row, column, parent=QModelIndex()):
-        """Return the index of the item in the model specified by the given row, column, and parent index."""
+        """
+        Returns the index of the item in the model specified by the given row, column, and parent index.
+        This method ensures that data fits nicely within the file browser.
+        """
+
+        # Check if the item has a parent. If not, that means the item is /home/username, therefore its parent in /home/ 
+        # /home/ is the rootItem
         if not parent.isValid():
-            # Top-level items
-            child_item = self.parent_root_item['children'][row]
+            parent_item = self.rootItem
         else:
             parent_item = parent.internalPointer()
-            if row < 0 or row >= len(parent_item['children']):
-                return QModelIndex()
+
+        # Add all the children to the item
+        if not parent_item['children']:
+            parent_path = parent_item['path']
+
+            children = sftp_listdir(self.sftp, parent_path)
+            parent_item['children'] = [self.create_item(os.path.join(parent_path, child).replace("\\", "/"), parent_item) for child in children]
+            self.sort_children(parent_item['children'], Qt.AscendingOrder)
+
+        # Check if the row is within the bounds of the parent's children
+        if row < len(parent_item['children']):
             child_item = parent_item['children'][row]
+            if child_item is None:
+                return QModelIndex()
 
-        return self.createIndex(row, column, child_item)
-
-
-    def parent(self, index):
-        """Return the parent of the model item with the given index."""
-        if not index.isValid():
-            return QModelIndex()
-
-        child_item = index.internalPointer()
-        parent_path = os.path.dirname(child_item['path'])
-
-        if parent_path == self.parent_root_path:
-            return QModelIndex()
-
-        parent_item = self._find_parent_item(self.parent_root_item, parent_path)
-
-        if parent_item:
-            grandparent_path = os.path.dirname(parent_item['path'])
-            grandparent_item = self._find_parent_item(self.parent_root_item, grandparent_path)
-            if grandparent_item:
-                row = grandparent_item['children'].index(parent_item)
-                return self.createIndex(row, 0, parent_item)
+            # Only show files that exist within /home/username/farm
+            if child_item['path'].startswith(self.home_path):
+                return self.createIndex(row, column, child_item)
 
         return QModelIndex()
 
-    def _find_parent_item(self, current_item, search_path):
+
+    def parent(self, index):
         """
-        Recursively find the parent item of the given path.
-
-        Args:
-            current_item (dict): The current item to search.
-            search_path (str): The path of the parent item to find.
-
-        Returns:
-            dict: The parent item dictionary if found, otherwise None.
+        Returns the parent of the model item with the given index.
         """
-        if current_item['path'] == search_path:
-            return current_item
+        if not index.isValid():
+            return QModelIndex()
 
-        for child in current_item['children']:
-            if child['is_dir']:
-                found = self._find_parent_item(child, search_path)
-                if found:
-                    return found
+        item = index.internalPointer()
+        if 'parent' not in item:
+            return QModelIndex()
 
-        return None
+        parent_item = item['parent']
 
-    def hasChildren(self, parent=QModelIndex()):
-        """Return whether the item has children (is a directory)."""
-        if not parent.isValid():
-            return True
-        return parent.internalPointer()['is_dir'] and len(parent.internalPointer()["children"]) > 0
+        if parent_item is None:
+            return QModelIndex()
+
+        grandparent_item = parent_item['parent']
+        
+        if grandparent_item is None:
+            return QModelIndex()
+
+        # Check if children list exists before accessing its attributes
+        if 'children' in grandparent_item and parent_item in grandparent_item['children']:
+            parent_index = self.createIndex(grandparent_item['children'].index(parent_item), 0, parent_item)
+            return parent_index
+        return QModelIndex()
 
     def filePath(self, index):
         """
@@ -168,38 +155,57 @@ class QFarmSystemModel(QAbstractItemModel):
         Returns:
             str: The file path of the item.
         """
-        if not index.isValid():
-            return ""
-
         item = index.internalPointer()
-        return item.get('path', "")
+        if item:
+            return item.get('path', '')
+        return ''
 
-    def fetchMore(self, index):
-        """Fetch more data for the given index."""
-        if not index.isValid():
+    def findIndex(self, path, parent=QModelIndex()):
+        """
+        Finds the QModelIndex corresponding to the given path.
+        """
+        if not path:
+            return QModelIndex()
+
+        # Start from the root item if no parent is specified
+        if not parent.isValid():
+            parent_item = self.rootItem
+        else:
+            parent_item = parent.internalPointer()
+
+        # Traverse the model to find the index corresponding to the path
+        for row in range(self.rowCount(parent)):
+            child_index = self.index(row, 0, parent)
+            if child_index.isValid():
+                child_item = child_index.internalPointer()
+                if child_item['path'] == path:
+                    return child_index
+                elif sftp_isdir(self.sftp, child_item['path']) and path.startswith(child_item['path']):
+                    # Recursively search for the index in child items
+                    return self.findIndex(path, child_index)
+
+        return QModelIndex()
+
+    def sort(self, column, order=Qt.SortOrder.AscendingOrder):
+        """
+        Sort the model data.
+        """
+        if column != 0:
             return
 
-        item = index.internalPointer()
-        if item['path'] in self.fetched_directories:
-            return  # Already fetched
+        # Recursively sort all children of the root item
+        def recursive_sort(item):
+            if item['children']:
+                item['children'].sort(key=lambda x: os.path.basename(x['path']).lower(), reverse=(order == Qt.SortOrder.DescendingOrder))
+                for child in item['children']:
+                    recursive_sort(child)
 
-        # Mark this directory as fetched
-        self.fetched_directories.add(item['path'])
-        
-        path = item['path']
-        # Fetch children and their children (grandchildren)
-        item['children'] = self.fetch_directory(path)
+        self.layoutAboutToBeChanged.emit()
+        recursive_sort(self.rootItem)
+        self.layoutChanged.emit()
 
-        item['children'].sort(key=lambda x: x['name'].lower())
-
-        # Notify the view that new rows have been inserted
-        self.beginInsertRows(index, 0, len(item['children']) - 1)
-        self.endInsertRows()
-
-    def canFetchMore(self, index):
-        """Return whether more data can be fetched."""
-        if not index.isValid():
-            return False
-
-        item = index.internalPointer()
-        return item['is_dir'] and item['path'] not in self.fetched_directories  # Fetch if not already fetched
+    def sort_children(self, children, order):
+        """
+        Sorts the children list alphabetically.
+        """
+        children.sort(key=lambda x: os.path.basename(x['path']).lower(), reverse=(order == Qt.SortOrder.DescendingOrder))

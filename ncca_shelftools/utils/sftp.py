@@ -184,3 +184,16 @@ def sftp_setup(sftp=None, username=""):
     # Check if the output directory exists, and create it if it does not
     if not sftp_exists(OUTPUT_DIR):
         sftp.mkdir(OUTPUT_DIR)
+
+
+def sftp_listdir(sftp=None, path=""):
+    if sftp is None or path == "":
+        raise ValueError("sftp client and path must be provided")
+    
+    try:
+        # List the contents of the directory
+        directory_contents = sftp.listdir(path)
+        return directory_contents
+    except IOError as e:
+        print(f"An error occurred: {e}")
+        return []
