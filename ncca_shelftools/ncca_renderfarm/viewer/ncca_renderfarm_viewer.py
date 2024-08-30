@@ -84,7 +84,6 @@ class NCCA_RenderFarmViewer(QMainWindow):
         self.expanded_paths = set()
 
         self.root_index = self.file_system_model.index(0, 0, QModelIndex())
-        print(self.root_index.internalPointer())
 
         self.tree_view.expand(self.file_system_model.index(0, 0, QModelIndex()))
 

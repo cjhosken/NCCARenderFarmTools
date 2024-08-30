@@ -1,4 +1,5 @@
 from PySide2.QtCore import QAbstractItemModel, QModelIndex, Qt, QTimer
+from PySide2.QtGui import QIcon
 import stat
 import os
 from utils import *
@@ -34,7 +35,26 @@ class QFarmSystemModel(QAbstractItemModel):
 
     def create_item(self, path, parent):
         """Creates a custom item to be shown in the file browser"""
-        return {'path': path, 'parent': parent, 'children': None}
+
+        icon_path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "icons")
+
+        # Sets folder icons
+        if sftp_isdir(self.sftp, path):
+            if path == self.home_path:
+                icon_path = os.path.join(icon_path, "farm.png") # Custom icon for the home folder
+            else:
+                icon_path = os.path.join(icon_path, "folder.png")
+                
+        # Set custom file icons
+        else:
+            _, file_ext = os.path.splitext(path)
+
+            if file_ext.lower() in SUPPORTED_IMAGE_FORMATS:
+                icon_path = os.path.join(icon_path, "image.png")
+            else:
+                icon_path = os.path.join(icon_path, "file.png")
+
+        return {'path': path, 'parent': parent, 'children': None, 'icon': icon_path}
 
 
     def rowCount(self, parent=QModelIndex()):
@@ -77,10 +97,17 @@ class QFarmSystemModel(QAbstractItemModel):
 
         item = index.internalPointer()
 
+
+        icon_path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "icons")
+
         if role == Qt.DisplayRole:
             if item["path"] == self.home_path:
                 return self.username
             return os.path.basename(item["path"])
+
+
+        elif role == Qt.DecorationRole:
+            return QIcon(item["icon"])
 
         return None
 
