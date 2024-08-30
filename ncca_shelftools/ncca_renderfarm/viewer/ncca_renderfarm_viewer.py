@@ -26,9 +26,9 @@ class NCCA_RenderFarmViewer(QMainWindow):
         self.resize(300, 600)  # Set initial window size
         
         self.sftp = info["sftp"]  # Initialize SFTP connection from info dictionary
-
         self.username = info["username"]  # Initialize username from info dictionary
-
+        sftp_setup(self.sftp, self.username)
+        
         # Central widget for main layout
         central_widget = QtWidgets.QWidget()
         self.setCentralWidget(central_widget)  # Set central widget
@@ -38,12 +38,7 @@ class NCCA_RenderFarmViewer(QMainWindow):
         self.root_path = os.path.join("/home", self.username, "farm").replace("\\", "/")
 
         # Initialize custom file system model
-        self.file_system_model = QFarmSystemModel(info["sftp"], self.username, self.root_path, None)  # Create an instance of QFarmSystemModel
-        #self.file_system_model.setFilter(QDir.AllDirs | QDir.NoDotAndDotDot | QDir.Files)  # Set filters for the model
-
-        # Configure the file system model to display only certain columns
-        #self.file_system_model.setNameFilters(["*"])
-        #self.file_system_model.setNameFilterDisables(False)
+        self.file_system_model = QFarmSystemModel(self.sftp, self.username, self.root_path, None)  # Create an instance of QFarmSystemModel
 
         # Initialize tree view
         self.tree_view = QTreeView()  # Create a QTreeView widget
@@ -56,11 +51,6 @@ class NCCA_RenderFarmViewer(QMainWindow):
         self.tree_view.setColumnHidden(1, True)  # Hide size column
         self.tree_view.setColumnHidden(2, True)  # Hide file type column
         self.tree_view.setColumnHidden(3, True)  # Show last modified date column
-
-        # Resize columns to fit content
-        #self.tree_view.header().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)
-        #self.tree_view.header().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeToContents)
-        #self.tree_view.header().setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeToContents)
 
         h_layout = QHBoxLayout()
 
@@ -141,7 +131,7 @@ class NCCA_RenderFarmViewer(QMainWindow):
         download_action.triggered.connect(lambda: self.download_item(file_path))  # Connect action to download_item method
         context_menu.addAction(download_action)  # Add action to context menu
 
-        if (file_path != self.root_path):
+        if (file_path != self.root_path and file_path != os.path.join(self.root_path, "projects").replace("\\", "/")):
             delete_action = QAction(NCCA_VIEWER_ACTION_DELETE_LABEL, self)  # Create action to delete the file
             delete_action.triggered.connect(lambda: self.delete_item(file_path))  # Connect action to delete_item method
             context_menu.addAction(delete_action)  # Add action to context menu
@@ -192,7 +182,7 @@ class NCCA_RenderFarmViewer(QMainWindow):
         Args:
         - file_path (str): Path of the file to delete.
         """
-        if (file_path != self.root_path):
+        if (file_path != self.root_path and file_path != os.path.join(self.root_path, "projects").replace("\\", "/")):
             reply = QMessageBox.question(self, DELETE_DIALOG.get("title"), 
                                         DELETE_DIALOG.get("message").format(file_path), 
                                         QMessageBox.Yes | QMessageBox.No, QMessageBox.No)  # Confirmation dialog

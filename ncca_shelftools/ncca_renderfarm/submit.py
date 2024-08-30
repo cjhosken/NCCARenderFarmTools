@@ -16,8 +16,9 @@ class RenderFarmSubmitDialog(QMainWindow):
         self.finish_ui()
 
         self.sftp = info["sftp"]
-        print(self.sftp)
         self.username = info["username"]
+
+        sftp_setup(self.sftp, self.username)
 
     def init_ui(self):
         self.central_widget = QWidget(self)
@@ -103,7 +104,7 @@ class RenderFarmSubmitDialog(QMainWindow):
         print(remote_project_dir)
 
         if (sftp_exists(self.sftp, remote_project_dir)):
-            if self.confirm_override(remote_project_dir):
+            if self.confirm_override(self.project_name.text()):
                 sftp_delete(self.sftp, remote_project_dir)
             else:
                 return
@@ -153,9 +154,9 @@ class RenderFarmSubmitDialog(QMainWindow):
         
         self.close()
 
-    def confirm_override(self, file_path):
+    def confirm_override(self, project_name):
         reply = QMessageBox.question(None, OVERRIDE_DIALOG.get("title"), 
-            OVERRIDE_DIALOG.get("message").format(file_path), 
+            OVERRIDE_DIALOG.get("message").format(project_name), 
             QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         return reply == QMessageBox.Yes
 

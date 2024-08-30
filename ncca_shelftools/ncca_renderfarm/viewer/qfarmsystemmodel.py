@@ -42,6 +42,8 @@ class QFarmSystemModel(QAbstractItemModel):
         if sftp_isdir(self.sftp, path):
             if path == self.home_path:
                 icon_path = os.path.join(icon_path, "farm.png") # Custom icon for the home folder
+            elif path == os.path.join(self.home_path, "projects").replace("\\", "/"):
+                icon_path = os.path.join(icon_path, "project.png")
             else:
                 icon_path = os.path.join(icon_path, "folder.png")
                 
