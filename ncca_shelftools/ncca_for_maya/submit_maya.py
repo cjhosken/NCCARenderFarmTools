@@ -124,8 +124,18 @@ class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         if (used_renderer == "vray"):
             use_gpu = cmds.getAttr("vraySettings.productionEngine") > 0
             render_options += f" -pad {frame_padding}" if frame_padding else ""
-        elif (used_renderer == "arnold"):
-            use_gpu = cmds.getAttr("defaultArnoldRenderOptions.renderDevice") == 1
+        elif used_renderer == "arnold":
+            # Check if the defaultArnoldRenderOptions node exists
+            if not cmds.objExists("defaultArnoldRenderOptions"):
+                cmds.createNode("aiOptions", name="defaultArnoldRenderOptions")
+            
+            # Check if the renderDevice attribute exists and set it to 1 if it doesn't exist
+            if not cmds.attributeQuery("renderDevice", node="defaultArnoldRenderOptions", exists=True):
+                cmds.addAttr("defaultArnoldRenderOptions", longName="renderDevice", attributeType="short")
+                cmds.setAttr("defaultArnoldRenderOptions.renderDevice", 0)
+            else:
+                use_gpu = cmds.getAttr("defaultArnoldRenderOptions.renderDevice") == 1
+
             render_options += f" -fnc {frame_number_format}" if frame_number_format else ""
             render_options += f" -pad {frame_padding}" if frame_padding else ""
         else:

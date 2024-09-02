@@ -1,6 +1,6 @@
 from config import * 
-from PySide2.QtWidgets import QMainWindow, QTreeView, QVBoxLayout, QMenu, QAction, QMessageBox, QFileDialog
-from PySide2.QtCore import QDir, Qt
+from PySide2.QtWidgets import QMainWindow, QTreeView, QVBoxLayout, QMenu, QAction, QMessageBox, QFileDialog, QPushButton, QHBoxLayout
+from PySide2.QtCore import QDir, Qt, QModelIndex
 import tempfile, shutil
 
 from .qfarmsystemmodel import QFarmSystemModel 
@@ -26,22 +26,19 @@ class NCCA_RenderFarmViewer(QMainWindow):
         self.resize(300, 600)  # Set initial window size
         
         self.sftp = info["sftp"]  # Initialize SFTP connection from info dictionary
-
         self.username = info["username"]  # Initialize username from info dictionary
-
+        sftp_setup(self.sftp, self.username)
+        
         # Central widget for main layout
         central_widget = QtWidgets.QWidget()
         self.setCentralWidget(central_widget)  # Set central widget
 
         self.layout = QVBoxLayout(central_widget)  # Create a vertical layout for central widget
+        
+        self.root_path = os.path.join("/home", self.username, "farm").replace("\\", "/")
 
         # Initialize custom file system model
-        self.file_system_model = QFarmSystemModel(info["sftp"], os.path.join("/home", self.username, "farm").replace("\\", "/"), None)  # Create an instance of QFarmSystemModel
-        #self.file_system_model.setFilter(QDir.AllDirs | QDir.NoDotAndDotDot | QDir.Files)  # Set filters for the model
-
-        # Configure the file system model to display only certain columns
-        #self.file_system_model.setNameFilters(["*"])
-        #self.file_system_model.setNameFilterDisables(False)
+        self.file_system_model = QFarmSystemModel(self.sftp, self.username, self.root_path, None)  # Create an instance of QFarmSystemModel
 
         # Initialize tree view
         self.tree_view = QTreeView()  # Create a QTreeView widget
@@ -55,11 +52,16 @@ class NCCA_RenderFarmViewer(QMainWindow):
         self.tree_view.setColumnHidden(2, True)  # Hide file type column
         self.tree_view.setColumnHidden(3, True)  # Show last modified date column
 
-        # Resize columns to fit content
-        #self.tree_view.header().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)
-        #self.tree_view.header().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeToContents)
-        #self.tree_view.header().setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeToContents)
+        h_layout = QHBoxLayout()
 
+        self.refresh_button = QPushButton("↻")
+        self.refresh_button.clicked.connect(self.refresh)
+        self.refresh_button.setFixedSize(25, 25)
+
+        h_layout.addStretch()
+        h_layout.addWidget(self.refresh_button)
+
+        self.layout.addLayout(h_layout)
         self.layout.addWidget(self.tree_view)  # Add tree view to layout
 
         # Connect double-click event to handle file selection
@@ -68,6 +70,12 @@ class NCCA_RenderFarmViewer(QMainWindow):
         # Connect custom context menu
         self.tree_view.setContextMenuPolicy(Qt.CustomContextMenu)
         self.tree_view.customContextMenuRequested.connect(self.on_custom_context_menu)
+
+        self.expanded_paths = set()
+
+        self.root_index = self.file_system_model.index(0, 0, QModelIndex())
+
+        self.tree_view.expand(self.file_system_model.index(0, 0, QModelIndex()))
 
     def on_double_click(self, index):
         """
@@ -123,9 +131,10 @@ class NCCA_RenderFarmViewer(QMainWindow):
         download_action.triggered.connect(lambda: self.download_item(file_path))  # Connect action to download_item method
         context_menu.addAction(download_action)  # Add action to context menu
 
-        delete_action = QAction(NCCA_VIEWER_ACTION_DELETE_LABEL, self)  # Create action to delete the file
-        delete_action.triggered.connect(lambda: self.delete_item(file_path))  # Connect action to delete_item method
-        context_menu.addAction(delete_action)  # Add action to context menu
+        if (file_path != self.root_path and file_path != os.path.join(self.root_path, "projects").replace("\\", "/")):
+            delete_action = QAction(NCCA_VIEWER_ACTION_DELETE_LABEL, self)  # Create action to delete the file
+            delete_action.triggered.connect(lambda: self.delete_item(file_path))  # Connect action to delete_item method
+            context_menu.addAction(delete_action)  # Add action to context menu
 
         context_menu.exec_(self.tree_view.viewport().mapToGlobal(point))  # Execute context menu at global point
 
@@ -142,8 +151,11 @@ class NCCA_RenderFarmViewer(QMainWindow):
             temp_file_path = os.path.join(temp_dir, file_name)  # Create temporary file path
             sftp_download(self.sftp, file_path, temp_file_path)
 
-            dialog = QImageDialog(temp_file_path)  # Create QImageDialog instance
-            dialog.exec_()  # Execute the image dialog
+            if os.path.exists(temp_file_path):
+                dialog = QImageDialog(temp_file_path)  # Create QImageDialog instance
+                dialog.exec_()  # Execute the image dialog
+            else:
+                print(f"{temp_file_path} Does not exist: ")
 
     def download_item(self, file_path):
         """
@@ -170,9 +182,48 @@ class NCCA_RenderFarmViewer(QMainWindow):
         Args:
         - file_path (str): Path of the file to delete.
         """
-        reply = QMessageBox.question(self, DELETE_DIALOG.get("title"), 
-                                    DELETE_DIALOG.get("message").format(file_path), 
-                                    QMessageBox.Yes | QMessageBox.No, QMessageBox.No)  # Confirmation dialog
+        if (file_path != self.root_path and file_path != os.path.join(self.root_path, "projects").replace("\\", "/")):
+            reply = QMessageBox.question(self, DELETE_DIALOG.get("title"), 
+                                        DELETE_DIALOG.get("message").format(file_path), 
+                                        QMessageBox.Yes | QMessageBox.No, QMessageBox.No)  # Confirmation dialog
 
-        if reply == QMessageBox.Yes:
-            sftp_delete(self.sftp, file_path)  # Delete file using SFTP
+            if reply == QMessageBox.Yes:
+                sftp_delete(self.sftp, file_path)  # Delete file using SFTP
+                self.refresh()
+
+    def get_expanded_paths(self):
+        expanded_paths = []
+
+        def traverse(item):
+            if item is None or "path" not in item:
+                return
+
+            index = self.file_system_model.findIndex(item["path"])
+            if index.isValid() and self.tree_view.isExpanded(index):
+                expanded_paths.append(item["path"])
+
+                if item['children'] is None:
+                    return
+
+                for child in item["children"]:
+                    traverse(child)
+    
+        root_item = self.root_index.internalPointer()
+        traverse(root_item)
+
+        return expanded_paths
+
+    def restore_expanded(self, expanded_paths):
+        for path in expanded_paths:
+            index = self.file_system_model.findIndex(path)
+            if index.isValid():
+                self.tree_view.expand(index)
+
+    def refresh(self):
+        expanded_paths = self.get_expanded_paths()
+
+        self.file_system_model.beginResetModel()
+        self.file_system_model.rootItem["children"] = None
+        self.file_system_model.endResetModel()
+
+        self.restore_expanded(expanded_paths)

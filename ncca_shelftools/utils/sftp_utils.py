@@ -159,14 +159,6 @@ def sftp_setup(sftp=None, username=""):
     
     # Define the home directory and NCCA script path for the given username
     FARM_HOME = f"/home/{username}"
-    NCCA_SCRIPT_PATH = FARM_HOME + "/.ncca"
-
-    # Check if the NCCA script path exists, and delete it if it does
-    if sftp_exists(sftp, NCCA_SCRIPT_PATH):
-        sftp_delete(sftp, NCCA_SCRIPT_PATH)
-
-    # Upload the payload script to the NCCA script path
-    sftp_upload(sftp, "../payload", NCCA_SCRIPT_PATH)
 
     # Define the farm directory and its subdirectories
     FARM_DIR = FARM_HOME + "/farm"
@@ -174,13 +166,26 @@ def sftp_setup(sftp=None, username=""):
     OUTPUT_DIR = FARM_DIR + "/output"
 
     # Check if the farm directory exists, and create it if it does not
-    if not sftp_exists(FARM_DIR):
+    if not sftp_exists(sftp, FARM_DIR):
         sftp.mkdir(FARM_DIR)
 
     # Check if the project directory exists, and create it if it does not
-    if not sftp_exists(PROJECT_DIR):
+    if not sftp_exists(sftp, PROJECT_DIR):
         sftp.mkdir(PROJECT_DIR)
     
     # Check if the output directory exists, and create it if it does not
-    if not sftp_exists(OUTPUT_DIR):
+    if not sftp_exists(sftp, OUTPUT_DIR):
         sftp.mkdir(OUTPUT_DIR)
+
+
+def sftp_listdir(sftp=None, path=""):
+    if sftp is None or path == "":
+        raise ValueError("sftp client and path must be provided")
+    
+    try:
+        # List the contents of the directory
+        directory_contents = sftp.listdir(path)
+        return directory_contents
+    except IOError as e:
+        print(f"An error occurred: {e}")
+        return []

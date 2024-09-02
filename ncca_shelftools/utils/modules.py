@@ -20,9 +20,12 @@ def install(packages):
             dialog = QtWidgets.QDialog()
             dialog.setWindowTitle('NCCA Installer')
             layout = QtWidgets.QVBoxLayout(dialog)
-            label = QtWidgets.QLabel(f'Installing {package}...')
+            label = QtWidgets.QLabel(f'{package} is required! \n You may need to relaunch your application for the tool to work correctly.')
+            ok_button = QtWidgets.QPushButton(f'Install {package}')
+            ok_button.clicked.connect(dialog.accept)
             layout.addWidget(label)
-            dialog.show()
+            layout.addWidget(ok_button)
+            dialog.exec_()
 
             try:
                 python_exe = sys.executable
@@ -37,6 +40,15 @@ def install(packages):
                 result = subprocess.run([python_exe, "-m", "pip", "install", package])
                 if result.returncode == 0:
                     installed_packages.append(package)
+
+                    try:
+                        if package in sys.modules:
+                            del sys.modules[package]
+                        importlib.invalidate_caches()
+                        importlib.import_module(package)
+                    except ImportError as e:
+                        QtWidgets.QMessageBox.warning(dialog, 'Error', f'Failed to import {package} after installation: {str(e)}. Try re-running the application.')
+
             except subprocess.CalledProcessError as e:
                 QtWidgets.QMessageBox.warning(dialog, 'Error', f'Failed to install {package}: {str(e)}')
 

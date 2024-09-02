@@ -30,7 +30,7 @@ QUBE_PY_ERROR = {
 
 IMAGE_ERROR = {
     "title" : "Image Error",
-    "message" : "Error converting {} to .png: {}"
+    "message" : "Error converting {} to .png"
 }
 
 
@@ -43,7 +43,7 @@ NCCA_SUBMIT_MESSAGE = {
 
 OVERRIDE_DIALOG = {
     "title" : "Confirm Override",
-    "message" : "'{}' already exists. Do you wish to override the project?"
+    "message" : "A project with the job name '{}' already exists. Do you wish to override this project?"
 }
 
 DELETE_DIALOG = {
