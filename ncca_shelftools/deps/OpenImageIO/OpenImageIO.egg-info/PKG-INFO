@@ -1,0 +1,11 @@
+Metadata-Version: 2.1
+Name: OpenImageIO
+Version: 2.6.4
+Summary: A Python package for OpenImageIO. Designed by the NCCA Labs at Bournemouth University
+Home-page: https://github.com/AcademySoftwareFoundation/OpenImageIO/tree/master
+Author: Christopher Hosken
+Author-email: hoskenchristopher@gmail.com
+License: UNKNOWN
+Description: Run python3 setup.py bdist_wheel
+Platform: UNKNOWN
+Description-Content-Type: text/markdown

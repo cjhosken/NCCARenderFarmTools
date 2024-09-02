@@ -1,0 +1,8 @@
+README.md
+setup.py
+./OpenImageIO/OpenImageIO.cpython-39-x86_64-linux-gnu.so
+./OpenImageIO/__init__.py
+OpenImageIO.egg-info/PKG-INFO
+OpenImageIO.egg-info/SOURCES.txt
+OpenImageIO.egg-info/dependency_links.txt
+OpenImageIO.egg-info/top_level.txt
