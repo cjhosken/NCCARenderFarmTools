@@ -66,6 +66,8 @@ This tool opens the farm viewer, allowing you to manage your files on the NCCA R
 
 > **Tip:** You can also access your files from Linux. Check out the tutorial videos by Jon Macey for more details.
 
+> **Issue:** If you are rendering in Karma, and your images are not opening correctly, make sure to enable "Legacy EXR" in the karmarendersettings. This is a known issue.
+
 ## Troubleshooting
 
 The tools may occasionally encounter bugs or performance issues. If you experience slowdowns or unexpected behavior:
