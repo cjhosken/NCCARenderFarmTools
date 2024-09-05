@@ -1,0 +1,772 @@
+{'FramesPerSecond': 24.0, 'HostComputer': b'cjhosken_Win - AMD Ryzen 7 5800H with Radeon Graphics', 'Software': b'Karma (xpu) 20.5.278', 'artist': b'', 'capDate': b'2024: 07: 26 21: 47: 48', 'channels': {'A': HALF (1,
+        1), 'B': HALF (1,
+        1), 'G': HALF (1,
+        1), 'R': HALF (1,
+        1)
+    }, 'chunkCount': 720, 'clipFar': 1000000.0, 'clipNear': 1.0, 'comment': b'', 'compression': ZIPS_COMPRESSION, 'dataWindow': (0,
+    0) - (1279,
+    719), 'date': b'', 'displayWindow': (0,
+    0) - (1279,
+    719), 'frame': 1.0, 'hostname': b'', 'husk:command': b'husk -s /Render/rendersettings --make-output-path -f 1 -R BRAY_HdKarmaXPU --purpose geometry,render --complexity veryhigh --snapshot 300 --mplay-session test C:/Users/hoske/AppData/Local/Temp/houdini_temp/usd_renders/usdrender_18172_242_2/__render__.usdnc', 'husk:render_stats': b'{
+        "__delegate": "BRAY_HdKarmaXPU",
+        "active_buckets": null,
+        "aov_buffers": [
+            {
+                "cryptomatte": false,
+                "memory": 22118904,
+                "name": "C",
+                "source": "lpe:C.*[LO]"
+            },
+            {
+                "cryptomatte": false,
+                "memory": 22118904,
+                "name": "C_emission",
+                "source": "lpe:C.*O"
+            },
+            {
+                "cryptomatte": false,
+                "memory": 22118904,
+                "name": "C_test",
+                "source":"lpe:C.*<L.\'test\'>"
+            },
+            {
+                "cryptomatte": false,
+                "memory": 27648504,
+                "name": "combineddiffuseshadow",
+                "source": "lpe:shadow;C<RD>.*L"
+            },
+            {
+                "cryptomatte": false,
+                "memory": 16589304,
+                "name": "combinedglossyreflection",
+                "source": "lpe:C<RG>.*L"
+            },
+            {
+                "cryptomatte": false,
+                "memory": 16589304,
+                "name": "directdiffuse",
+                "source": "lpe:C<RD>L"
+            },
+            {
+                "cryptomatte": false,
+                "memory": 16589304,
+                "name": "glossytransmission",
+                "source": "lpe:C<TG>.*L"
+            },
+            {
+                "cryptomatte": false,
+                "memory": 11059704,
+                "name": "combineddiffuseshadow__occluded",
+                "source": "lpe:C<RD>.*L"
+            }
+        ],
+        "aov_raster_memory": {
+            "current": 176947200,
+            "peak": 176947200
+        },
+        "camera_near_far": [
+            1,
+            1000000
+        ],
+        "cpu_architecture": "AMD64: mmx xmmx sse sse2 cmov fpcmov ht sse3 ssse3 sse4.1 sse4.2 avx avx2",
+        "cpu_brand": "AMD Ryzen 7 5800H with Radeon Graphics",
+        "deep_image_memory": {
+            "current": 0,
+            "peak": 0
+        },
+        "dicing_camera": "/cameras/camera1",
+        "engine": "xpu",
+        "filter_errors": null,
+        "geometry_counts": {
+            "curve": {
+                "total": 0,
+                "unique": 0
+            },
+            "diced_polys": {
+                "total": 0,
+                "unique": 0
+            },
+            "point": {
+                "total": 0,
+                "unique": 0
+            },
+            "polygon": {
+                "total": 12854,
+                "unique": 12854
+            }
+        },
+        "hostname": "cjhosken_Win",
+        "karma_version": "karma 20.5.278",
+        "light_types": {
+            "cylinder": 0,
+            "disk": 0,
+            "distant": 0,
+            "environment": 1,
+            "geometry": 0,
+            "line": 0,
+            "point": 0,
+            "rect": 0,
+            "sphere": 0
+        },
+        "load_memory": 1267277824,
+        "load_time": {
+            "cpu": 0,
+            "sys": 0,
+            "wallclock": 1.08630599999999999
+        },
+        "object_counts": {
+            "camera": {
+                "total": 1,
+                "unique": 1
+            },
+            "curvemesh": {
+                "total": 0,
+                "unique": 0
+            },
+            "light": {
+                "total": 1,
+                "unique": 1
+            },
+            "light_tree": {
+                "total": 0,
+                "unique": 0
+            },
+            "pointmesh": {
+                "total": 0,
+                "unique": 0
+            },
+            "polygonmesh": {
+                "total": 1,
+                "unique": 1
+            },
+            "space": {
+                "total": 0,
+                "unique": 0
+            },
+            "volume": {
+                "total": 0,
+                "unique": 0
+            }
+        },
+        "percent_complete": 100,
+        "primvar_cache": {
+            "cacheHits": 0,
+            "cacheMiss": 5,
+            "cacheSize": 2,
+            "numericCacheSize": 3,
+            "primvars": [
+                {
+                    "memory": 977560,
+                    "name": "Total"
+                },
+                {
+                    "memory": 411416,
+                    "name": "real32[2] st"
+                },
+                {
+                    "memory": 257080,
+                    "name": "int32 <topology>"
+                },
+                {
+                    "memory": 154576,
+                    "name": "real32[3] N"
+                },
+                {
+                    "memory": 154488,
+                    "name": "real32[3] P"
+                }
+            ],
+            "stringCount": 0,
+            "stringMemory": 0
+        },
+        "ptex_stats": {
+            "blockReads": 0,
+            "fileReopens": 0,
+            "filesAccessed": 3,
+            "filesOpen": 0,
+            "memUsed": 1232,
+            "peakFilesOpen": 0,
+            "peakMemUsed": 0
+        },
+        "rat_disk_cache": {
+            "cache_hits": 2,
+            "local_files_created": 0,
+            "temp_files_created": 0
+        },
+        "rat_stats": {
+            "bytes_read": 1027433,
+            "faults": 4,
+            "max_open_files": 384,
+            "open_files": 4,
+            "peak_open_files": 4,
+            "streams_per_file": -1
+        },
+        "ray_batch_efficiency": {},
+        "ray_counts": {
+            "indirect": 5319719,
+            "light_geometry": 0,
+            "occlusion": 59704910,
+            "primary": 33945244,
+            "probe": 276199401,
+            "total": 375169274
+        },
+        "ray_depths": {
+            "camera": [
+                33945244,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "indirect": [
+                5319719,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "light_geometry": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "occlusion": [
+                59704910,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "probe": [
+                276199401,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "total": [
+                375169274,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ]
+        },
+        "ray_depths_percentage": {
+            "camera": [
+                100,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "indirect": [
+                100.000000000000014,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "light_geometry": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "occlusion": [
+                100,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "probe": [
+                100,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "total": [
+                100,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ]
+        },
+        "renderProgressAnnotation": "1280 x 720\\n Optix[idle] EmbreeCPU[idle]",
+        "renderStatsAnnotation": "Karma XPU:\\nTotal Threads: 16\\n\\nDevice 0\\nType              : Optix\\nName              : NVIDIA GeForce RTX 3070 Laptop GPU\\nStatus            : idle\\nHostMemTotal      : 198.65 MB\\nDeviceMemTotal    : 266.11 MB\\n    Geometry      : 2.57 MB\\n    Textures      : 64.00 MB\\n    Volumes       : 0.00 KB\\n    Other         : 199.54 MB\\nPeakHostMemTotal  : 198.65 MB\\nPeakDeviceMemTotal: 267.83 MB\\n    Geometry      : 4.29 MB\\n    Textures      : 64.00 MB\\n    Volumes       : 0.00 KB\\n    Other         : 199.54 MB\\nSamples           : 107\\nContrib           : 83%\\n\\nDevice 1\\nType              : EmbreeCPU\\nName              : Embree CPU device\\nStatus            : idle\\nThreads Used      : 13\\nHostMemTotal      : 201.92 MB\\nPeakHostMemTotal  : 202.91 MB\\nSamples           : 21\\nContrib           : 16%\\n",
+        "render_camera": "/cameras/camera1",
+        "render_settings": {
+            "abortmissingtexture": false,
+            "abortnogpudevice": false,
+            "autoheadlight": false,
+            "autoraybias": true,
+            "background_iprfilter": "",
+            "bucketorder": "Middle",
+            "bucketsize": 32,
+            "cacheratio": 0.25,
+            "cachesize": 1000,
+            "colorlimit": 10,
+            "colorlimitindirect": 10,
+            "colorlimitindlinked": true,
+            "constrainmaxrough": true,
+            "convergence_mode": "Variance",
+            "dicingcamera": "",
+            "dicingqualityscale": 1,
+            "diffusecomponents": [
+                "diffuse"
+            ],
+            "disable_lighting": false,
+            "exportcomponents": [
+                "diffuse",
+                "reflect",
+                "coat",
+                "refract",
+                "volume",
+                "sss"
+            ],
+            "guiding_clearbuffers": false,
+            "guiding_components": [
+                "diffuse",
+                "volume",
+                "sss"
+            ],
+            "guiding_deterministic": false,
+            "guiding_enable": false,
+            "guiding_samples": 0,
+            "head_ao_distance": 1,
+            "head_ao_samples": 1,
+            "head_depthcue_alpha": 1,
+            "head_depthcue_color": [
+                0,
+                0,
+                0
+            ],
+            "head_depthcue_z": [
+                0,
+                0
+            ],
+            "image_blur": true,
+            "imagefilter": "[]",
+            "imagemode": "Progressive",
+            "ipr_continuous_dicing": false,
+            "ipr_inc_random": false,
+            "ipr_proxy_for_imagefilter": 2,
+            "ipr_proxydepth": 0,
+            "ipr_reserve_threads": 0,
+            "light_sampling_mode": "Light Tree",
+            "light_sampling_quality": 1,
+            "name": "karma",
+            "offscreenquality": 0.100000001490116119,
+            "override_lighting": "Off",
+            "overrideobject": "",
+            "pathtracedsamples": 128,
+            "pixelfilter": "gauss",
+            "pixelfiltersize": 2,
+            "pixeloracle": "[\\"variance\\", {\\"variance\\": 0.01, \\"plane\\": \\"C\\", \\"minrays\\": -1, \\"ociomode\\": 0, \\"ociodisplay\\": \\"sRGB - Display\\", \\"ocioview\\": \\"Un-tone-mapped\\", \\"ociocolorspace\\": \\"default\\"}]",
+            "progressivepasses": 0,
+            "randomseed": 628496858,
+            "raybias": 0.00100000004749745131,
+            "refractcomponents": [
+                "refract"
+            ],
+            "rendercamera": "/cameras/camera1",
+            "russianroulette_cutoff": 2,
+            "samplefilter": "",
+            "samplesperpixel": 9,
+            "screendoorlimit": 4,
+            "ssscomponents": [
+                "sss"
+            ],
+            "use_background": "Auto",
+            "usecacheratio": true,
+            "uvunwrap_object_id": -1,
+            "uvunwrap_ptex_max_res": [
+                1280,
+                1280
+            ],
+            "uvunwrap_ptex_min_res": [
+                1280,
+                1280
+            ],
+            "uvunwrap_ptex_rel_scale": false,
+            "uvunwrap_ptex_scale": 1,
+            "uvunwrap_ptex_small_pct": 0,
+            "uvunwrap_texture_tile": -1,
+            "uvunwrap_type": "UDIM",
+            "version": [
+                20,
+                5,
+                278
+            ],
+            "volumecomponents": [
+                "volume"
+            ]
+        },
+        "render_stage": 5,
+        "render_stage_label": "Converged",
+        "resolution": [
+            1280,
+            720
+        ],
+        "shader_calls": {
+            "displacement": 0,
+            "emission": 0,
+            "light": 0,
+            "opacity": 0,
+            "surface": 0,
+            "volume": 0
+        },
+        "shader_nodes": {
+            "cpu_shaders": {
+                "total": 2,
+                "unique": 2
+            },
+            "largest_shader": 78,
+            "nodes": {
+                "total": 1958,
+                "unique": 1942
+            },
+            "shader_function_errors": 0,
+            "shader_functions": 1,
+            "shaders": {
+                "total": 212,
+                "unique": 209
+            },
+            "usd_preview_shaders": 0
+        },
+        "system_memory": {
+            "current": 2932297728,
+            "peak": 2932297728
+        },
+        "system_time": {
+            "cpu": 2.45999999999999996,
+            "sys": 3.64999999999999991,
+            "totaltime": 12.609,
+            "wallclock": 8.06365800000000021
+        },
+        "threads": 16,
+        "timings": {
+            "Dicing": 0,
+            "Filtering": 0,
+            "Indirect rays": 0,
+            "Lighting": 0,
+            "Primary rays": 0,
+            "SSS samples": 0,
+            "Shading": 0,
+            "Shadows": 0,
+            "Unaccounted": 0
+        },
+        "ttfp": 2.20274400000000004,
+        "unified_cache": {
+            "memory_limit": 17141071872,
+            "memory_used": 2097150,
+            "usage": {
+                "TBF Texture": {
+                    "faults": 288,
+                    "generated": 2097150,
+                    "in_cache": 2097150,
+                    "item_size": 7281
+                }
+            }
+        },
+        "username": "hoske",
+        "world_to_camera": [
+            0.859253227710723877,
+            0.130482852458953857,
+            0.49462929368019104,
+            0,
+            -7.45058059692382812e-09,
+            0.966921728104352951,
+            -0.255073279142379761,
+            0,
+            0.511550486087799072,
+            -0.219172537326812744,
+            -0.830830618739128113,
+            0,
+            -0.0164858945898753717,
+            -0.487272408706902915,
+            8.77350120471163564,
+            1
+        ],
+        "world_to_ndc": [
+            2.29754908851400907,
+            0.800809093788996451,
+            0.494629788309979335,
+            0.49462929368019104,
+            -0.12753665734876285,
+            3.97404297073314794,
+            -0.255073534215914,
+            -0.255073279142379761,
+            0.805177632744266569,
+            -1.34512201065625181,
+            -0.83083144957057764,
+            -0.830830618739128113,
+            4.34741417881974357,
+            2.31979262827622223,
+            7.77350897822061437,
+            8.77350120471163564
+        ],
+        "world_to_raster": [
+            2940.8628332979315,
+            -220.449456078339892,
+            0.494629788309979335,
+            0.49462929368019104,
+            -163.246921406416448,
+            -3044.96369991038,
+            -0.255073534215914,
+            -0.255073279142379761,
+            1030.62736991266115,
+            370.289802180329048,
+            -0.83083144957057764,
+            -0.830830618739128113,
+            5564.69014888927177,
+            4646.6701750334978,
+            7.77350897822061437,
+            8.77350120471163564
+        ],
+        "world_to_screen": [
+            4.10046888334782711,
+            1.10698889389780186,
+            0.494629788309979335,
+            0.49462929368019104,
+            -3.55551459282344288e-08,
+            8.20315922060867564,
+            -0.255073534215914,
+            -0.255073279142379761,
+            2.44118588422766125,
+            -1.85941340257337551,
+            -0.83083144957057764,
+            -0.830830618739128113,
+            -0.0786728470721490547,
+            -4.13391594815919117,
+            7.77350897822061437,
+            8.77350120471163564
+        ],
+        "xpu_compiles": {
+            "active": 0,
+            "avg_time": 0.00348028571428571441,
+            "count": 7,
+            "interrupted": 0,
+            "max_time": 0.0079030000000000003
+        },
+        "xpu_device_count": 2,
+        "xpu_devices": [
+            {
+                "xpu_device_contrib": 83.59375,
+                "xpu_device_error": "",
+                "xpu_device_label": "NVIDIA GeForce RTX 3070 Laptop GPU",
+                "xpu_device_memory": {
+                    "geometry": 2693376,
+                    "host": 208304132,
+                    "other": 209227640,
+                    "peak_geometry": 4501504,
+                    "peak_host": 208304140,
+                    "peak_other": 209227640,
+                    "peak_texture": 67110656,
+                    "peak_used": 280840628,
+                    "peak_volume": 0,
+                    "texture": 67110656,
+                    "used": 279032500,
+                    "volume": 0
+                },
+                "xpu_device_samples": 107,
+                "xpu_device_status": "idle",
+                "xpu_device_type": "Optix"
+            },
+            {
+                "xpu_device_contrib": 16.40625,
+                "xpu_device_error": "",
+                "xpu_device_label": "Embree CPU device",
+                "xpu_device_memory": {
+                    "geometry": 0,
+                    "host": 211723408,
+                    "other": 0,
+                    "peak_geometry": 0,
+                    "peak_host": 212770832,
+                    "peak_other": 0,
+                    "peak_texture": 0,
+                    "peak_used": 0,
+                    "peak_volume": 0,
+                    "texture": 0,
+                    "used": 0,
+                    "volume": 0
+                },
+                "xpu_device_samples": 21,
+                "xpu_device_status": "idle",
+                "xpu_device_type": "EmbreeCPU"
+            }
+        ]
+    }', 'husk:usd_file': b'C:/Users/hoske/AppData/Local/Temp/houdini_temp/usd_renders/usdrender_18172_242_2/__render__.usdnc', 'husk:usd_file_load_time': 0.4115000069141388, 'husk:usd_file_stats': b'{
+        "assetCount": 1,
+        "instancedModelCount": 0,
+        "modelCount": 1,
+        "primary": {
+            "primCounts": {
+                "activePrimCount": 28,
+                "inactivePrimCount": 0,
+                "instanceCount": 0,
+                "pureOverCount": 0,
+                "totalPrimCount": 28
+            },
+            "primCountsByType": {
+                "Camera": 1,
+                "DomeLight": 1,
+                "HoudiniLayerInfo": 1,
+                "Material": 1,
+                "Mesh": 1,
+                "NodeGraph": 1,
+                "RenderProduct": 1,
+                "RenderSettings": 1,
+                "RenderVar": 7,
+                "Scope": 5,
+                "Shader": 5,
+                "Xform": 3
+            }
+        },
+        "prototypeCount": 0,
+        "totalInstanceCount": 0,
+        "totalPrimCount": 28,
+        "usedLayerCount": 5
+    }', 'lineOrder': INCREASING_Y, 'name': b'C', 'oiio:ColorSpace': b'Linear', 'owner': b'', 'pixelAspectRatio': 1.0, 'renderMemory': None, 'renderMemory_s': b'2.73 GB', 'renderTime': None, 'renderTime_s': b'0: 00: 08.06', 'screenWindowCenter': (0.0,
+    0.0), 'screenWindowWidth': 1.0, 'type': b'scanlineimage', 'typeSemantics': b'color', 'worldToCamera': None, 'worldToCamera_d': None, 'worldToNDC': None, 'worldToNDC_d': None
+}
+dict_keys(['A', 'B', 'G', 'R'
+])
