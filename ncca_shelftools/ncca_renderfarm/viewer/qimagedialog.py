@@ -31,11 +31,10 @@ class QImageDialog(QDialog):
         channel_row_widget.setLayout(channel_row)
 
         self.channels = QComboBox()
-        self.channels.addItems(get_base_channels(image_path))
-        self.channels.setCurrentText("RGBA")
+        self.channels.addItems(self.get_base_channels(image_path))
 
         self.color_channels = QComboBox()
-        self.color_channels.addItems(get_color_channels(image_path, self.channels.currentText()))
+        self.color_channels.addItems(self.get_color_channels(image_path, self.channels.currentText()))
         self.color_channels.setCurrentText("Combined")
 
         channel_row.addWidget(self.color_channels)
@@ -54,16 +53,21 @@ class QImageDialog(QDialog):
         # Load and display image
         self.load_image(image_path, self.channels.currentText(), self.color_channels.currentText())  # Call the method to load and display the image
 
-    def load_image(self, image_path, channel=None, color_channel="RGBA"):
+    def load_image(self, image_path, channel=None, color_channel=None):
         """
         Load the image from the specified path and display it in the dialog.
         """
         file_name_without_ext, file_ext = os.path.splitext(os.path.basename(image_path))  # Split filename and extension
 
+        if color_channel == "Combined":
+            channel = channel.split(".")[0]
+        else:
+            channel = color_channel
+
         if (file_ext.lower() in SUPPORTED_EXR_IMAGE_FORMATS):
             alt_file_name = file_name_without_ext + ".png"  # Generate alternative PNG file name
             alt_file_path = os.path.join(os.path.dirname(image_path), alt_file_name)  # Create alternative file path
-            exr_to_png(image_path, alt_file_path, channel, color_channel)  # Convert EXR to PNG
+            exr_to_png(image_path, alt_file_path, channel)  # Convert EXR to PNG
             image_path = alt_file_path  # Update temporary file path to PNG
 
         pixmap = QPixmap(image_path)
@@ -75,7 +79,7 @@ class QImageDialog(QDialog):
     
     def on_channel_change(self, index):
         self.color_channels.clear()
-        self.color_channels.addItems(get_color_channels(self.raw_image_path, self.channels.currentText()))
+        self.color_channels.addItems(self.get_color_channels(self.raw_image_path, self.channels.currentText()))
         self.color_channels.setCurrentText("Combined")
 
     def on_color_channel_change(self, index):
@@ -84,4 +88,12 @@ class QImageDialog(QDialog):
         """
         self.load_image(self.raw_image_path, self.channels.currentText(), self.color_channels.currentText())
 
+
+    def get_base_channels(self, image_path):
+        return list(get_channels(image_path)["channels"].keys())
+    
+    def get_color_channels(self, image_path, channel):
+        color_channels = get_channels(image_path)["channels"][channel]
+        color_channels.insert(0, "Combined")
+        return color_channels
     
