@@ -2,130 +2,161 @@
 # It also contains all the SFTP functions needed for the renderfarm as well as EXR to PNG conversion.
 
 from config import * 
-from PySide2 import QtWidgets
-from PySide2.QtGui import QImage
 from .modules import *
-from PySide2.QtGui import QPixmap
 
-def linear_to_srgb(linear_value):
-    """Convert a linear RGB value to sRGB."""
-    if linear_value <= 0.0031308:
-        return 12.92 * linear_value
+def get_base_channels(exr_file):
+    install(["OpenEXR"])
+    import OpenEXR
+    """
+    Get all base channels available in the EXR file, with special handling for color channels.
+    
+    Parameters:
+    - exr_file: Path to the input EXR file.
+    
+    Returns:
+    - A dictionary mapping base channel names to their types ('RGBA', 'RGB', or 'Unknown').
+    """
+    file = OpenEXR.InputFile(exr_file)
+    all_channels = file.header()['channels'].keys()
+    file.close()
+    
+    # Dictionary to store base channels and their types
+    base_channels = ["RGBA"]
+
+    # Iterate over all channels to find base names
+    for ch in all_channels:
+        if '.' in ch:
+            base_name = ch.split('.')[0]
+            if base_name not in base_channels:
+                base_channels.append(base_name)
+    
+    
+    return base_channels
+
+def get_color_channels(exr_file, base_channel):
+    install(["OpenEXR"])
+    import OpenEXR
+    """
+    Get all color channels (e.g., '.R', '.G', '.B', '.A') for a specified base channel.
+    
+    Parameters:
+    - exr_file: Path to the input EXR file.
+    - base_channel: The base channel name (e.g., 'specular', 'RGB', 'RGBA').
+    
+    Returns:
+    - A list of color channels for the specified base channel.
+    """
+    file = OpenEXR.InputFile(exr_file)
+    all_channels = file.header()['channels'].keys()
+    file.close()
+    
+    # Get color channels associated with the base channel
+    if base_channel in ["RGBA"]:
+        color_channels = [ch for ch in all_channels if '.' not in ch]
     else:
-        return 1.055 * (linear_value ** (1.0 / 2.4)) - 0.055
+        color_channels = [ch.split(".")[1] for ch in all_channels if ch.startswith(f"{base_channel}.")]
+    
+    color_channels.insert(0, "Combined")
 
-def exr_to_png(exr_path, png_path, channel=None):
+    return color_channels
+
+def exr_to_png(exr_file, png_file, channel=None, color_channel=None):
     install(["OpenEXR", "Imath", "numpy", "Pillow"])
-    import OpenEXR, Imath 
+    import OpenEXR, Imath
     import numpy as np
-    from PIL import Image 
+    from PIL import Image
+    """
+    Convert an EXR file to PNG based on specified channel and color channel.
+    
+    Parameters:
+    - exr_file: Path to the input EXR file.
+    - png_file: Path to the output PNG file.
+    - channel: Base name of the channel (e.g., 'specular').
+    - color_channel: Specific color channel (e.g., 'R', 'G', 'B', 'A'). If None or 'RGBA', handle accordingly.
+    """
     # Open the EXR file
-
-    try:
-        exr_file = OpenEXR.InputFile(exr_path)
-    except Exception as e:
-        print(f"Failed to open {exr_path}: ", e)
-        return
-
-    # Get the data window to determine the size of the image
-    header = exr_file.header()
-    dw = header['dataWindow']
-    width = dw.max.x - dw.min.x + 1
-    height = dw.max.y - dw.min.y + 1
-
-    # Define the channel names for the RGB and Alpha channels
-    channels = ['R', 'G', 'B', 'A']
-
-    # Check if alpha channel is present in the EXR file
-    has_alpha = 'A' in header['channels']
-
-    # Read the data for each channel
-    channel_data = []
-    for channel in channels:
-        if channel == 'A' and not has_alpha:
-            # Create a fully opaque alpha channel if it doesn't exist
-            ch_np = np.ones((height, width), dtype=np.float32)
-        else:
-            # Read the channel data as a string of floats
-            ch_str = exr_file.channel(channel, Imath.PixelType(Imath.PixelType.FLOAT))
+    file = OpenEXR.InputFile(exr_file)
+    header = file.header()
+    all_channels = header['channels'].keys()
+    
+    # Determine the full channel name
+    if channel and color_channel:
+        full_channel = ""
+        if color_channel != "Combined":
+            full_channel = f"{channel}.{color_channel}"
             
-            # Convert the string to a numpy array and reshape it
-            ch_np = np.frombuffer(ch_str, dtype=np.float32).reshape((height, width))
+            if (channel=="RGBA"):
+                full_channel = color_channel
         
-        channel_data.append(ch_np)
-
-    # Stack the channels to form an RGBA image
-    r, g, b = channel_data[:3]
-    if has_alpha:
-        a = channel_data[3]
     else:
-        a = np.ones_like(r, dtype=np.float32)
+        full_channel = channel if channel in all_channels else None
 
-    # Convert linear RGB to sRGB
-    r_srgb = np.vectorize(linear_to_srgb)(r)
-    g_srgb = np.vectorize(linear_to_srgb)(g)
-    b_srgb = np.vectorize(linear_to_srgb)(b)
+    if not full_channel and channel:
+        # Handle case where channel is provided but no color_channel is specified
+        for ch in all_channels:
+            if ch.startswith(f"{channel}."):
+                full_channel = ch
+                break
 
-    # Normalize to the range 0-255
-    r_srgb = np.clip(r_srgb * 255, 0, 255).astype(np.uint8)
-    g_srgb = np.clip(g_srgb * 255, 0, 255).astype(np.uint8)
-    b_srgb = np.clip(b_srgb * 255, 0, 255).astype(np.uint8)
-    a = np.clip(a * 255, 0, 255).astype(np.uint8)
+    if full_channel and full_channel not in all_channels:
+        raise ValueError(f"Channel '{full_channel}' not found in EXR file.")
 
-    # Combine into an RGBA image
-    rgba_image = np.stack((r_srgb, g_srgb, b_srgb, a), axis=-1)
+    if full_channel:
+        # Read and process the channel data
+        channel_data = np.frombuffer(file.channel(full_channel, Imath.PixelType(Imath.PixelType.FLOAT)), dtype=np.float32)
+        width = header['dataWindow'].max.x - header['dataWindow'].min.x + 1
+        height = header['dataWindow'].max.y - header['dataWindow'].min.y + 1
+        channel_data = np.reshape(channel_data, (height, width))
 
-    # Convert the numpy array to a PIL image and save it as PNG
-    image = Image.fromarray(rgba_image, 'RGBA')
-    image.save(png_path)
+        # Normalize the data to 0-255
+        channel_data = (channel_data - np.min(channel_data)) / (np.max(channel_data) - np.min(channel_data))
+        channel_data = (channel_data * 255).astype(np.uint8)
 
-def get_exr_channels(image_path):
-    return ["Beauty"]
+        # Create and save the image
+        img = Image.fromarray(channel_data, 'L')
+        img.save(png_file)
 
-def isolate_channel_to_qpixmap(image_path, channel="RGBA"):
-    install(["opencv-python", "numpy"])
-    import cv2
-    import numpy as np
-    # Read the image using OpenCV
-    image = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
-    
-    if image is None:
-        raise ValueError(f"Unable to load image from path: {image_path}")
-    
-    # Determine if the image is RGB or RGBA
-    if len(image.shape) == 3:
-        if image.shape[2] == 3:  # RGB image
-            b, g, r = cv2.split(image)
-            alpha = None
-        elif image.shape[2] == 4:  # RGBA image
-            b, g, r, alpha = cv2.split(image)
+    elif channel:
+        # Handle case where channel is specified but no color_channel is provided
+        color_channels = ['R', 'G', 'B', 'A']
+        combined_image = None
+
+        for color in color_channels:
+            chan = color
+            if channel != "RGBA":
+                chan = f"{channel}.{color}"
+                
+            if chan in all_channels:
+                color_data = np.frombuffer(file.channel(chan, Imath.PixelType(Imath.PixelType.FLOAT)), dtype=np.float32)
+                width = header['dataWindow'].max.x - header['dataWindow'].min.x + 1
+                height = header['dataWindow'].max.y - header['dataWindow'].min.y + 1
+                color_data = np.reshape(color_data, (height, width))
+                
+                # Normalize the data to 0-255
+                color_data = (color_data - np.min(color_data)) / (np.max(color_data) - np.min(color_data))
+                color_data = (color_data * 255).astype(np.uint8)
+
+                if combined_image is None:
+                    combined_image = np.zeros((height, width, len(color_channels)), dtype=np.uint8)
+
+                # Assign the color channel data
+                idx = color_channels.index(color)
+                combined_image[:, :, idx] = color_data
+
+        if combined_image is not None:
+            # Check if the alpha channel was included
+            if 'A' not in all_channels:
+                # Set default alpha channel to fully opaque
+                combined_image[:, :, 3] = 255
+            
+            # Save the image
+            img_mode = 'RGBA' if 'A' in all_channels else 'RGB'
+            img = Image.fromarray(combined_image, img_mode)
+            img.save(png_file)
         else:
-            raise ValueError("Unsupported image format")
+            raise ValueError(f"No valid color channels found for '{channel}' in EXR file.")
     else:
-        raise ValueError("Image does not have channels")
+        raise ValueError("Either 'channel' or 'color_channel' must be specified.")
 
-    
-    # Isolate the requested channel
-    if channel == "Image":
-        return QPixmap(image_path)
-    elif channel == "Red":
-        isolated_image = cv2.merge([r, r, r])
-    elif channel == "Green":
-        isolated_image = cv2.merge([g, g, g])
-    elif channel == "Blue":
-        isolated_image = cv2.merge([b, b, b])
-    elif channel == "Alpha":
-        if alpha is not None:
-            isolated_image = cv2.merge([alpha, alpha, alpha])
-        else:
-            fully_opaque_alpha = np.full_like(image[..., 0], 255)
-            isolated_image = cv2.merge([fully_opaque_alpha, fully_opaque_alpha, fully_opaque_alpha])
-    else:
-        isolated_image = np.zeros_like(image)
-    
-    # Convert to QImage and QPixmap
-    height, width = isolated_image.shape[:2]
-    bytes_per_line = 3 * width
-    qimg = QImage(isolated_image.data, width, height, bytes_per_line, QImage.Format_BGR888)
-    
-    return QPixmap.fromImage(qimg)
+    # Close the EXR file
+    file.close()

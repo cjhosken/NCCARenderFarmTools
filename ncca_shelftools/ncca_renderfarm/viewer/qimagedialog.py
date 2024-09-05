@@ -2,6 +2,7 @@
 
 from PySide2.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QLabel, QComboBox, QWidget
 from PySide2.QtCore import Qt 
+from PySide2.QtGui import QPixmap
 from config import * 
 from utils import *
 
@@ -29,14 +30,16 @@ class QImageDialog(QDialog):
         channel_row_widget = QWidget()
         channel_row_widget.setLayout(channel_row)
 
-        self.color_channels = QComboBox()
-        self.color_channels.addItems(["Image", "Red", "Green", "Blue", "Alpha"])
-
         self.channels = QComboBox()
-        self.channels.addItems(get_exr_channels(image_path))
+        self.channels.addItems(get_base_channels(image_path))
+        self.channels.setCurrentText("RGBA")
+
+        self.color_channels = QComboBox()
+        self.color_channels.addItems(get_color_channels(image_path, self.channels.currentText()))
+        self.color_channels.setCurrentText("Combined")
 
         channel_row.addWidget(self.color_channels)
-        #channel_row.addWidget(self.channels) Commented out for the time being, as it doesnt work properly yet
+        channel_row.addWidget(self.channels)
 
         layout.addWidget(channel_row_widget)
 
@@ -45,7 +48,7 @@ class QImageDialog(QDialog):
         self.image_label.setAlignment(Qt.AlignCenter)  # Center-align the image within the label
         layout.addWidget(self.image_label)  # Add the image label to the layout
 
-        self.color_channels.currentIndexChanged.connect(self.on_channel_change)
+        self.color_channels.currentIndexChanged.connect(self.on_color_channel_change)
         self.channels.currentIndexChanged.connect(self.on_channel_change)
         
         # Load and display image
@@ -60,18 +63,22 @@ class QImageDialog(QDialog):
         if (file_ext.lower() in SUPPORTED_EXR_IMAGE_FORMATS):
             alt_file_name = file_name_without_ext + ".png"  # Generate alternative PNG file name
             alt_file_path = os.path.join(os.path.dirname(image_path), alt_file_name)  # Create alternative file path
-            exr_to_png(image_path, alt_file_path, channel)  # Convert EXR to PNG
+            exr_to_png(image_path, alt_file_path, channel, color_channel)  # Convert EXR to PNG
             image_path = alt_file_path  # Update temporary file path to PNG
 
         pixmap = QPixmap(image_path)
 
         if not pixmap.isNull():  # Check if the QPixmap was successfully loaded
-            pixmap = isolate_channel_to_qpixmap(image_path, color_channel)
             self.image_label.setPixmap(pixmap.scaledToWidth(800))  # Scale the image to fit within 800 pixels width
         else:
             self.image_label.setText(IMAGE_ERROR.get("message").replace(image_path))  # Display an error message if image loading fails
     
     def on_channel_change(self, index):
+        self.color_channels.clear()
+        self.color_channels.addItems(get_color_channels(self.raw_image_path, self.channels.currentText()))
+        self.color_channels.setCurrentText("Combined")
+
+    def on_color_channel_change(self, index):
         """
         Slot for handling changes in the selected channel.
         """
