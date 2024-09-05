@@ -144,11 +144,11 @@ def exr_to_png(exr_file, png_file, channel=None, color_channel=None):
     file.close()
 
 # Example usage
-exr_file = 'karma.exr'
+exr_file = 'blender.exr'
 png_file = 'output.png'
 
 print(get_base_channels(exr_file))
-print(get_color_channels(exr_file, "RGBA"))
+print(get_color_channels(exr_file, "normal"))
 
 # Convert EXR to PNG based on specified channel and color channel
 #exr_to_png(exr_file, png_file, channel="RGBA", color_channel='A')  # Convert 'specular.R' channel

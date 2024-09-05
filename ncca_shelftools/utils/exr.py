@@ -21,7 +21,7 @@ def get_base_channels(exr_file):
     file.close()
     
     # Dictionary to store base channels and their types
-    base_channels = ["RGBA"]
+    base_channels = ["Image"]
 
     # Iterate over all channels to find base names
     for ch in all_channels:
@@ -51,7 +51,7 @@ def get_color_channels(exr_file, base_channel):
     file.close()
     
     # Get color channels associated with the base channel
-    if base_channel in ["RGBA"]:
+    if base_channel not in all_channels:
         color_channels = [ch for ch in all_channels if '.' not in ch]
     else:
         color_channels = [ch.split(".")[1] for ch in all_channels if ch.startswith(f"{base_channel}.")]
@@ -85,7 +85,7 @@ def exr_to_png(exr_file, png_file, channel=None, color_channel=None):
         if color_channel != "Combined":
             full_channel = f"{channel}.{color_channel}"
             
-            if (channel=="RGBA"):
+            if (channel=="Image"):
                 full_channel = color_channel
         
     else:
@@ -123,7 +123,7 @@ def exr_to_png(exr_file, png_file, channel=None, color_channel=None):
 
         for color in color_channels:
             chan = color
-            if channel != "RGBA":
+            if channel != "Image":
                 chan = f"{channel}.{color}"
                 
             if chan in all_channels:
