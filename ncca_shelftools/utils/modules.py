@@ -42,8 +42,8 @@ def install(packages):
                     installed_packages.append(package)
 
                     try:
-                        if package in sys.modules:
-                            del sys.modules[package]
+                        #if package in sys.modules:
+                        #    del sys.modules[package]
                         importlib.invalidate_caches()
                         importlib.import_module(package)
                     except ImportError as e:

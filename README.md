@@ -7,10 +7,12 @@ The NCCA RenderFarm Tools provide seamless integration with the NCCA Renderfarm,
   - Maya Software Render
   - ~~Arnold (CPU)~~ (Watermarked)
   - ~~VRay (CPU)~~ (License Issues)
+  - ~~Renderman~~ (Untested) 
 
 - **Houdini**
   - Mantra
   - Karma (CPU)
+  - ~~Arnold~~ (Untested)
 
 ## Installation
 
@@ -21,7 +23,7 @@ To install the shelf tools:
    - **Linux**: `linux_setup.sh`
    - **Windows**: `windows_setup.sh`
 
-The tools will be installed across all Houdini and Maya distributions on your system.
+The tools will be installed across all Houdini and Maya distributions on your system. To use the tool properly on Wndows, you'll need to launch the Qube Client from Apps Anywhere.
 
 ## Usage
 
