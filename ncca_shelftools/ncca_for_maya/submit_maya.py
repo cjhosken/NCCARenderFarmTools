@@ -61,7 +61,6 @@ class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         self.output_filename.setToolTip(NCCA_MAYASUBMIT_OUTPUT_TOOLTIP)
         self.gridLayout.addWidget(self.output_filename, 4, 1, 1, 5)
 
-
         label = QtWidgets.QLabel(NCCA_MAYASUBMIT_EXTRA_LABEL)
         self.gridLayout.addWidget(label, 5, 0, 1, 1)
         self.extra_commands = QtWidgets.QLineEdit()
