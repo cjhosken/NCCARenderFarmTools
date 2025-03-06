@@ -23,8 +23,6 @@ To install the shelf tools:
 
 The tools will be installed across all Houdini and Maya distributions on your system.
 
-> **Note:** If you're using Houdini on Windows, you must run the setup script each time you install Houdini via Apps Anywhere.
-
 ## Usage
 
 ### Overview

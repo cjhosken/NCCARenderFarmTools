@@ -129,7 +129,7 @@ class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         if (used_renderer == "vray"):
             use_gpu = cmds.getAttr("vraySettings.productionEngine") > 0
             render_options += f" -pad {frame_padding}" if frame_padding else ""
-        elif used_renderer == "arnold":
+        elif (used_renderer == "arnold"):
             # Check if the defaultArnoldRenderOptions node exists
             if not cmds.objExists("defaultArnoldRenderOptions"):
                 cmds.createNode("aiOptions", name="defaultArnoldRenderOptions")
@@ -143,6 +143,14 @@ class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
 
             render_options += f" -fnc {frame_number_format}" if frame_number_format else ""
             render_options += f" -pad {frame_padding}" if frame_padding else ""
+        elif (used_renderer == "renderman"):
+            renderer_type = cmds.getAttr("rmanGlobals.renderVariant")                           
+          
+            
+            if renderer_type == "xpu": # If RenderMan is using XPU
+                xpuMode = cmds.getAttr("rmanGlobals.xpuMode")[0]  
+                use_gpu = xpuMode[1]
+        
         else:
             pass
 
@@ -231,4 +239,4 @@ def main():
             dialog = Maya_RenderFarmSubmitDialog(info=login_info, parent=main_window)
             dialog.show()
     else:
-        QtWidgets.QMessageBox.warning(None, QUBE_PY_ERROR.get("title"), QUBE_PY_ERROR.get("message"))
+        QtWidgets.QMessageBox.warning(None, QUBE_PY_ERROR.get("title"), QUBE_PY_ERROR.get("message").format("Qube not installed!"))

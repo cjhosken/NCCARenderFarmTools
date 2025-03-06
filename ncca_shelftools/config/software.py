@@ -21,7 +21,8 @@ MAYA_RENDERERS = {
     "Set by file": "file",
     "Arnold": "arnold",
     "VRay": "vray",
-    "Maya Software": "sw"
+    "Maya Software": "sw",
+    "Renderman": "renderman"
 }
 
 # All available file extensions that Maya can render

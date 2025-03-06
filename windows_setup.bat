@@ -9,18 +9,16 @@ REM Determine the script directory and cd to it
 set SCRIPT_DIR=%~dp0
 cd %SCRIPT_DIR%
 
-REM Set variables (adjust paths as needed)
-set NCCA_DIR="%USERPROFILE%\.ncca"
-set MAYA_BASE_PATH="%USERPROFILE%\Documents\maya"
-set HOUDINI_SHELF_BASE_PATH="%USERPROFILE%\Documents"
-
-
 REM The home directory is different on the NCCA Lab Machines.
 REM The reason we dont set the paths immediately is so that users can develop on their home machines.
 IF DEFINED HOMESHARE (
-    set NCCA_DIR="%HOMESHARE%\.ncca"
-    set MAYA_BASE_PATH="%HOMESHARE%\Maya"
-    set HOUDINI_SHELF_BASE_PATH="%HOMESHARE%"
+    set NCCA_DIR=%HOMESHARE%\.ncca
+    set MAYA_BASE_PATH=%HOMESHARE%\Maya
+    set HOUDINI_SHELF_BASE_PATH=%HOMESHARE%
+) ELSE (
+    echo "Could not find The H:/ Drive! Quitting..."
+    endlocal
+    pause > nul
 )
 
 REM Create NCCA_DIR if it doesn't exist
@@ -37,28 +35,17 @@ if exist "%ncca_shelftools_dir%" (
 REM Copy 'ncca_shelftools' directory to NCCA_DIR
 xcopy /e /i .\ncca_shelftools "%ncca_shelftools_dir%"
 
-
 REM Iterate over Maya versions and copy shelf files
 for /d %%d in ("%MAYA_BASE_PATH%\*") do (
     set "MAYA_VERSION=%%~nd"
-    IF DEFINED HOMESHARE (
-        if exist "%%d\Projects\!MAYA_VERSION!\Prefs\shelves" (
-            echo Copying to Maya directory: %%d
-            if exist "%%d\Projects\!MAYA_VERSION!\Prefs\shelves\shelf_NCCA.mel" (
-                del "%%d\Projects\!MAYA_VERSION!\Prefs\shelves\shelf_NCCA.mel"
-            )
+
+    if exist "%MAYA_BASE_PATH%\!MAYA_VERSION!\Prefs\shelves" (
+        echo Copying to Maya directory: %MAYA_BASE_PATH%\!MAYA_VERSION!\Prefs\shelves
+        if exist "%MAYA_BASE_PATH%\!MAYA_VERSION!\Prefs\shelves\shelf_NCCA.mel" (
+            del "%MAYA_BASE_PATH%\!MAYA_VERSION!\Prefs\shelves\shelf_NCCA.mel"
+        )
     
-            copy "%ncca_shelftools_dir%\ncca_for_maya\shelf_NCCA.mel" "%%d\Projects\!MAYA_VERSION!\Prefs\shelves\shelf_NCCA.mel"
-        )
-    ) ELSE (
-        if exist "%%d\prefs\shelves" (
-            echo Copying to Maya directory: %%d
-            if exist "%%d\prefs\shelves\shelf_NCCA.mel" (
-                del "%%d\prefs\shelves\shelf_NCCA.mel"
-            )
-            
-            copy "%ncca_shelftools_dir%\ncca_for_maya\shelf_NCCA.mel" "%%d\prefs\shelves\shelf_NCCA.mel"
-        )
+        copy "%ncca_shelftools_dir%\ncca_for_maya\shelf_NCCA.mel" "%MAYA_BASE_PATH%\!MAYA_VERSION!\Prefs\shelves\shelf_NCCA.mel"
     )
 )
 
