@@ -99,9 +99,6 @@ class RenderFarmSubmitDialog(QMainWindow):
 
         local_project_dir = self.project_path.text()
         remote_project_dir = os.path.join("/home", self.username, "farm", "projects", self.project_name.text()).replace("\\", "/")
-        
-        print(local_project_dir)
-        print(remote_project_dir)
 
         if (sftp_exists(self.sftp, remote_project_dir)):
             if self.confirm_override(self.project_name.text()):
@@ -109,7 +106,7 @@ class RenderFarmSubmitDialog(QMainWindow):
             else:
                 return
 
-        sftp_upload(self.sftp, local_project_dir, remote_project_dir)
+        sftp_upload(self.sftp, local_project_dir, remote_project_dir, ignore=["backup"])
         # Submit the job
 
         frame_range=f"{self.start_frame.value()}-{self.end_frame.value()}x{self.by_frame.value()}"
@@ -120,9 +117,7 @@ class RenderFarmSubmitDialog(QMainWindow):
             import qb
         except Exception as e: 
             traceback_info = traceback.format_exc()
-            print(traceback_info)
-            print(e)
-            QtWidgets.QMessageBox.warning(None, QUBE_PY_ERROR.get("title"), QUBE_PY_ERROR.get("message").format(traceback_info + e))
+            QtWidgets.QMessageBox.warning(None, QUBE_PY_ERROR.get("title"), QUBE_PY_ERROR.get("message").format(str(traceback_info) + str(e)))
             self.close()
             return
 

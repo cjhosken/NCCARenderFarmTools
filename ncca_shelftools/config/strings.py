@@ -5,7 +5,7 @@
 
 NCCA_ERROR = {
     "title" : "NCCA Error",
-    "message" : "Uh oh! An error occured. Please report a bug or contact the NCCA admin if this issue persists. {}"
+    "message" : "Uh oh! An error occured. Please report a bug or contact the NCCA admin if this issue persists. \n\n Error: {}"
 }
 
 NCCA_INVALID_LOGIN_ERROR = {
@@ -25,7 +25,7 @@ QUBE_EXE_ERROR = {
 
 QUBE_PY_ERROR = {
     "title" : "Qb Error",
-    "message" : "Qb could not be found! Make sure that you have installed Qube from Apps Anywhere. If you are on Linux, or this issue continues to occur, please report a bug or contact the NCCA admin." 
+    "message" : "Qb could not be found! Make sure that you have installed Qube from Apps Anywhere. If you are on Linux, or this issue continues to occur, please report a bug or contact the NCCA admin. \n\nError: {}" 
 }
 
 IMAGE_ERROR = {
@@ -38,7 +38,7 @@ IMAGE_ERROR = {
 
 NCCA_SUBMIT_MESSAGE = {
     "title" : "NCCA",
-    "message" : "'{}' has been successfully added to the NCCA Renderfarm! \nID: {}"
+    "message" : "'{}' has been successfully added to the NCCA Renderfarm! \n\nID: {}"
 }
 
 OVERRIDE_DIALOG = {

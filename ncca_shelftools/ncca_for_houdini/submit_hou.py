@@ -1,6 +1,7 @@
 # The Houdini submit dialog allows users to submit jobs to the NCCA renderfarm from a Houdini client.
 
 import hou
+import re
 from PySide2 import QtCore, QtWidgets
 
 from config import *
@@ -13,11 +14,11 @@ class Houdini_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         super().__init__(NCCA_HOUSUBMIT_DIALOG_TITLE, info, parent)
         # Move to Build mode
         # Set the GUI components and layout
-        name=hou.hipFile.basename()
+        name=hou.hipFile.basename().replace(".", "_")
         frames=hou.playbar.frameRange()
 
         self.project_name.setText(f"{self.user}_{name}")
-        self.project_path.setText(str(hou.getenv("JOB")))
+        self.project_path.setText(str(hou.getenv("HIP")))
 
         self.start_frame.setValue(frames[0])
         self.start_frame.setRange(frames[0], frames[1])
@@ -52,14 +53,12 @@ class Houdini_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
 
         rop = hou.node(self.output_driver.text())
 
-        #print(rop.type().name())
-
         if rop.type().name() == "usdrender_rop":
             if rop.parm("renderer").eval() == "BRAY_HdKarmaXPU":
                 QtWidgets.QMessageBox.warning(self, "GPU Unsupported!", "XPU Rendering is not supported on the render farm. This is because the renderfarm has no GPUs.")
                 self.close()
                 return
-            elif rop.parm("renderer").eval() == "HdArnoldRendererPlugin":
+            if rop.parm("renderer").eval() == "HdArnoldRendererPlugin":
                 QtWidgets.QMessageBox.warning(self, "Arnold Unsupported!", "Arnold Rendering is not supported on the render farm. Please use another render engine.")
                 self.close()
                 return
@@ -72,19 +71,32 @@ class Houdini_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         render_command += f" -d {rop}"
         render_command += f" {render_path}"
 
-        source_command = HOUDINI_ENVIRONMENT_VARIABLES.replace("%HOUDINI_VERSION%", houdini_version)
+        job_path = remote_project_dir
+
+        source_command = HOUDINI_ENVIRONMENT_VARIABLES.replace("%HOUDINI_VERSION%", houdini_version).replace("%HOUDINI_JOB_PATH%", job_path)
 
         full_command = f"{source_command} {pre_render} {render_command}"
 
-        #print(full_command)
-
         super().submit_project(command=full_command)
 
-    def select_project_path(self):
-        folder_path=hou.ui.selectFile(os.path.dirname(str(hou.getenv("JOB"))),NCCA_SUBMIT_PROJECTFOLDER_CAPTION,False,hou.fileType.Directory,"", os.path.basename(str(hou.getenv("JOB"))),False,False,hou.fileChooserMode.Write)
+    def select_project_path(self):        
+        folder_path=hou.ui.selectFile(
+            start_directory=os.path.dirname(str(hou.getenv("HIP"))),
+            title=NCCA_SUBMIT_PROJECTFOLDER_CAPTION,
+            file_type=hou.fileType.Directory,
+            chooser_mode=hou.fileChooserMode.Write
+        )
         self.raise_()
 
-        if folder_path != None:
+        if folder_path:
+            def replacer(match):
+                var_name = match.group(0)
+                env_var = var_name[1:]
+                value = hou.getenv(env_var)
+                return value if value else var_name
+            
+            folder_path = re.sub(r'\$[A-Za-z][A-Za-z0-9_]*', replacer, folder_path)
+
             self.project_path.setText(folder_path)
 
         self.check_for_submit()
@@ -94,7 +106,7 @@ class Houdini_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         # work around for weird bug where window hides behind main one
         self.raise_()            
 
-        if output is not None and hou.node(output).parmTuple("f") is not None:
+        if output and hou.node(output).parmTuple("f") is not None:
             self.output_driver.setText(output)
             frame_values=hou.node(output).parmTuple("f").eval()    
             
@@ -110,7 +122,7 @@ class Houdini_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         self.by_frame.setValue(min(max(1, self.by_frame.value()), self.end_frame.value() - self.start_frame.value()))
 
     def check_for_submit(self):
-        self.submit.setEnabled(self.output_driver.text() is not None and self.project_path.text() is not None)
+        self.submit.setEnabled(bool(self.output_driver.text()) and bool(self.project_path.text()))
 
 def main():
     if os.path.exists(QUBE_PYPATH.get(OPERATING_SYSTEM)):        

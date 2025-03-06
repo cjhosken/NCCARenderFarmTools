@@ -87,14 +87,16 @@ def sftp_download(sftp=None, remote_path="", local_path=""):
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
 
-def sftp_upload(sftp=None, local_path="", remote_path=""):
+def sftp_upload(sftp=None, local_path="", remote_path="", ignore=[]):
     """
-    Recursively upload a file or directory from the local machine to the remote SFTP server.
+    Recursively upload a file or directory from the local machine to the remote SFTP server,
+    with the option to ignore specific files or directories.
 
     Args:
     - sftp: SFTP connection object.
     - local_path (str): Path to the local file or directory.
     - remote_path (str): Path to save the uploaded file or directory on the remote server.
+    - ignore (list): List of filenames or directory names to ignore during the upload.
     """
     # Check if the local path is a directory
     if os.path.isdir(local_path):
@@ -110,11 +112,17 @@ def sftp_upload(sftp=None, local_path="", remote_path=""):
             local_item_path = os.path.join(local_path, item)
             remote_item_path = os.path.join(remote_path, item).replace("\\", "/")
 
+            # Skip the item if it is in the ignore list
+            if item in ignore:
+                continue
+
             # Recursively upload each file or directory
-            sftp_upload(sftp, local_item_path, remote_item_path)
+            sftp_upload(sftp, local_item_path, remote_item_path, ignore)
     else:
-        # Upload the file
-        sftp.put(local_path, remote_path)
+        # Upload the file if it is not in the ignore list
+        if os.path.basename(local_path) not in ignore:
+            sftp.put(local_path, remote_path)
+
 
 def sftp_delete(sftp, remote_path):
     """

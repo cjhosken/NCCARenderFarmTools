@@ -13,16 +13,21 @@ from utils import get_maya_window
 class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
     def __init__(self, info=None, parent=None):
         super().__init__(NCCA_MAYASUBMIT_DIALOG_TITLE, info, parent)
-        name = os.path.basename(cmds.file(q=True, sn=True))
+        name = os.path.basename(cmds.file(q=True, sn=True)).replace(".", "_")
 
         if (not name):
-            name = "untitled.ma"
+            name = "untitled_ma"
+
+        project_path = os.path.dirname(cmds.file(q=True, sn=True))
+        if (not project_path):
+            project_path = cmds.workspace(q=True, rootDirectory=True)
+
 
         min_frame = int(cmds.playbackOptions(q=True, min=True))
         max_frame = int(cmds.playbackOptions(q=True, max=True))
 
         self.project_name.setText(f"{self.user}_{name}")
-        self.project_path.setText(os.path.dirname(cmds.file(q=True, sn=True)))
+        self.project_path.setText(project_path)
 
         self.start_frame.setValue(min_frame)
         self.start_frame.setRange(min_frame, max_frame)
@@ -166,7 +171,7 @@ class Maya_RenderFarmSubmitDialog(RenderFarmSubmitDialog):
         super().submit_project(command)
 
     def check_for_submit(self):
-        self.submit.setEnabled(self.project_path.text() is not None)
+        self.submit.setEnabled(True if self.project_path.text() else False)
 
     def convert_render_path(self, render_path):
         # Define regular expressions to identify patterns
